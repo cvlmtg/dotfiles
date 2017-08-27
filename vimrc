@@ -143,8 +143,8 @@ endif
 " ----------------------------------------------------------------------
 
 if empty(glob(s:base . '/autoload/plug.vim'))
-    silent execute '!curl -fLo ' . s:base . '/autoload/plug.vim --create-dirs'
-          \ . 'https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
+    execute '!curl -fLso ' . s:base . '/autoload/plug.vim --create-dirs'
+          \ 'https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
     autocmd VimEnter * PlugInstall
 endif
 
