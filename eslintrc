@@ -1,0 +1,97 @@
+{
+  "parser": "babel-eslint",
+  "extends": "airbnb",
+  "rules": {
+    "no-multi-spaces": [ 2, { "exceptions": {
+      "AssignmentExpression": true,
+      "VariableDeclarator": true
+    } } ],
+    "key-spacing": [ 2, {
+      "beforeColon": false,
+      "afterColon": true,
+      "align": "value"
+    } ],
+    "one-var-declaration-per-line": [ 2, "initializations" ],
+    "one-var": [ 2, {
+      "uninitialized": "always",
+      "initialized": "never"
+    } ],
+    "react/forbid-prop-types": [1, { "forbid": [ 'any', 'array' ] } ],
+    "no-mixed-operators": [ 2, { "allowSamePrecedence": true } ],
+    "react/jsx-closing-bracket-location": [ 2, "after-props" ],
+    "import/extensions": [ 2, "never", { "json": "always" } ],
+    "react/prop-types": [ 2, { "ignore": [ "children" ] } ],
+    "import/first": [ 2, { "absolute-first": false } ],
+    "react/jsx-no-bind": [2, { "ignoreRefs": true } ],
+    "react/jsx-first-prop-new-line": [ 2, "never" ],
+    "no-param-reassign": [ 2, { "props": false } ],
+    "space-before-function-paren": [ 2, "never" ],
+    "array-bracket-spacing": [ 2, "always" ],
+    no-bitwise: [ 2, { "int32Hint": true } ],
+    "object-curly-spacing": [ 2, "always" ],
+    "dot-location": [ 2, "property" ],
+    "comma-dangle": [ 2, "never" ],
+    "jsx-a11y/href-no-hash": 0,
+    "no-prototype-builtins": 0,
+    "no-underscore-dangle": 0,
+    "no-restricted-syntax": [ 2,
+      "LabeledStatement",
+      "ForInStatement",
+      "WithStatement",
+      "error"
+    ],
+    "react/sort-comp": [1, {
+      order: [
+        'static-methods',
+        'lifecycle',
+        '/^on[A-Z].+$/',
+        'everything-else',
+        'rendering'
+      ],
+      groups: {
+        lifecycle: [
+          'displayName',
+          'propTypes',
+          'contextTypes',
+          'childContextTypes',
+          'mixins',
+          'statics',
+          'defaultProps',
+          'constructor',
+          'getDefaultProps',
+          'getInitialState',
+          'state',
+          'getChildContext',
+          '/^(shouldC|c)omponent.+$/'
+        ],
+        rendering: [
+          '/^(get|render)[A-Z].+$/',
+          'render'
+        ]
+      }
+    }],
+    "arrow-parens": 0,
+    "no-plusplus": 0,
+    "no-continue": 0,
+    "no-console": 0,
+    "strict": 0
+  },
+  "settings": {
+    "import/ignore": [ "node_modules", "\\.coffee$" ],
+    "import/resolver": {
+      "node": {
+        "extensions": [
+          ".js", ".jsx", ".cjsx", ".coffee"
+        ]
+      }
+    }
+  },
+  "globals": {
+    "PDFJS": true,
+    "l": true
+  },
+  "env": {
+    "browser": true,
+    "mocha": true
+  }
+}

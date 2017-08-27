@@ -1,0 +1,13 @@
+# Be 8 bit clean.
+set input-meta on
+set output-meta on
+
+#set editing-mode vi
+
+"\e[A": history-search-backward
+"\e[B": history-search-forward
+"\C-a": beginning-of-line
+"\C-e": end-of-line
+"\e[C": forward-char
+"\e[D": backward-char
+"\C-l": clear-screen

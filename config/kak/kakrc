@@ -1,0 +1,80 @@
+colorscheme zenburn
+
+set global tabstop 2
+set global indentwidth 2
+set global incsearch true
+set global aligntab false
+set global ui_options ncurses_set_title=false
+
+# delete previous word
+map global insert <c-w> '<a-;>:exec -draft bd<ret>'
+
+# show line numbers and matching chars
+hook global WinCreate .* %{addhl show_matching; addhl number_lines -relative -hlcursor}
+
+# use fzf with kak
+def fzf-file \
+  -docstring 'invoke fzf to open a file' \
+  -allow-override \
+  %{ %sh{
+    if [ -z "$TMUX" ]; then
+      echo echo only works inside tmux
+    else
+      if [ -d .git ]; then
+        FILE=`git ls-files . -co --exclude-standard | fzf-tmux -d 15`
+      else
+        RG=`which rg`
+
+        if [ -n "$RG" ]; then
+          FILE=`rg -l -g '' | fzf-tmux -d 15`
+        else
+          FILE=`ag -l -g '' | fzf-tmux -d 15`
+        fi
+      fi
+
+      if [ -n "$FILE" ]; then
+        echo edit ${FILE}
+      fi
+    fi
+}}
+
+def fzf-buffer \
+  -docstring 'invoke fzf to select a buffer' \
+  -allow-override \
+  %{ %sh{
+    if [ -z "$TMUX" ]; then
+      echo echo only works inside tmux
+    else
+      BUFFER=`echo ${kak_buflist} | tr : '\n' | fzf-tmux -d 15`
+      if [ -n "$BUFFER" ]; then
+        echo buffer ${BUFFER}
+      fi
+    fi
+}}
+
+map global user f :fzf-file<ret>
+map global user b :fzf-buffer<ret>
+
+# split window horizontally or vertically
+def split-window \
+  -docstring 'split the window horizontally or vertically' \
+  -allow-override \
+  -hidden \
+  %{
+    onkey z %{ %sh{
+      if [ "${kak_reg_z}" = "v" ]; then
+        if [ "$TERM_PROGRAM" = "iTerm.app" -a -z "$TMUX" ]; then
+          echo iterm-new-vertical
+        else
+          echo tmux-new-horizontal
+        fi
+      elif [ "${kak_reg_z}" = "s" ]; then
+        if [ "$TERM_PROGRAM" = "iTerm.app" -a -z "$TMUX" ]; then
+          echo iterm-new-horizontal
+        else
+          echo tmux-new-vertical
+        fi
+      fi
+}}}
+
+hook global NormalKey <c-w> split-window
