@@ -145,7 +145,7 @@ endif
 if empty(glob(s:base . '/autoload/plug.vim'))
     execute '!curl -fLso ' . s:base . '/autoload/plug.vim --create-dirs'
           \ 'https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
-    autocmd VimEnter * PlugInstall
+    autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
 endif
 
 call plug#begin()
