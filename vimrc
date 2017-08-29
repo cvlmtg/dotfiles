@@ -167,7 +167,7 @@ Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-surround'
 Plug 'wellle/targets.vim'
 Plug 'tpope/vim-repeat'
-Plug 'sareyko/neat.vim'
+Plug 'sareyko/neat.vim', { 'on': 'Neat' }
 Plug 'w0rp/ale'
 
 Plug 'mustache/vim-mustache-handlebars'
