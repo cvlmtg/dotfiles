@@ -7,6 +7,9 @@ if test $local_index -gt $usr_index
   set PATH /usr/local/bin $PATH
 end
 
+# per i pacchetti python installati con 'pip install --user'
+set PATH ~/Library/Python/2.7/bin/ $PATH
+
 # usiamo rbenv invece di rvm
 if test -d ~/.rbenv
   if test -d ~/.rbenv/bin
@@ -23,8 +26,10 @@ else
   set -x SHELL /usr/bin/fish
 end
 
-if not contains ~/bin $PATH
-  set PATH ~/bin $PATH
+if test -d ~/bin
+  if not contains ~/bin $PATH
+    set PATH ~/bin $PATH
+  end
 end
 
 # rimuoviamo il messaggio di benvenuto
