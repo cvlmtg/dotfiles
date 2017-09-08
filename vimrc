@@ -551,10 +551,6 @@ autocmd vimrc VimEnter * noremap Y y$
 function! s:SuperStar()
     let l:w='\<' . expand('<cword>') . '\>'
 
-    if &hlsearch == 1 && @/ ==# l:w
-      return ":set nohlsearch\<CR>"
-    end
-
     call histadd('/', l:w)
     let @/=l:w
     " http://stackoverflow.com/a/3766135
