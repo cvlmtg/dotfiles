@@ -8,7 +8,9 @@ if test $local_index -gt $usr_index
 end
 
 # per i pacchetti python installati con 'pip install --user'
-set PATH ~/Library/Python/2.7/bin/ $PATH
+if test -d ~/Library/Python/2.7/bin/
+  set PATH ~/Library/Python/2.7/bin/ $PATH
+end
 
 # usiamo rbenv invece di rvm
 if test -d ~/.rbenv
