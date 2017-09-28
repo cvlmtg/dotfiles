@@ -373,10 +373,6 @@ highlight SpellRare term=underline cterm=underline
 highlight clear SpellLocal
 highlight SpellLocal term=underline cterm=underline
 
-" customize ALE errors
-highlight ALEError ctermbg=none cterm=underline
-highlight ALEWarning ctermbg=none cterm=underline
-
 " ----------------------------------------------------------------------
 " STATUSLINE -----------------------------------------------------------
 " ----------------------------------------------------------------------
