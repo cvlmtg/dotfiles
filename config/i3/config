@@ -178,7 +178,7 @@ bar {
 }
 
 # start a terminal
-bindsym $mod+Return exec gnome-terminal
+bindsym $mod+Return exec i3-sensible-terminal
 
 # start dmenu (a program launcher). only displays applications shipping
 # a .desktop file. It is a wrapper around dmenu, so you need that
