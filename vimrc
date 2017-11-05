@@ -307,7 +307,7 @@ set ignorecase
 set smartcase
 
 " live substitution preview
-if has("nvim")
+if has('nvim')
     set inccommand=nosplit
 endif
 
@@ -324,6 +324,17 @@ set showmatch
 " set codes for 24bit term colors
 let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
 let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
+
+" change cursor shape in insert mode
+if !has('nvim')
+  if exists('$TMUX')
+    let &t_SI = "\<Esc>Ptmux;\<Esc>\<Esc>]50;CursorShape=1\x7\<Esc>\\"
+    let &t_EI = "\<Esc>Ptmux;\<Esc>\<Esc>]50;CursorShape=0\x7\<Esc>\\"
+  else
+    let &t_SI = "\<Esc>]50;CursorShape=1\x7"
+    let &t_EI = "\<Esc>]50;CursorShape=0\x7"
+  endif
+end
 
 if has('gui_running')
     set guicursor+=a:blinkon0 " disable cursor blinking
