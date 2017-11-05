@@ -45,9 +45,15 @@ if which pygmentize > /dev/null
 end
 set -x LESS '-R -i'
 
-set -x SVN_EDITOR nvim
-set -x EDITOR nvim
-set -x VISUAL nvim
+if test -x /usr/local/bin/nvim
+  set -x SVN_EDITOR nvim
+  set -x EDITOR nvim
+  set -x VISUAL nvim
+else
+  set -x SVN_EDITOR vim
+  set -x EDITOR vim
+  set -x VISUAL vim
+end
 
 # nvm version manager for fish!
 if test -d ~/.nvf; nvf init; end
