@@ -228,6 +228,10 @@ let g:ale_linters = {
 " toggle location list to see linting errors
 nmap <leader>l :lwindow<CR>
 
+" move between linting errors
+nmap <silent> <C-k> <Plug>(ale_previous_wrap)
+nmap <silent> <C-j> <Plug>(ale_next_wrap)
+
 " fzf ------------------------------------------------------------------
 
 set wildignore+=*/tmp/*,*/cache/*,*/node_modules/*,*/vendor/*
