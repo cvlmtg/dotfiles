@@ -245,6 +245,8 @@ nnoremap <leader>f :<C-u>FzfGitFiles<CR>
 " completor -----------------------------------------------------------------
 
 let g:completor_node_binary = substitute(system('which node'), '\n', '', '')
+let g:completor_less_omni_trigger = '([\w-]+|@[\w-]*|[\w-]+:\s*[\w-]*)$'
+let g:completor_css_omni_trigger = '([\w-]+|@[\w-]*|[\w-]+:\s*[\w-]*)$'
 let g:completor_min_chars = 3
 
 " <CR>: close popup and save indent.
