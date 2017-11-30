@@ -22,12 +22,6 @@ if test -d ~/.rbenv
   end
 end
 
-if test -x /usr/local/bin/fish
-  set -x SHELL /usr/local/bin/fish
-else
-  set -x SHELL /usr/bin/fish
-end
-
 if test -d ~/bin
   if not contains ~/bin $PATH
     set PATH ~/bin $PATH
@@ -45,7 +39,9 @@ if which pygmentize > /dev/null
 end
 set -x LESS '-R -i'
 
-if test -x /usr/local/bin/nvim
+set -x SHELL (which fish)
+
+if which nvim > /dev/null
   set -x SVN_EDITOR nvim
   set -x EDITOR nvim
   set -x VISUAL nvim
