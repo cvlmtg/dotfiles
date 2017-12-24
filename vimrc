@@ -151,8 +151,12 @@ endif
 call plug#begin()
 
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
-Plug 'ternjs/tern_for_vim', { 'do': 'npm install' }
-Plug 'maralla/completor.vim', { 'do': 'make js' }
+Plug 'prabirshrestha/asyncomplete-buffer.vim'
+Plug 'prabirshrestha/asyncomplete-lsp.vim'
+Plug 'prabirshrestha/asyncomplete.vim'
+Plug 'yami-beta/asyncomplete-omni.vim'
+Plug 'prabirshrestha/async.vim'
+Plug 'prabirshrestha/vim-lsp'
 Plug 'junegunn/fzf.vim'
 
 Plug 'craigemery/vim-autotag'
@@ -238,16 +242,41 @@ set wildignore+=*/tmp/*,*/cache/*,*/node_modules/*,*/vendor/*
 
 let g:fzf_command_prefix = 'Fzf'
 
-nnoremap <leader><Space> :<C-u>FzfTags <C-r><C-w><CR>
+nnoremap <leader><Space> :<C-u>LspDefinition<CR>
 nnoremap <leader>b :<C-u>FzfBuffers<CR>
 nnoremap <leader>f :<C-u>FzfGitFiles<CR>
 
-" completor -----------------------------------------------------------------
+" complete -------------------------------------------------------------
 
-let g:completor_node_binary = substitute(system('which node'), '\n', '', '')
-let g:completor_less_omni_trigger = '([\w-]+|@[\w-]*|[\w-]+:\s*[\w-]*)$'
-let g:completor_css_omni_trigger = '([\w-]+|@[\w-]*|[\w-]+:\s*[\w-]*)$'
-let g:completor_min_chars = 3
+let g:asyncomplete_remove_duplicates = 1
+let g:asyncomplete_auto_popup = 0
+let g:lsp_async_completion = 1
+let g:lsp_log_file = ''
+
+call asyncomplete#register_source(asyncomplete#sources#buffer#get_source_options({
+      \ 'name': 'buffer',
+      \ 'whitelist': ['*'],
+      \ 'blacklist': ['go'],
+      \ 'completor': function('asyncomplete#sources#buffer#completor'),
+      \ }))
+
+call asyncomplete#register_source(asyncomplete#sources#omni#get_source_options({
+      \ 'name': 'omni',
+      \ 'whitelist': ['*'],
+      \ 'blacklist': ['html'],
+      \ 'completor': function('asyncomplete#sources#omni#completor')
+      \  }))
+
+" npm install -g typescript-language-server
+
+if executable('typescript-language-server')
+  call lsp#register_server({
+        \ 'name': 'typescript-language-server',
+        \ 'cmd': { server_info->[&shell, &shellcmdflag, 'typescript-language-server --stdio']},
+        \ 'root_uri': { server_info->lsp#utils#path_to_uri(lsp#utils#find_nearest_parent_directory(lsp#utils#get_buffer_path(), '.git/..'))},
+        \ 'whitelist': ['typescript', 'javascript', 'javascript.jsx']
+        \ })
+endif
 
 " <CR>: close popup and save indent.
 function! s:smartCr()
@@ -255,26 +284,25 @@ function! s:smartCr()
     return "\<CR>"
   end
 
-  if strcharpart(getline('.'), col('.'), 1) =~ '\S\|^$'
-    return "\<CR>"
-  else
-    return "\<C-y>"
-  end
+  return "\<C-y>"
 endfunction
 inoremap <silent> <CR> <C-r>=<SID>smartCr()<CR>
 
 function! s:smartTab()
     if pumvisible()
       return "\<C-n>"
-    else
-      " trigger the autocomplete only if the
-      " character before the cursor is not a space
-      if strcharpart(getline('.'), col('.') - 2, 1) =~ '^\s\=$'
-        return "\<Tab>"
-      else
-        return "\<C-x>\<C-u>\<C-p>"
-      endif
     endif
+
+    let l:line = getline('.')
+    let l:col = col('.') - 2
+
+    " trigger the autocomplete only if the
+    " character before the cursor is not a space
+    if strcharpart(l:line, l:col, 1) =~ '^\s\=$'
+      return "\<Tab>"
+    endif
+
+    return asyncomplete#force_refresh()
 endfunction
 inoremap <silent> <Tab> <C-r>=<SID>smartTab()<CR>
 inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
