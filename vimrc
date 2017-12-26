@@ -450,7 +450,7 @@ endfunction
 
 function! s:ShortenPath(path, everything)
   if a:everything == 1
-    return substitute(a:path, '\(\w\)\%([-.]\|\w\)\+/', '\1/', 'g')
+    return pathshorten(a:path)
   end
 
   let l:parts = split(a:path, '/')
