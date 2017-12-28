@@ -3,14 +3,13 @@
 ; --------------------------------------------------------------------------
 
 (require 'package)
-(package-initialize)
 (add-to-list 'package-archives
              '("melpa" . "http://melpa.milkbox.net/packages/"))
+(package-initialize)
 
 (setq list-of-packages
-      '(evil evil-surround evil-matchit evil-args
-             php-mode autopair linum-relative
-             ergoemacs-mode))
+      '(evil evil-leader evil-surround evil-matchit evil-args
+             linum-relative))
 
 (defun check-and-install-packages ()
   (interactive)
@@ -51,6 +50,7 @@
 (menu-bar-mode -1)
 
 ; evidenziamo le parentesi
+(setq show-paren-delay 0)
 (show-paren-mode 1)
 
 ; mostra il numero della colonna nella riga di stato
@@ -73,15 +73,15 @@
 ; --------------------------------------------------------------------------
 
 (setq make-backup-files nil)
+(electric-pair-mode 1)
 
-; --------------------------------------------------------------------------
-; ERGOEMACS ----------------------------------------------------------------
-; --------------------------------------------------------------------------
+; reduce startup noise
+(setq inhibit-startup-message t)
+(setq initial-scratch-message nil)
 
-(setq ergoemacs-theme nil)
-(setq ergoemacs-keyboard-layout "it")
-(require 'ergoemacs-mode)
-(ergoemacs-mode 1)
+; indent with two spaces, don't use tab
+(setq standard-indent 2)
+(setq-default indent-tabs-mode nil)
 
 ; --------------------------------------------------------------------------
 ; EVIL! --------------------------------------------------------------------
@@ -89,15 +89,14 @@
 
 (require 'evil)
 (evil-mode 1)
-
-(defun copy-to-end-of-line ()
-  (interactive)
-  (evil-yank (point) (point-at-eol)))
+(global-evil-leader-mode)
+(global-evil-surround-mode)
 
 ; customizziamo i nostri tasti
 (define-key evil-normal-state-map "Y" 'copy-to-end-of-line)
 
-(define-key evil-normal-state-map (kbd "C-w <up>") 'evil-window-up)
-(define-key evil-normal-state-map (kbd "C-w <down>") 'evil-window-down)
-(define-key evil-normal-state-map (kbd "C-w <left>") 'evil-window-left)
-(define-key evil-normal-state-map (kbd "C-w <right>") 'evil-window-right)
+(evil-leader/set-leader "<SPC>")
+(evil-leader/set-key
+  "f" 'helm-projectile-find-file
+  "F" 'helm-projectile-ag
+  "g" 'magit)
