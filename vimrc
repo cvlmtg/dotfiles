@@ -172,10 +172,8 @@ Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-surround'
 Plug 'wellle/targets.vim'
 Plug 'tpope/vim-repeat'
-Plug 'sareyko/neat.vim', { 'on': 'Neat' }
 Plug 'w0rp/ale'
 
-Plug 'mustache/vim-mustache-handlebars'
 Plug 'MaxMEllon/vim-jsx-pretty'
 Plug 'kchmck/vim-coffee-script'
 Plug 'pangloss/vim-javascript'
@@ -193,11 +191,6 @@ call plug#end()
 if !exists('g:loaded_matchit') && findfile('plugin/matchit.vim', &rtp) ==# ''
     runtime! macros/matchit.vim
 endif
-
-" neat -----------------------------------------------------------------
-" brew install html-xml-utils
-
-let neat#html#commands = [ ':% !hxnormalize -x' ]
 
 " ctrlsf ---------------------------------------------------------------
 
