@@ -250,21 +250,20 @@ let g:lsp_log_file = ''
 call asyncomplete#register_source(asyncomplete#sources#buffer#get_source_options({
       \ 'name': 'buffer',
       \ 'whitelist': ['*'],
-      \ 'blacklist': ['go'],
       \ 'completor': function('asyncomplete#sources#buffer#completor'),
       \ }))
 
 call asyncomplete#register_source(asyncomplete#sources#omni#get_source_options({
       \ 'name': 'omni',
       \ 'whitelist': ['*'],
-      \ 'blacklist': ['html'],
+      \ 'blacklist': ['html', 'javascript', 'javascript.jsx'],
       \ 'completor': function('asyncomplete#sources#omni#completor')
       \  }))
 
 call asyncomplete#register_source(asyncomplete#sources#file#get_source_options({
     \ 'name': 'file',
-    \ 'whitelist': ['*'],
     \ 'priority': 10,
+    \ 'whitelist': ['*'],
     \ 'completor': function('asyncomplete#sources#file#completor')
     \ }))
 
