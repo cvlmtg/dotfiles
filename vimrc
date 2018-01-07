@@ -456,11 +456,7 @@ function! StatuslineColumn()
     return l:column . ' '
 endfunction
 
-function! s:ShortenPath(path, everything)
-  if a:everything == 1
-    return pathshorten(a:path)
-  end
-
+function! s:ShortenPath(path)
   let l:parts = split(a:path, '/')
 
   if len(l:parts) < 3
@@ -485,10 +481,10 @@ function! StatuslinePath()
     " lot of things, so to keep this function simple let's assume
     " that 'a lot of things' is 50 characters long
     if strlen(l:path) > l:width
-        let l:path = <SID>ShortenPath(l:path, 0)
+        let l:path = <SID>ShortenPath(l:path)
 
         if strlen(l:path) > l:width
-          let l:path = <SID>ShortenPath(l:path, 1)
+          let l:path = pathshorten(l:path)
         end
     endif
     if getbufvar(l:bufnum, '&modified')
@@ -514,7 +510,7 @@ function! StatuslineBranch()
     let l:branch = gitbranch#name()
 
     if !empty(l:branch)
-        let l:branch = <SID>ShortenPath(l:branch, 1)
+        let l:branch = pathshorten(l:branch)
         let l:branch = ' ⎇  ' . l:branch
     endif
     return l:branch
