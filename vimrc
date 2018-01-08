@@ -759,7 +759,8 @@ endif
 
 autocmd vimrc FileType ruby
             \ setlocal expandtab textwidth=0 |
-            \ setlocal spell spelllang=it,en
+            \ setlocal spell spelllang=it,en |
+            \ setlocal suffixesadd=.rb
 
 autocmd vimrc FileType xml
             \ setlocal foldmethod=syntax |
@@ -784,7 +785,8 @@ autocmd vimrc FileType coffee
 
 autocmd vimrc FileType javascript
             \ setlocal expandtab textwidth=0 |
-            \ setlocal spell spelllang=it,en
+            \ setlocal spell spelllang=it,en |
+            \ setlocal suffixesadd=.js,.jsx
 
 " under linux we need to specify "spellfile" because
 " usually /usr/local/share is not writable
