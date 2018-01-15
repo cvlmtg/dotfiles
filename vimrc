@@ -181,9 +181,7 @@ Plug 'groenewege/vim-less'
 Plug 'mtscout6/vim-cjsx'
 Plug 'dag/vim-fish'
 
-Plug 'altercation/vim-colors-solarized'
 Plug 'cvlmtg/vim-256noir'
-Plug 'morhetz/gruvbox'
 
 call plug#end()
 
@@ -384,28 +382,9 @@ if has('gui_running')
     set fuopt=maxvert,maxhorz
 endif
 
-let g:solarized_termcolors=256
-let g:solarized_underline=0
-
-let g:gruvbox_contrast_dark='hard'
-let g:gruvbox_sign_column='dark0'
-let g:gruvbox_italic=0
-
-let s:colorscheme='256_noir'
-
-if s:colorscheme == 'solarized'
-    set background=light
-else
-    set background=dark
-endif
-
 set cursorline
-
-if !has("gui_vimr")
-  exe 'colorscheme ' . s:colorscheme
-else
-  colorscheme gruvbox
-endif
+set background=dark
+colorscheme 256_noir
 
 " customize spelling colors to avoid unreadable
 " combinations of background and foreground
