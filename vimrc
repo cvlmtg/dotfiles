@@ -228,6 +228,10 @@ nmap <leader>l :lwindow<CR>
 nmap <silent> <C-k> <Plug>(ale_previous_wrap)
 nmap <silent> <C-j> <Plug>(ale_next_wrap)
 
+" looks like the default syle is lost with the last
+" versions of ALE, so let's redefine it here
+highlight link ALEErrorSign error
+
 " fzf ------------------------------------------------------------------
 
 set wildignore+=*/tmp/*,*/cache/*,*/node_modules/*,*/vendor/*
