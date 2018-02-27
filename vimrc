@@ -242,7 +242,6 @@ nnoremap <leader>f :<C-u>FzfGitFiles<CR>
 " complete -------------------------------------------------------------
 
 let g:asyncomplete_remove_duplicates = 1
-let g:asyncomplete_auto_popup = 0
 let g:lsp_async_completion = 1
 let g:lsp_log_file = ''
 
@@ -266,7 +265,7 @@ call asyncomplete#register_source(asyncomplete#sources#file#get_source_options({
     \ 'completor': function('asyncomplete#sources#file#completor')
     \ }))
 
-" npm install -g typescript-language-server
+" npm install -g typescript typescript-language-server
 
 if executable('typescript-language-server')
   call lsp#register_server({
