@@ -16,10 +16,7 @@ endif
 if has('nvim')
   set clipboard+=unnamedplus
 else
-  " use the system clipboard (on osx/tmux this doesn't work)
-  if !(has('mac') && exists('$TMUX'))
-      set clipboard=unnamed,unnamedplus
-  endif
+  set clipboard=unnamed,unnamedplus
 endif
 
 " disable the magic "vim: .." lines in files
