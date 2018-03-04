@@ -210,7 +210,6 @@ nmap <leader>a <Plug>CtrlSFCCwordPath<CR>
 
 " ale ------------------------------------------------------------------
 
-let g:ale_statusline_format = [ '✖ %d', '⚠ %d', '' ]
 let g:ale_sign_warning = '⚠'
 let g:ale_sign_error = '✖'
 
@@ -270,40 +269,16 @@ call asyncomplete#register_source(asyncomplete#sources#file#get_source_options({
 if executable('typescript-language-server')
   call lsp#register_server({
         \ 'name': 'typescript-language-server',
+        \ 'priority': 9,
         \ 'cmd': { server_info->[&shell, &shellcmdflag, 'typescript-language-server --stdio']},
         \ 'root_uri': { server_info->lsp#utils#path_to_uri(lsp#utils#find_nearest_parent_directory(lsp#utils#get_buffer_path(), '.git/..'))},
         \ 'whitelist': ['typescript', 'javascript', 'javascript.jsx']
         \ })
 endif
 
-" <CR>: close popup and save indent.
-function! s:smartCr()
-  if !pumvisible()
-    return "\<CR>"
-  end
-
-  return "\<C-y>"
-endfunction
-inoremap <silent> <CR> <C-r>=<SID>smartCr()<CR>
-
-function! s:smartTab()
-    if pumvisible()
-      return "\<C-n>"
-    endif
-
-    let l:line = getline('.')
-    let l:col = col('.') - 2
-
-    " trigger the autocomplete only if the
-    " character before the cursor is not a space
-    if strcharpart(l:line, l:col, 1) =~ '^\s\=$'
-      return "\<Tab>"
-    endif
-
-    return asyncomplete#force_refresh()
-endfunction
-inoremap <silent> <Tab> <C-r>=<SID>smartTab()<CR>
 inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
+inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
+inoremap <expr> <cr> pumvisible() ? "\<C-y>" : "\<cr>"
 
 " close popup with <space>
 imap <expr> <Space> pumvisible() ? "\<C-y>\<Space>" : "\<Space>"
@@ -359,13 +334,8 @@ let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
 
 " change cursor shape in insert mode
 if !has('nvim')
-  if exists('$TMUX')
-    let &t_SI = "\<Esc>Ptmux;\<Esc>\<Esc>]50;CursorShape=1\x7\<Esc>\\"
-    let &t_EI = "\<Esc>Ptmux;\<Esc>\<Esc>]50;CursorShape=0\x7\<Esc>\\"
-  else
-    let &t_SI = "\<Esc>]50;CursorShape=1\x7"
-    let &t_EI = "\<Esc>]50;CursorShape=0\x7"
-  endif
+  let &t_SI = "\e[6 q"
+  let &t_EI = "\e[2 q"
 end
 
 if has('gui_running')
@@ -487,13 +457,26 @@ function! StatuslineBranch()
     return l:branch
 endfunction
 
+function! LinterStatus() abort
+  let l:counts = ale#statusline#Count(bufnr(''))
+
+  let l:all_errors = l:counts.error + l:counts.style_error
+  let l:all_non_errors = l:counts.total - l:all_errors
+
+  return l:counts.total == 0 ? '' : printf(
+        \ '✖ %d ⚠ %d',
+        \ all_errors,
+        \ all_non_errors
+        \)
+endfunction
+
 " set the statusline format
 set statusline=%#LineNr#%{StatuslineColumn()}%*
 set statusline+=\ %{StatuslinePath()}
 
 " paste mode and errors/warnings from the linter
 set statusline+=\ %#IncSearch#%{StatuslinePaste()}
-set statusline+=%(\ %{ALEGetStatusLine()}\ %)
+set statusline+=%(\ %{LinterStatus()}\ %)
 set statusline+=%*
 
 " right side
@@ -735,6 +718,18 @@ if isdirectory($HOME . '/.rbenv')
     let g:ruby_path = $HOME . '/.rbenv/shims'
 endif
 
+" https://damien.pobel.fr/post/configure-neovim-vim-gf-javascript-import/
+function! LoadNodeModule(fname)
+    let nodeModules = "./node_modules/"
+    let packagePath = nodeModules . a:fname . "/package.json"
+
+    if filereadable(packagePath)
+        return nodeModules . a:fname . "/" . json_decode(join(readfile(packagePath))).main
+    else
+        return nodeModules . a:fname
+    endif
+endfunction
+
 autocmd vimrc FileType ruby
             \ setlocal expandtab textwidth=0 |
             \ setlocal spell spelllang=it,en |
@@ -762,6 +757,7 @@ autocmd vimrc FileType coffee
             \ setlocal foldmethod=indent
 
 autocmd vimrc FileType javascript
+            \ setlocal includeexpr=LoadNodeModule(v:fname) |
             \ setlocal expandtab textwidth=0 |
             \ setlocal spell spelllang=it,en |
             \ setlocal suffixesadd=.js,.jsx
