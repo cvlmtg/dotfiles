@@ -13,10 +13,10 @@ if test -d ~/Library/Python/2.7/bin
 end
 
 # usiamo rbenv invece di rvm
-if test -d ~/.rbenv
-  if test -d ~/.rbenv/bin
-    set PATH "$HOME/.rbenv/bin" $PATH
-  end
+if test -d ~/.rbenv/bin
+  set PATH "$HOME/.rbenv/bin" $PATH
+end
+if test -d ~/.rbenv/shims
   if not contains ~/.rbenv/shims $PATH
     set PATH "$HOME/.rbenv/shims" $PATH
   end
@@ -32,7 +32,13 @@ end
 set fish_greeting ""
 
 # impostazioni varie
-set -x FZF_DEFAULT_COMMAND 'rg --files --no-ignore --hidden --follow --glob "!.git/*"'
+if which fd > /dev/null
+  set -x FZF_DEFAULT_COMMAND 'fd --hidden --exclude ".git/"'
+  set -x FZF_CTRL_T_COMMAND "$FZF_DEFAULT_COMMAND"
+  set -x FZF_ALT_C_COMMAND "fd -t d"
+else
+  set -x FZF_DEFAULT_COMMAND 'rg --files --follow --hidden --glob "!.git/*"'
+end
 
 if which pygmentize > /dev/null
   set -x LESSOPEN '| pygmentize -f 256 -O encoding=utf-8,style=monokai "%s"'
