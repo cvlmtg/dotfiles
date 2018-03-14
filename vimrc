@@ -244,20 +244,20 @@ let g:asyncomplete_remove_duplicates = 1
 let g:lsp_async_completion = 1
 let g:lsp_log_file = ''
 
-call asyncomplete#register_source(asyncomplete#sources#buffer#get_source_options({
+autocmd User lsp_setup call asyncomplete#register_source(asyncomplete#sources#buffer#get_source_options({
       \ 'name': 'buffer',
       \ 'whitelist': ['*'],
       \ 'completor': function('asyncomplete#sources#buffer#completor'),
       \ }))
 
-call asyncomplete#register_source(asyncomplete#sources#omni#get_source_options({
+autocmd User lsp_setup call asyncomplete#register_source(asyncomplete#sources#omni#get_source_options({
       \ 'name': 'omni',
       \ 'whitelist': ['*'],
       \ 'blacklist': ['html', 'javascript', 'javascript.jsx'],
       \ 'completor': function('asyncomplete#sources#omni#completor')
       \  }))
 
-call asyncomplete#register_source(asyncomplete#sources#file#get_source_options({
+autocmd User lsp_setup call asyncomplete#register_source(asyncomplete#sources#file#get_source_options({
     \ 'name': 'file',
     \ 'priority': 10,
     \ 'whitelist': ['*'],
@@ -267,7 +267,7 @@ call asyncomplete#register_source(asyncomplete#sources#file#get_source_options({
 " npm install -g typescript typescript-language-server
 
 if executable('typescript-language-server')
-  call lsp#register_server({
+  autocmd User lsp_setup call lsp#register_server({
         \ 'name': 'typescript-language-server',
         \ 'priority': 9,
         \ 'cmd': { server_info->[&shell, &shellcmdflag, 'typescript-language-server --stdio']},
@@ -278,7 +278,6 @@ endif
 
 inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
 inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
-inoremap <expr> <cr> pumvisible() ? "\<C-y>" : "\<cr>"
 
 " close popup with <space>
 imap <expr> <Space> pumvisible() ? "\<C-y>\<Space>" : "\<Space>"
