@@ -22,6 +22,12 @@ if test -d ~/.rbenv/shims
   end
 end
 
+# questo serve per react-native
+if test -d $HOME/Library/Android/sdk
+  set -x ANDROID_HOME $HOME/Library/Android/sdk
+  set PATH $PATH $ANDROID_HOME/tools $ANDROID_HOME/platform-tools
+end
+
 if test -d ~/bin
   if not contains ~/bin $PATH
     set PATH ~/bin $PATH
