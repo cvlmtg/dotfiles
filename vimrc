@@ -435,7 +435,7 @@ function! StatuslineBranch()
 
     if !empty(l:branch)
         let l:branch = pathshorten(l:branch)
-        let l:branch = ' ⎇  ' . l:branch
+        let l:branch = ' ⌥ ' . l:branch
     endif
     return l:branch
 endfunction
