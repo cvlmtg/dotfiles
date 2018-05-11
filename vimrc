@@ -263,7 +263,7 @@ let g:LanguageClient_serverCommands = {
       \ 'javascript': ['javascript-typescript-stdio'],
       \ }
 
-nnoremap <silent> <leader><Space> :call LanguageClient#textDocument_definition()<CR>
+nnoremap <silent> <leader><Space> :<C-u>FzfTags <C-r><C-w><CR>
 nnoremap <silent> K :call LanguageClient#textDocument_hover()<CR>
 
 " easy align -----------------------------------------------------------
@@ -740,10 +740,11 @@ autocmd vimrc FileType coffee
       \ setlocal foldmethod=indent
 
 autocmd vimrc FileType javascript
-            \ setlocal includeexpr=LoadNodeModule(v:fname) |
-            \ setlocal expandtab textwidth=0 |
-            \ setlocal spell spelllang=it,en |
-            \ setlocal suffixesadd=.js,.jsx
+      \ nnoremap <buffer> <leader><Space> :call LanguageClient#textDocument_definition()<CR> |
+      \ setlocal includeexpr=LoadNodeModule(v:fname) |
+      \ setlocal expandtab textwidth=0 |
+      \ setlocal spell spelllang=it,en |
+      \ setlocal suffixesadd=.js,.jsx
 
 " under linux we need to specify "spellfile" because
 " usually /usr/local/share is not writable
