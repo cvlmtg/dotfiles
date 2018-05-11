@@ -514,8 +514,8 @@ cmap w!! %!sudo tee > /dev/null %
 
 " can't type <C-]> on the italian keyboard...
 autocmd vimrc FileType help
-            \ nnoremap <buffer> <CR> <C-]> |
-            \ nnoremap <buffer> <BS> <C-T>
+      \ nnoremap <buffer> <CR> <C-]> |
+      \ nnoremap <buffer> <BS> <C-T>
 
 " use ":e %%" to insert the current file path
 cnoremap <expr> %% getcmdtype() == ':' ? expand('%:h').'/' : '%%'
@@ -641,15 +641,15 @@ set foldnestmax=8
 " until leaving insert mode. Foldmethod is local to the window.
 " Protect against screwing up folding when switching between windows.
 autocmd vimrc InsertEnter *
-            \ if !exists('w:last_fdm') |
-            \   let w:last_fdm = &foldmethod |
-            \   setlocal foldmethod=manual |
-            \ endif
+      \ if !exists('w:last_fdm') |
+      \   let w:last_fdm = &foldmethod |
+      \   setlocal foldmethod=manual |
+      \ endif
 autocmd vimrc InsertLeave,WinLeave *
-            \ if exists('w:last_fdm') |
-            \   let &l:foldmethod = w:last_fdm |
-            \   unlet w:last_fdm |
-            \ endif
+      \ if exists('w:last_fdm') |
+      \   let &l:foldmethod = w:last_fdm |
+      \   unlet w:last_fdm |
+      \ endif
 
 function! s:SmartFold()
     if !foldlevel('.')
@@ -714,30 +714,30 @@ function! LoadNodeModule(fname)
 endfunction
 
 autocmd vimrc FileType ruby
-            \ setlocal expandtab textwidth=0 |
-            \ setlocal spell spelllang=it,en |
-            \ setlocal suffixesadd=.rb
+      \ setlocal expandtab textwidth=0 |
+      \ setlocal spell spelllang=it,en |
+      \ setlocal suffixesadd=.rb
 
 autocmd vimrc FileType xml
-            \ setlocal foldmethod=syntax |
-            \ setlocal foldnestmax=20
+      \ setlocal foldmethod=syntax |
+      \ setlocal foldnestmax=20
 
 autocmd vimrc FileType fish
-            \ setlocal formatoptions+=ro |
-            \ setlocal iskeyword+=-
+      \ setlocal formatoptions+=ro |
+      \ setlocal iskeyword+=-
 
 " '-' should be part of the word, not a separator
 autocmd vimrc FileType css
-            \ setlocal iskeyword+=-
+      \ setlocal iskeyword+=-
 
 " write C123 to jump to line 123 of the compiled js
 autocmd vimrc FileType coffee
-            \ command! -nargs=1 C CoffeeCompile | :<args>
+      \ command! -nargs=1 C CoffeeCompile | :<args>
 
 autocmd vimrc FileType coffee
-            \ setlocal expandtab textwidth=0 |
-            \ setlocal spell spelllang=it,en |
-            \ setlocal foldmethod=indent
+      \ setlocal expandtab textwidth=0 |
+      \ setlocal spell spelllang=it,en |
+      \ setlocal foldmethod=indent
 
 autocmd vimrc FileType javascript
             \ setlocal includeexpr=LoadNodeModule(v:fname) |
@@ -748,13 +748,13 @@ autocmd vimrc FileType javascript
 " under linux we need to specify "spellfile" because
 " usually /usr/local/share is not writable
 autocmd vimrc FileType cucumber
-            \ setlocal spell spelllang=it,en |
-            \ setlocal textwidth=76
+      \ setlocal spell spelllang=it,en |
+      \ setlocal textwidth=76
 
 autocmd vimrc Filetype gitcommit
-            \ let &l:spellfile=s:base.'/spell/it.utf8.add' |
-            \ setlocal spell spelllang=it,en |
-            \ setlocal textwidth=72
+      \ let &l:spellfile=s:base.'/spell/it.utf8.add' |
+      \ setlocal spell spelllang=it,en |
+      \ setlocal textwidth=72
 
 " Syntax highlight HTML code inside PHP strings.
 let g:php_htmlInStrings = 1
@@ -768,10 +768,10 @@ let g:PHP_vintage_case_default_indent = 1
 " remove "$" and "-" for broken js/css/html syntax plugins
 " remove ":" as it is considered a separator
 autocmd vimrc FileType php
-            \ setlocal spell spelllang=it,en |
-            \ setlocal commentstring=//\ %s |
-            \ setlocal iskeyword-=-,:$ |
-            \ setlocal foldnestmax=2
+      \ setlocal spell spelllang=it,en |
+      \ setlocal commentstring=//\ %s |
+      \ setlocal iskeyword-=-,:$ |
+      \ setlocal foldnestmax=2
 
 " ----------------------------------------------------------------------
 " SESSION MANAGEMENT ---------------------------------------------------
