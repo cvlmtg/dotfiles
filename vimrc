@@ -473,6 +473,10 @@ set statusline+=\ \|\ %{&ff}\
 
 inoremap jj <Esc>
 
+" since <C-i> is the same as <Tab>, use <C-p> to
+" move forward the jump list (it's near <C-o>)
+nnoremap <C-p> <C-i>
+
 " map <Esc> in terminal mode (except when we use fzf)
 if has('nvim')
   tnoremap <silent><expr> <Esc> (b:term_title =~# 'bin/fzf' ? '<Esc>' : '<C-\><C-n>')
