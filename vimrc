@@ -225,8 +225,6 @@ nmap <leader>l :lwindow<CR>
 nmap <silent> <C-k> <Plug>(ale_previous_wrap)
 nmap <silent> <C-j> <Plug>(ale_next_wrap)
 
-" looks like the default syle is lost with the last
-" versions of ALE, so let's redefine it here
 highlight link ALEErrorSign error
 
 " fzf ------------------------------------------------------------------
@@ -305,8 +303,8 @@ endif
 set wildmode=longest,full
 
 " keep more context when scrolling off the end of a buffer
-set scrolljump=3
-set scrolloff=3
+set scrolljump=5
+set scrolloff=5
 
 " show matching brackets
 set showmatch
@@ -342,7 +340,7 @@ colorscheme 256_noir
 " customize spelling colors to avoid unreadable
 " combinations of background and foreground
 highlight clear SpellBad
-highlight SpellBad term=standout,underline ctermfg=1 cterm=underline
+highlight SpellBad term=underline cterm=underline
 highlight clear SpellCap
 highlight SpellCap term=underline cterm=underline
 highlight clear SpellRare
@@ -435,7 +433,7 @@ function! StatuslineBranch()
 
     if !empty(l:branch)
         let l:branch = pathshorten(l:branch)
-        let l:branch = ' ⌥ ' . l:branch
+        let l:branch = ' ⌥  ' . l:branch
     endif
     return l:branch
 endfunction
@@ -746,14 +744,11 @@ autocmd vimrc FileType javascript
       \ setlocal spell spelllang=it,en |
       \ setlocal suffixesadd=.js,.jsx
 
-" under linux we need to specify "spellfile" because
-" usually /usr/local/share is not writable
 autocmd vimrc FileType cucumber
       \ setlocal spell spelllang=it,en |
       \ setlocal textwidth=76
 
 autocmd vimrc Filetype gitcommit
-      \ let &l:spellfile=s:base.'/spell/it.utf8.add' |
       \ setlocal spell spelllang=it,en |
       \ setlocal textwidth=72
 
