@@ -234,6 +234,7 @@ set wildignore+=*/tmp/*,*/cache/*,*/node_modules/*,*/vendor/*
 let g:fzf_command_prefix = 'Fzf'
 
 nnoremap <leader>b :<C-u>FzfBuffers<CR>
+nnoremap <leader>h :<C-u>FzfHelptags<CR>
 nnoremap <leader>f :<C-u>FzfGitFiles --exclude-standard --cached --others<CR>
 
 " complete -------------------------------------------------------------
