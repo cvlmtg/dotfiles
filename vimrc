@@ -148,13 +148,16 @@ endif
 call plug#begin()
 
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
-Plug 'roxma/nvim-completion-manager'
 Plug 'junegunn/fzf.vim'
 Plug 'autozimu/LanguageClient-neovim', {
       \ 'do': 'bash install.sh',
       \ 'branch': 'next',
       \ }
-if !has('nvim')
+if has('nvim')
+  Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
+else
+  Plug 'roxma/nvim-yarp'
+  Plug 'Shougo/deoplete.nvim'
   Plug 'roxma/vim-hug-neovim-rpc'
 endif
 
@@ -239,6 +242,9 @@ nnoremap <leader>f :<C-u>FzfGitFiles --exclude-standard --cached --others<CR>
 
 " complete -------------------------------------------------------------
 
+nnoremap <silent> <leader><Space> :<C-u>FzfTags <C-r><C-w><CR>
+nnoremap <silent> K :call LanguageClient#textDocument_hover()<CR>
+
 inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
 inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
 inoremap <expr> <CR> (pumvisible() ? "\<c-y>\<cr>" : "\<CR>")
@@ -246,24 +252,14 @@ inoremap <expr> <CR> (pumvisible() ? "\<c-y>\<cr>" : "\<CR>")
 " close popup with <space>
 imap <expr> <Space> pumvisible() ? "\<C-y>\<Space>" : "\<Space>"
 
-au User CmSetup call cm#register_source({'name' : 'cm-css',
-      \ 'priority': 9,
-      \ 'scoping': 1,
-      \ 'scopes': ['css','scss', 'less'],
-      \ 'abbreviation': 'css',
-      \ 'word_pattern': '[\w\-]+',
-      \ 'cm_refresh_patterns':['[\w\-]+\s*:\s+'],
-      \ 'cm_refresh': {'omnifunc': 'csscomplete#CompleteCSS'},
-      \ })
-
 " npm install -g javascript-typescript-langserver
 let g:LanguageClient_serverCommands = {
       \ 'javascript.jsx': ['javascript-typescript-stdio'],
       \ 'javascript': ['javascript-typescript-stdio'],
       \ }
+let g:deoplete#enable_at_startup = 1
 
-nnoremap <silent> <leader><Space> :<C-u>FzfTags <C-r><C-w><CR>
-nnoremap <silent> K :call LanguageClient#textDocument_hover()<CR>
+call deoplete#custom#var('file', 'enable_buffer_path', v:true)
 
 " easy align -----------------------------------------------------------
 
