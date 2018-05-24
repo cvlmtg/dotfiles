@@ -302,7 +302,7 @@ if has('nvim')
 endif
 
 " show available completions
-set wildmode=longest,full
+set wildmode=list:longest,full
 
 " keep more context when scrolling off the end of a buffer
 set scrolljump=5
