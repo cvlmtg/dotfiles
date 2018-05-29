@@ -163,7 +163,6 @@ endif
 
 Plug 'ludovicchabant/vim-gutentags'
 Plug 'airblade/vim-gitgutter'
-Plug 'itchyny/vim-gitbranch'
 Plug 'mbbill/undotree'
 Plug 'dyng/ctrlsf.vim'
 
@@ -426,16 +425,6 @@ function! StatuslinePaste()
     return ''
 endfunction
 
-function! StatuslineBranch()
-    let l:branch = gitbranch#name()
-
-    if !empty(l:branch)
-        let l:branch = pathshorten(l:branch)
-        let l:branch = ' ⌥  ' . l:branch
-    endif
-    return l:branch
-endfunction
-
 function! LinterStatus() abort
   let l:counts = ale#statusline#Count(bufnr(''))
 
@@ -457,13 +446,6 @@ set statusline+=\ %{StatuslinePath()}
 set statusline+=\ %#IncSearch#%{StatuslinePaste()}
 set statusline+=%(\ %{LinterStatus()}\ %)
 set statusline+=%*
-
-" right side
-set statusline+=%=
-
-set statusline+=%{StatuslineBranch()}
-" file format and file type
-set statusline+=\ \|\ %{&ff}\ 
 
 " ----------------------------------------------------------------------
 " REMAPS ---------------------------------------------------------------
