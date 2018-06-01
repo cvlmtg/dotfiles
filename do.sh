@@ -9,8 +9,8 @@ install () {
         base="$(basename $file)"
         path="$(dirname $file)"
 
-        # "bin/" is treated specially
-        if [[ "$path" == "bin" ]]; then
+        # some paths are special
+        if [[ "$path" == "bin" ]] || [[ "$path" == "Library" ]]; then
             dest="$HOME/$file"
         else
             dest="$HOME/.$file"
