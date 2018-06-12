@@ -561,7 +561,13 @@ function! RestoreRegister()
 endfunction
 
 function! s:SaveRegister()
-    let s:restore_reg = @"
+    if &clipboard == 'unnamed'
+      let s:restore_reg = @*
+    elseif &clipboard == 'unnamedplus'
+      let s:restore_reg = @+
+    else
+      let s:restore_reg = @"
+    endif
     return "p@=RestoreRegister()\<cr>"
 endfunction
 
