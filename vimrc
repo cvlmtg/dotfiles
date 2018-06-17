@@ -156,9 +156,9 @@ Plug 'autozimu/LanguageClient-neovim', {
 if has('nvim')
   Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
 else
-  Plug 'roxma/nvim-yarp'
-  Plug 'Shougo/deoplete.nvim'
   Plug 'roxma/vim-hug-neovim-rpc'
+  Plug 'Shougo/deoplete.nvim'
+  Plug 'roxma/nvim-yarp'
 endif
 
 Plug 'ludovicchabant/vim-gutentags'
@@ -178,7 +178,6 @@ Plug 'MaxMEllon/vim-jsx-pretty'
 Plug 'kchmck/vim-coffee-script'
 Plug 'pangloss/vim-javascript'
 Plug 'groenewege/vim-less'
-Plug 'mtscout6/vim-cjsx'
 Plug 'dag/vim-fish'
 
 Plug 'cvlmtg/vim-256noir'
