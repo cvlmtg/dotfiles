@@ -456,6 +456,10 @@ inoremap jj <Esc>
 " move forward the jump list (it's near <C-o>)
 nnoremap <C-p> <C-i>
 
+" save the jump if large enough
+nnoremap <expr> k (v:count > 6 ? "m'" . v:count : '') . 'k'
+nnoremap <expr> j (v:count > 6 ? "m'" . v:count : '') . 'j'
+
 " map <Esc> in terminal mode (except when we use fzf)
 if has('nvim')
   tnoremap <silent><expr> <Esc> (b:term_title =~# 'bin/fzf' ? '<Esc>' : '<C-\><C-n>')
