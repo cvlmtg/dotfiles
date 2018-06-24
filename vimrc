@@ -193,7 +193,10 @@ endif
 
 let g:ctrlsf_regex_pattern = 1
 let g:ctrlsf_winsize = '30%'
-let g:ctrlsf_auto_close = 0
+let g:ctrlsf_auto_close = {
+      \ "normal" : 0,
+      \ "compact": 0
+      \}
 
 " just a little shortcut
 function! SmartCtrlSF(args)
