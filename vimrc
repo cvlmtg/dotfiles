@@ -258,10 +258,16 @@ imap <expr> <Space> pumvisible() ? "\<C-y>\<Space>" : "\<Space>"
 let g:LanguageClient_serverCommands = {
       \ 'javascript.jsx': ['javascript-typescript-stdio'],
       \ 'javascript': ['javascript-typescript-stdio'],
+      \ 'ruby': ['ruby'],
       \ }
+let g:LanguageClient_diagnosticsEnable = 0
 let g:deoplete#enable_at_startup = 1
 
 call deoplete#custom#var('file', 'enable_buffer_path', v:true)
+
+" suppress the annoying 'match x of y', 'The only match' and
+" 'Pattern not found' messages
+set shortmess+=c
 
 " easy align -----------------------------------------------------------
 
@@ -684,7 +690,6 @@ endfunction
 nnoremap <silent> <expr> <Enter> <SID>SmartFold()
 
 let g:xml_syntax_folding = 1
-let g:javaScript_fold = 1
 let g:php_folding = 2
 
 " ----------------------------------------------------------------------
@@ -763,8 +768,7 @@ let g:PHP_vintage_case_default_indent = 1
 autocmd vimrc FileType php
       \ setlocal spell spelllang=it,en |
       \ setlocal commentstring=//\ %s |
-      \ setlocal iskeyword-=-,:$ |
-      \ setlocal foldnestmax=2
+      \ setlocal iskeyword-=-,:$
 
 " ----------------------------------------------------------------------
 " SESSION MANAGEMENT ---------------------------------------------------
