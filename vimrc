@@ -4,13 +4,13 @@ endif
 
 " http://vim.wikia.com/wiki/Working_with_Unicode
 if has('multi_byte')
-    if &termencoding == ''
-        let &termencoding = &encoding
-    endif
-    set encoding=utf-8
-    scriptencoding utf-8
-    setglobal fileencoding=utf-8
-    set fileencodings=ucs-bom,utf-8,latin1
+  if &termencoding == ''
+    let &termencoding = &encoding
+  endif
+  set encoding=utf-8
+  scriptencoding utf-8
+  setglobal fileencoding=utf-8
+  set fileencodings=ucs-bom,utf-8,latin1
 endif
 
 if has('nvim')
@@ -34,19 +34,19 @@ if !has('nvim')
 
   " fish shell is supported since vim 7.4.276
   if version < 704 || (version == 704 && !has('patch276'))
-      if &shell =~# 'fish$'
-          set shell=bash
-      endif
+    if &shell =~# 'fish$'
+      set shell=bash
+    endif
   endif
 
   " remove comments symbols when joining lines
   if version > 703 || (version == 703 && has('patch541'))
-      set formatoptions+=j
+    set formatoptions+=j
   endif
 
   " for screens bigger than 232 columns
   if has('mouse_sgr')
-      set ttymouse=sgr
+    set ttymouse=sgr
   endif
 
   " do highlight as you search
@@ -104,7 +104,7 @@ let mapleader="\<Space>"
 
 " http://rbtnn.hateblo.jp/entry/2014/12/28/010913
 augroup vimrc
-    autocmd!
+  autocmd!
 augroup END
 
 " ----------------------------------------------------------------------
@@ -114,10 +114,10 @@ augroup END
 let s:base = has('nvim') ? '~/.config/nvim' : '~/.vim'
 
 function! s:EnsureExists(path)
-    let l:dir = expand(a:path)
-    if !isdirectory(l:dir)
-        call mkdir(l:dir)
-    endif
+  let l:dir = expand(a:path)
+  if !isdirectory(l:dir)
+    call mkdir(l:dir)
+  endif
 endfunction
 
 let &g:spellfile = s:base . '/spell/it.utf8.add'
@@ -130,9 +130,9 @@ call <SID>EnsureExists(g:sessiondir)
 call <SID>EnsureExists(&backupdir)
 
 if exists('+undofile')
-    set undofile
-    set undodir=~/.cache/vim_undo
-    call <SID>EnsureExists(&undodir)
+  set undofile
+  set undodir=~/.cache/vim_undo
+  call <SID>EnsureExists(&undodir)
 endif
 
 " ----------------------------------------------------------------------
@@ -140,9 +140,9 @@ endif
 " ----------------------------------------------------------------------
 
 if empty(glob(s:base . '/autoload/plug.vim'))
-    execute '!curl -fLso ' . s:base . '/autoload/plug.vim --create-dirs'
-          \ 'https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
-    autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+  execute '!curl -fLso ' . s:base . '/autoload/plug.vim --create-dirs'
+        \ 'https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
+  autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
 endif
 
 call plug#begin()
@@ -186,7 +186,7 @@ call plug#end()
 
 " load matchit.vim, but only if the user hasn't installed a newer version
 if !exists('g:loaded_matchit') && findfile('plugin/matchit.vim', &rtp) ==# ''
-    runtime! macros/matchit.vim
+  runtime! macros/matchit.vim
 endif
 
 " ctrlsf ---------------------------------------------------------------
@@ -200,12 +200,12 @@ let g:ctrlsf_auto_close = {
 
 " just a little shortcut
 function! SmartCtrlSF(args)
-    if &columns < 120
-        let g:ctrlsf_position = 'bottom'
-    else
-        let g:ctrlsf_position = 'left'
-    endif
-    call ctrlsf#Search(a:args, 0)
+  if &columns < 120
+    let g:ctrlsf_position = 'bottom'
+  else
+    let g:ctrlsf_position = 'left'
+  endif
+  call ctrlsf#Search(a:args, 0)
 endfunction
 
 command! -nargs=* -complete=file Rg call SmartCtrlSF(<q-args>)
@@ -302,7 +302,7 @@ set smartcase
 
 " live substitution preview
 if has('nvim')
-    set inccommand=nosplit
+  set inccommand=nosplit
 endif
 
 " show available completions
@@ -326,17 +326,17 @@ if !has('nvim')
 end
 
 if has('gui_running')
-    set guicursor+=a:blinkon0 " disable cursor blinking
-    set guioptions-=e         " textual tabs in gui mode
-    set guioptions-=T         " do not show the toolbar
-    set guioptions-=r         " do not show the scrollbars
-    set guioptions-=m         " remove menu bar
-    set guioptions-=L
-    set lines=52 columns=84
+  set guicursor+=a:blinkon0 " disable cursor blinking
+  set guioptions-=e         " textual tabs in gui mode
+  set guioptions-=T         " do not show the toolbar
+  set guioptions-=r         " do not show the scrollbars
+  set guioptions-=m         " remove menu bar
+  set guioptions-=L
+  set lines=52 columns=84
 
-    " in fullscreen maximize columns and rows
-    set guifont=DejaVu\ Sans\ Mono:h12
-    set fuopt=maxvert,maxhorz
+  " in fullscreen maximize columns and rows
+  set guifont=DejaVu\ Sans\ Mono:h12
+  set fuopt=maxvert,maxhorz
 endif
 
 set cursorline
@@ -360,28 +360,28 @@ highlight SpellLocal term=underline cterm=underline
 
 " copied and modified from http://www.blaenkdenum.com/posts/a-simpler-vim-statusline/
 function! StatuslineColumn()
-    let l:vc           = virtcol('.')
-    let l:ruler_width  = max([strlen(line('$')), (&numberwidth - 1)])
-    let l:column_width = strlen(l:vc)
-    let l:padding      = l:ruler_width - l:column_width
-    let l:column       = ''
+  let l:vc           = virtcol('.')
+  let l:ruler_width  = max([strlen(line('$')), (&numberwidth - 1)])
+  let l:column_width = strlen(l:vc)
+  let l:padding      = l:ruler_width - l:column_width
+  let l:column       = ''
 
-    " no idea if there's a faster alternative
-    redir => l:signlist
-    silent! execute 'sign place buffer='. bufnr('%')
-    redir END
-    if strlen(l:signlist) > 18
-        let l:padding += 2
-    endif
+  " no idea if there's a faster alternative
+  redir => l:signlist
+  silent! execute 'sign place buffer='. bufnr('%')
+  redir END
+  if strlen(l:signlist) > 18
+    let l:padding += 2
+  endif
 
-    if l:padding > 0
-        " + 1 becuase for some reason vim eats one of the spaces
-        let l:column .= repeat(' ', l:padding + 1) . l:vc
-    else
-        let l:column .= l:vc
-    endif
+  if l:padding > 0
+    " + 1 becuase for some reason vim eats one of the spaces
+    let l:column .= repeat(' ', l:padding + 1) . l:vc
+  else
+    let l:column .= l:vc
+  endif
 
-    return l:column . ' '
+  return l:column . ' '
 endfunction
 
 function! s:ShortenPath(path)
@@ -401,37 +401,37 @@ function! s:ShortenPath(path)
 endfunction
 
 function! StatuslinePath()
-    let l:width  = winwidth(0) - 50
-    let l:path   = expand('%')
-    let l:bufnum = bufnr('%')
+  let l:width  = winwidth(0) - 50
+  let l:path   = expand('%')
+  let l:bufnum = bufnr('%')
 
-    " shorten file path if too long. available space depends on a
-    " lot of things, so to keep this function simple let's assume
-    " that 'a lot of things' is 50 characters long
+  " shorten file path if too long. available space depends on a
+  " lot of things, so to keep this function simple let's assume
+  " that 'a lot of things' is 50 characters long
+  if strlen(l:path) > l:width
+    let l:path = <SID>ShortenPath(l:path)
+
     if strlen(l:path) > l:width
-        let l:path = <SID>ShortenPath(l:path)
+      let l:path = pathshorten(l:path)
+    end
+  endif
+  if getbufvar(l:bufnum, '&modified')
+    let l:path .= ' +'
+  endif
 
-        if strlen(l:path) > l:width
-          let l:path = pathshorten(l:path)
-        end
-    endif
-    if getbufvar(l:bufnum, '&modified')
-        let l:path .= ' +'
-    endif
+  if getbufvar(l:bufnum, '&readonly')
+    let l:path .= ' ‼'
+  endif
 
-    if getbufvar(l:bufnum, '&readonly')
-        let l:path .= ' ‼'
-    endif
-
-    return l:path
+  return l:path
 endfunction
 
 function! StatuslinePaste()
-    if exists('g:actual_curbuf') && g:actual_curbuf == bufnr('%') && &paste
-        return 'P'
-    endif
+  if exists('g:actual_curbuf') && g:actual_curbuf == bufnr('%') && &paste
+    return 'P'
+  endif
 
-    return ''
+  return ''
 endfunction
 
 function! LinterStatus() abort
@@ -526,36 +526,36 @@ autocmd vimrc VimEnter * noremap Y y$
 
 " like the original *, but don't jump to the next match
 function! s:SuperStar()
-    let l:w='\<' . expand('<cword>') . '\>'
+  let l:w='\<' . expand('<cword>') . '\>'
 
-    call histadd('/', l:w)
-    let @/=l:w
-    " http://stackoverflow.com/a/3766135
-    return ":set hlsearch\<CR>:normal wb\<CR>"
+  call histadd('/', l:w)
+  let @/=l:w
+  " http://stackoverflow.com/a/3766135
+  return ":set hlsearch\<CR>:normal wb\<CR>"
 endfunction
 
 nnoremap <expr> * <SID>SuperStar()
 
 " http://stackoverflow.com/questions/1533565
 function! s:GetVisualSelection()
-    let [l:lnum1, l:col1] = getpos("'<")[1:2]
-    let [l:lnum2, l:col2] = getpos("'>")[1:2]
-    let l:lines = getline(l:lnum1, l:lnum2)
-    let l:lines[-1] = l:lines[-1][: l:col2 - (&selection == 'inclusive' ? 1 : 2)]
-    let l:lines[0] = l:lines[0][l:col1 - 1 :]
-    return join(l:lines, "\n")
+  let [l:lnum1, l:col1] = getpos("'<")[1:2]
+  let [l:lnum2, l:col2] = getpos("'>")[1:2]
+  let l:lines = getline(l:lnum1, l:lnum2)
+  let l:lines[-1] = l:lines[-1][: l:col2 - (&selection == 'inclusive' ? 1 : 2)]
+  let l:lines[0] = l:lines[0][l:col1 - 1 :]
+  return join(l:lines, "\n")
 endfunction
 
 " search the visually selected block of text
 function! s:SearchSelection()
-    let l:tmp = <SID>GetVisualSelection()
-    let l:tmp = escape(l:tmp, '\"')
-    let l:tmp = substitute(l:tmp, '\_s\+$', '\\s\\*', '')
-    let l:tmp = substitute(l:tmp, '^\_s\+', '\\s\\*', '')
-    let l:tmp = substitute(l:tmp, '\_s\+',  '\\_s\\+', 'g')
-    let l:tmp = '\V' . l:tmp
-    call histadd('/', l:tmp)
-    let @/ = l:tmp
+  let l:tmp = <SID>GetVisualSelection()
+  let l:tmp = escape(l:tmp, '\"')
+  let l:tmp = substitute(l:tmp, '\_s\+$', '\\s\\*', '')
+  let l:tmp = substitute(l:tmp, '^\_s\+', '\\s\\*', '')
+  let l:tmp = substitute(l:tmp, '\_s\+',  '\\_s\\+', 'g')
+  let l:tmp = '\V' . l:tmp
+  call histadd('/', l:tmp)
+  let @/ = l:tmp
 endfunction
 
 xnoremap <silent> <s-n> :call <SID>SearchSelection()<CR><s-n><s-n>
@@ -574,14 +574,14 @@ function! RestoreRegister()
 endfunction
 
 function! s:SaveRegister()
-    if &clipboard == 'unnamed'
-      let s:restore_reg = @*
-    elseif &clipboard == 'unnamedplus'
-      let s:restore_reg = @+
-    else
-      let s:restore_reg = @"
-    endif
-    return "p@=RestoreRegister()\<cr>"
+  if &clipboard == 'unnamed'
+    let s:restore_reg = @*
+  elseif &clipboard == 'unnamedplus'
+    let s:restore_reg = @+
+  else
+    let s:restore_reg = @"
+  endif
+  return "p@=RestoreRegister()\<cr>"
 endfunction
 
 xnoremap <silent> <expr> p <SID>SaveRegister()
@@ -591,17 +591,17 @@ xnoremap <silent> <expr> p <SID>SaveRegister()
 " ----------------------------------------------------------------------
 
 function! StripTrailingWhitespaces()
-    " preparation: save last search
-    " and cursor position.
-    let l:search = @/
-    let l:line = line('.')
-    let l:col = col('.')
-    " do the business
-    %s/\s\+$//e
-    " clean up: restore previous search
-    " history and cursor position
-    let @/=l:search
-    call cursor(l:line, l:col)
+  " preparation: save last search
+  " and cursor position.
+  let l:search = @/
+  let l:line = line('.')
+  let l:col = col('.')
+  " do the business
+  %s/\s\+$//e
+  " clean up: restore previous search
+  " history and cursor position
+  let @/=l:search
+  call cursor(l:line, l:col)
 endfunction
 
 " show tabs and trailing spaces
@@ -653,37 +653,37 @@ autocmd vimrc InsertLeave,WinLeave *
       \ endif
 
 function! s:SmartFold()
-    if !foldlevel('.')
-        return "\<Enter>"
-    end
+  if !foldlevel('.')
+    return "\<Enter>"
+  end
 
-    " the first line of current fold
-    let l:foldline = foldclosed('.')
+  " the first line of current fold
+  let l:foldline = foldclosed('.')
 
-    " close the current fold
-    if l:foldline == -1
-        return 'zc'
-    end
+  " close the current fold
+  if l:foldline == -1
+    return 'zc'
+  end
 
-    let l:line = getline(l:foldline)
-    " open the current fold only for classes
-    " and tests, open recursively everything else
-    if l:line =~? '\s*class ' || l:line =~? '\s*describe(\='
-        return 'zo'
-    endif
+  let l:line = getline(l:foldline)
+  " open the current fold only for classes
+  " and tests, open recursively everything else
+  if l:line =~? '\s*class ' || l:line =~? '\s*describe(\='
+    return 'zo'
+  endif
 
-    if indent(l:foldline) == 0
-        return 'zO'
-    endif
+  if indent(l:foldline) == 0
+    return 'zO'
+  endif
 
-    let l:nb   = prevnonblank(l:foldline - 1)
-    let l:line = getline(l:nb)
+  let l:nb   = prevnonblank(l:foldline - 1)
+  let l:line = getline(l:nb)
 
-    if l:line =~? '\s*class ' || l:line =~? '\s*describe(\='
-        return 'zo'
-    else
-        return 'zO'
-    endif
+  if l:line =~? '\s*class ' || l:line =~? '\s*describe(\='
+    return 'zo'
+  else
+    return 'zO'
+  endif
 endfunction
 
 " use space in normal mode to toggle folding
@@ -698,19 +698,19 @@ let g:php_folding = 2
 
 " this should speed up vim a bit with rbenv
 if isdirectory($HOME . '/.rbenv')
-    let g:ruby_path = $HOME . '/.rbenv/shims'
+  let g:ruby_path = $HOME . '/.rbenv/shims'
 endif
 
 " https://damien.pobel.fr/post/configure-neovim-vim-gf-javascript-import/
 function! LoadNodeModule(fname)
-    let nodeModules = "./node_modules/"
-    let packagePath = nodeModules . a:fname . "/package.json"
+  let nodeModules = "./node_modules/"
+  let packagePath = nodeModules . a:fname . "/package.json"
 
-    if filereadable(packagePath)
-        return nodeModules . a:fname . "/" . json_decode(join(readfile(packagePath))).main
-    else
-        return nodeModules . a:fname
-    endif
+  if filereadable(packagePath)
+    return nodeModules . a:fname . "/" . json_decode(join(readfile(packagePath))).main
+  else
+    return nodeModules . a:fname
+  endif
 endfunction
 
 autocmd vimrc FileType ruby
@@ -776,64 +776,64 @@ autocmd vimrc FileType php
 
 " creates a session (I don't remember where i stole this)
 function! s:MakeSession()
-    let b:sessiondir = <SID>getSessionDir()
-    if (filewritable(b:sessiondir) != 2)
-        exe 'silent !mkdir -p ' b:sessiondir
-        redraw!
-    endif
-    let b:filename = b:sessiondir . '/session.vim'
-    exe 'mksession! ' . b:filename
+  let b:sessiondir = <SID>getSessionDir()
+  if (filewritable(b:sessiondir) != 2)
+    exe 'silent !mkdir -p ' b:sessiondir
+    redraw!
+  endif
+  let b:filename = b:sessiondir . '/session.vim'
+  exe 'mksession! ' . b:filename
 endfunction
 
 " updates a session, BUT ONLY IF IT ALREADY EXISTS
 " and we actually loaded it (i.e. we edited a random
 " file launching vim from within a dir with a session)
 function! s:UpdateSession()
-    if s:sessionloaded == 1
-        let b:sessiondir = <SID>getSessionDir()
-        let b:sessionfile = b:sessiondir . '/session.vim'
-        if (filereadable(b:sessionfile))
-            exe 'mksession! ' . b:sessionfile
-        endif
+  if s:sessionloaded == 1
+    let b:sessiondir = <SID>getSessionDir()
+    let b:sessionfile = b:sessiondir . '/session.vim'
+    if (filereadable(b:sessionfile))
+      exe 'mksession! ' . b:sessionfile
     endif
+  endif
 endfunction
 
 " loads a session if it exists and we started without arguments
 let s:sessionloaded = 0
 function! s:LoadSession()
-    if argc() == 0
-        let b:sessiondir = <SID>getSessionDir()
-        let b:sessionfile = b:sessiondir . '/session.vim'
-        if (filereadable(b:sessionfile))
-            exe 'source ' b:sessionfile
-            let s:sessionloaded = 1
-        else
-            echo 'No session loaded.'
-        endif
+  if argc() == 0
+    let b:sessiondir = <SID>getSessionDir()
+    let b:sessionfile = b:sessiondir . '/session.vim'
+    if (filereadable(b:sessionfile))
+      exe 'source ' b:sessionfile
+      let s:sessionloaded = 1
     else
-        let b:sessionfile = ''
-        let b:sessiondir = ''
+      echo 'No session loaded.'
     endif
+  else
+    let b:sessionfile = ''
+    let b:sessiondir = ''
+  endif
 endfunction
 
 function! s:GetCurrentGitBranch()
-    " http://stackoverflow.com/questions/2863756
-    let l:branch = <SID>sub(system('git rev-parse --abbrev-ref HEAD 2> /dev/null'), '\n$', '')
-    if empty(l:branch)
-        return ''
-    endif
-    return l:branch
+  " http://stackoverflow.com/questions/2863756
+  let l:branch = <SID>sub(system('git rev-parse --abbrev-ref HEAD 2> /dev/null'), '\n$', '')
+  if empty(l:branch)
+    return ''
+  endif
+  return l:branch
 endfunction
 
 function! s:sub(str, pat, rep)
-    " borrowed from fugitive.vim by tpope
-    return substitute(a:str, '\v\C' . a:pat, a:rep, '')
+  " borrowed from fugitive.vim by tpope
+  return substitute(a:str, '\v\C' . a:pat, a:rep, '')
 endfunction
 
 function! s:getSessionDir()
-    let l:branch = <SID>GetCurrentGitBranch()
-    let l:sessiondir = expand(g:sessiondir) . getcwd() . '/' . l:branch
-    return l:sessiondir
+  let l:branch = <SID>GetCurrentGitBranch()
+  let l:sessiondir = expand(g:sessiondir) . getcwd() . '/' . l:branch
+  return l:sessiondir
 endfunction
 
 set sessionoptions=curdir,folds,tabpages
@@ -847,10 +847,10 @@ autocmd vimrc VimLeave * :call <SID>UpdateSession()
 
 " save and restore cursor position on file load
 function! s:ResCur()
-    if line("'\"") <= line('$')
-        normal! g`"
-        return 1
-    endif
+  if line("'\"") <= line('$')
+    normal! g`"
+    return 1
+  endif
 endfunction
 
 autocmd vimrc BufReadPost * call s:ResCur()
