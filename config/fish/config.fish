@@ -46,11 +46,6 @@ else
   set -x FZF_DEFAULT_COMMAND 'rg --files --follow --hidden --glob "!.git/*"'
 end
 
-if which pygmentize > /dev/null
-  set -x LESSOPEN '| pygmentize -f 256 -O encoding=utf-8,style=monokai "%s"'
-end
-set -x LESS '-R -i'
-
 set -x SHELL (which fish)
 
 if which nvim > /dev/null
