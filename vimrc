@@ -235,9 +235,10 @@ inoremap <expr> <cr> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
 nmap <silent> <C-k> <Plug>(coc-diagnostic-prev)
 nmap <silent> <C-j> <Plug>(coc-diagnostic-next)
 
-" suppress the annoying 'match x of y', 'The only match' and
-" 'Pattern not found' messages
+" suppress the annoying 'match x of y', 'The only match'
+" and 'Pattern not found' messages
 set shortmess+=c
+set signcolumn=yes
 
 " easy align -----------------------------------------------------------
 
