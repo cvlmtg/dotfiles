@@ -149,17 +149,7 @@ call plug#begin()
 
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
-Plug 'autozimu/LanguageClient-neovim', {
-      \ 'do': 'bash install.sh',
-      \ 'branch': 'next',
-      \ }
-if has('nvim')
-  Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
-else
-  Plug 'roxma/vim-hug-neovim-rpc'
-  Plug 'Shougo/deoplete.nvim'
-  Plug 'roxma/nvim-yarp'
-endif
+Plug 'neoclide/coc.nvim', {'do': { -> coc#util#install()}}
 
 Plug 'ludovicchabant/vim-gutentags'
 Plug 'airblade/vim-gitgutter'
@@ -172,7 +162,6 @@ Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-surround'
 Plug 'wellle/targets.vim'
 Plug 'tpope/vim-repeat'
-Plug 'w0rp/ale'
 
 Plug 'MaxMEllon/vim-jsx-pretty'
 Plug 'kchmck/vim-coffee-script'
@@ -213,24 +202,6 @@ command! -nargs=* -complete=file Rg call SmartCtrlSF(<q-args>)
 " grep the word under the cursor
 nmap <leader>a <Plug>CtrlSFCCwordPath<CR>
 
-" ale ------------------------------------------------------------------
-
-let g:ale_sign_warning = '⚠'
-let g:ale_sign_error = '✖'
-
-let g:ale_linters = {
-      \   'javascript': [ 'eslint' ],
-      \ }
-
-" toggle location list to see linting errors
-nmap <leader>l :lwindow<CR>
-
-" move between linting errors
-nmap <silent> <C-k> <Plug>(ale_previous_wrap)
-nmap <silent> <C-j> <Plug>(ale_next_wrap)
-
-highlight link ALEErrorSign error
-
 " fzf ------------------------------------------------------------------
 
 set wildignore+=*/tmp/*,*/cache/*,*/node_modules/*,*/vendor/*
@@ -244,26 +215,25 @@ nnoremap <leader>f :<C-u>FzfGitFiles --exclude-standard --cached --others<CR>
 
 " complete -------------------------------------------------------------
 
-nnoremap <silent> <leader><Space> :<C-u>FzfTags <C-r><C-w><CR>
-nnoremap <silent> K :call LanguageClient#textDocument_hover()<CR>
+function! s:check_back_space() abort
+  let col = col('.') - 1
+  return !col || getline('.')[col - 1]  =~# '\s'
+endfunction
 
-inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
-inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
-inoremap <expr> <CR> (pumvisible() ? "\<c-y>\<cr>" : "\<CR>")
+" Use tab for trigger completion with characters ahead and navigate.
+inoremap <silent><expr> <TAB>
+      \ pumvisible() ? "\<C-n>" :
+      \ <SID>check_back_space() ? "\<TAB>" :
+      \ coc#refresh()
+inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
 
-" close popup with <space>
-imap <expr> <Space> pumvisible() ? "\<C-y>\<Space>" : "\<Space>"
+" Use <cr> for confirm completion.
+" Coc only does snippet and additional edit on confirm.
+inoremap <expr> <cr> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
 
-" npm install -g javascript-typescript-langserver
-let g:LanguageClient_serverCommands = {
-      \ 'javascript.jsx': ['javascript-typescript-stdio'],
-      \ 'javascript': ['javascript-typescript-stdio'],
-      \ 'ruby': ['ruby'],
-      \ }
-let g:LanguageClient_diagnosticsEnable = 0
-let g:deoplete#enable_at_startup = 1
-
-call deoplete#custom#var('file', 'enable_buffer_path', v:true)
+" move between linting errors
+nmap <silent> <C-k> <Plug>(coc-diagnostic-prev)
+nmap <silent> <C-j> <Plug>(coc-diagnostic-next)
 
 " suppress the annoying 'match x of y', 'The only match' and
 " 'Pattern not found' messages
@@ -435,16 +405,21 @@ function! StatuslinePaste()
 endfunction
 
 function! LinterStatus() abort
-  let l:counts = ale#statusline#Count(bufnr(''))
+  let l:info = get(b:, 'coc_diagnostic_info', {})
+  let l:msgs = []
 
-  let l:all_errors = l:counts.error + l:counts.style_error
-  let l:all_non_errors = l:counts.total - l:all_errors
+  if empty(l:info)
+    return ''
+  endif
 
-  return l:counts.total == 0 ? '' : printf(
-        \ '✖ %d ⚠ %d',
-        \ all_errors,
-        \ all_non_errors
-        \)
+  if get(l:info, 'error', 0)
+    call add(l:msgs, '✖' . info['error'])
+  endif
+  if get(l:info, 'warning', 0)
+    call add(l:msgs, '⚠' . info['warning'])
+  endif
+
+  return join(msgs, ' ')
 endfunction
 
 " set the statusline format
