@@ -1,0 +1,10 @@
+{
+  "coc.preferences.diagnostic.enable": true,
+  "coc.preferences.diagnostic.errorSign": "✖",
+  "coc.preferences.diagnostic.warningSign": "⚠",
+  "eslint.enable": true,
+  "eslint.autoFixOnSave": false,
+  "eslint.packageManager": "npm",
+  "typescript.validate.enable": false,
+  "javascript.validate.enable": false
+}
