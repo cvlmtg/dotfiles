@@ -120,7 +120,7 @@ function! s:EnsureExists(path)
   endif
 endfunction
 
-let &g:spellfile = s:base . '/spell/it.utf8.add'
+let spellfile = s:base . '/spell/it.utf8.add'
 let g:sessiondir = '~/.cache/vim_session'
 set backupdir=~/.cache/vim_backup
 
