@@ -716,7 +716,7 @@ autocmd vimrc FileType coffee
       \ setlocal foldmethod=indent
 
 autocmd vimrc FileType javascript
-      \ nnoremap <buffer> <leader><Space> :call LanguageClient#textDocument_definition()<CR> |
+      \ nmap <buffer> <silent> <leader><Space> <Plug>(coc-definition) |
       \ setlocal includeexpr=LoadNodeModule(v:fname) |
       \ setlocal expandtab textwidth=0 |
       \ setlocal spell spelllang=it,en |
