@@ -1,0 +1,11 @@
+# This is Git's per-user configuration file.
+[user]
+# Please adapt and uncomment the following lines:
+	name = Matteo Cavalleri
+	email = cvlmtg@gmail.com
+[alias]
+	tree = log --graph --oneline --decorate --date=relative --all
+[diff]
+	algorithm = patience
+[commit]
+	verbose = true
