@@ -2,23 +2,6 @@ if !has('nvim')
   set nocompatible
 endif
 
-" http://vim.wikia.com/wiki/Working_with_Unicode
-if has('multi_byte')
-  if &termencoding == ''
-    let &termencoding = &encoding
-  endif
-  set encoding=utf-8
-  scriptencoding utf-8
-  setglobal fileencoding=utf-8
-  set fileencodings=ucs-bom,utf-8,latin1
-endif
-
-if has('nvim')
-  set clipboard+=unnamedplus
-else
-  set clipboard=unnamed,unnamedplus
-endif
-
 " disable the magic "vim: .." lines in files
 set nomodeline
 
@@ -28,7 +11,22 @@ set nomodeline
 " try to live without them
 set noswapfile
 
-if !has('nvim')
+if has('nvim')
+  set clipboard+=unnamedplus
+else
+  set clipboard=unnamed,unnamedplus
+
+  " http://vim.wikia.com/wiki/Working_with_Unicode
+  if has('multi_byte')
+    if &termencoding == ''
+      let &termencoding = &encoding
+    endif
+    set encoding=utf-8
+    scriptencoding utf-8
+    setglobal fileencoding=utf-8
+    set fileencodings=ucs-bom,utf-8,latin1
+  endif
+
   " allow backspacing over everything in insert mode
   set backspace=indent,eol,start
 
@@ -164,7 +162,6 @@ Plug 'wellle/targets.vim'
 Plug 'tpope/vim-repeat'
 
 Plug 'MaxMEllon/vim-jsx-pretty'
-Plug 'kchmck/vim-coffee-script'
 Plug 'pangloss/vim-javascript'
 Plug 'groenewege/vim-less'
 Plug 'dag/vim-fish'
@@ -295,20 +292,6 @@ if !has('nvim')
   let &t_SI = "\e[6 q"
   let &t_EI = "\e[2 q"
 end
-
-if has('gui_running')
-  set guicursor+=a:blinkon0 " disable cursor blinking
-  set guioptions-=e         " textual tabs in gui mode
-  set guioptions-=T         " do not show the toolbar
-  set guioptions-=r         " do not show the scrollbars
-  set guioptions-=m         " remove menu bar
-  set guioptions-=L
-  set lines=52 columns=84
-
-  " in fullscreen maximize columns and rows
-  set guifont=DejaVu\ Sans\ Mono:h12
-  set fuopt=maxvert,maxhorz
-endif
 
 set cursorline
 set background=dark
@@ -611,7 +594,7 @@ xnoremap <Tab> >gv
 
 set foldlevelstart=99
 set foldmethod=syntax
-set foldnestmax=8
+set foldnestmax=16
 
 " http://vim.wikia.com/wiki/Keep_folds_closed_while_inserting_text
 " Don't screw up folds when inserting text that might affect them,
@@ -706,19 +689,11 @@ autocmd vimrc FileType fish
 autocmd vimrc FileType css
       \ setlocal iskeyword+=-
 
-" write C123 to jump to line 123 of the compiled js
-autocmd vimrc FileType coffee
-      \ command! -nargs=1 C CoffeeCompile | :<args>
-
-autocmd vimrc FileType coffee
-      \ setlocal expandtab textwidth=0 |
-      \ setlocal spell spelllang=it,en |
-      \ setlocal foldmethod=indent
-
 autocmd vimrc FileType javascript
       \ nmap <buffer> <silent> <leader><Space> <Plug>(coc-definition)
 
 autocmd vimrc FileType javascript
+      \ setlocal include=\\%(\\<require\\s*(\\s*\\\|\\<import\\>[^;\"']*\\)[\"']\\zs[^\"']* |
       \ setlocal includeexpr=LoadNodeModule(v:fname) |
       \ setlocal expandtab textwidth=0 |
       \ setlocal spell spelllang=it,en |
