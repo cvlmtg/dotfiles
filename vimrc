@@ -197,7 +197,7 @@ endfunction
 command! -nargs=* -complete=file Rg call SmartCtrlSF(<q-args>)
 
 " grep the word under the cursor
-nmap <leader>a <Plug>CtrlSFCCwordPath<CR>
+nmap <leader>a :Rg <C-R><C-W><CR>
 
 " fzf ------------------------------------------------------------------
 
