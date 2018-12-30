@@ -13,6 +13,22 @@ set noswapfile
 
 if has('nvim')
   set clipboard+=unnamedplus
+
+  if has('mac')
+    " speeds up neovim startup on macos
+    let g:clipboard = {
+          \ 'name': 'pbcopy',
+          \ 'copy': {
+          \    '+': 'pbcopy',
+          \    '*': 'pbcopy',
+          \  },
+          \ 'paste': {
+          \    '+': 'pbpaste',
+          \    '*': 'pbpaste',
+          \ },
+          \ 'cache_enabled': 0,
+          \ }
+  endif
 else
   set clipboard=unnamed,unnamedplus
 
