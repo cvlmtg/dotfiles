@@ -1,43 +1,38 @@
-# sotto osx /usr/local/bin viene dopo /usr/bin...
-set -l local_index (contains -i /usr/local/bin $PATH)
-set -l usr_index   (contains -i /usr/bin $PATH)
+function add_path
+  # http://pgib.me/blog/2013/10/11/macosx-tmux-zsh-rbenv/
+  # quando lanciamo TMUX il nostro $PATH viene modificato
+  # da path_helper, per cui cerchiamo di sistemare le cose
 
-if test $local_index -gt $usr_index
-  set -e PATH[$local_index]
-  set PATH /usr/local/bin $PATH
-end
-
-# per i pacchetti python installati con 'pip install --user'
-if test -d ~/Library/Python/2.7/bin
-  set PATH ~/Library/Python/2.7/bin $PATH
-end
-
-# usiamo rbenv invece di rvm
-if test -d ~/.rbenv/bin
-  set PATH "$HOME/.rbenv/bin" $PATH
-end
-if test -d ~/.rbenv/shims
-  if not contains ~/.rbenv/shims $PATH
-    set PATH "$HOME/.rbenv/shims" $PATH
+  if test -d $argv
+    if contains $argv $PATH
+      set -l index (contains -i $argv $PATH)
+      set -e PATH[$index]
+    end
+    set PATH $argv $PATH
   end
 end
 
+add_path ~/Library/Python/2.7/bin
+add_path ~/.rbenv/bin
+add_path ~/.rbenv/shims
+add_path ~/.fzf/bin
+add_path ~/bin
+
 # questo serve per react-native
+
 if test -d $HOME/Library/Android/sdk
   set -x ANDROID_HOME $HOME/Library/Android/sdk
   set PATH $PATH $ANDROID_HOME/tools $ANDROID_HOME/platform-tools
 end
 
-if test -d ~/bin
-  if not contains ~/bin $PATH
-    set PATH ~/bin $PATH
-  end
-end
-
 # rimuoviamo il messaggio di benvenuto
+
 set fish_greeting ""
 
 # impostazioni varie
+
+set -x SHELL (which fish)
+
 if which fd > /dev/null
   set -x FZF_DEFAULT_COMMAND 'fd --hidden --exclude ".git/"'
   set -x FZF_CTRL_T_COMMAND "$FZF_DEFAULT_COMMAND"
@@ -45,8 +40,6 @@ if which fd > /dev/null
 else
   set -x FZF_DEFAULT_COMMAND 'rg --files --follow --hidden --glob "!.git/*"'
 end
-
-set -x SHELL (which fish)
 
 if which nvim > /dev/null
   set -x SVN_EDITOR nvim
@@ -59,4 +52,5 @@ else
 end
 
 # nvm version manager for fish!
+
 if test -d ~/.nvf; nvf init; end
