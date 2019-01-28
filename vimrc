@@ -12,10 +12,7 @@ set nomodeline
 set noswapfile
 
 if has('nvim')
-  set clipboard+=unnamedplus
-
-  if has('mac')
-    " speeds up neovim startup on macos
+  if has('mac') " speeds up neovim startup on macos
     let g:clipboard = {
           \ 'name': 'pbcopy',
           \ 'copy': {
@@ -29,6 +26,8 @@ if has('nvim')
           \ 'cache_enabled': 0,
           \ }
   endif
+
+  set clipboard+=unnamedplus
 else
   set clipboard=unnamed,unnamedplus
 
@@ -251,7 +250,10 @@ nmap <silent> <C-j> <Plug>(coc-diagnostic-next)
 " suppress the annoying 'match x of y', 'The only match'
 " and 'Pattern not found' messages
 set shortmess+=c
-set signcolumn=yes
+
+if exists('&signcolumn') " Vim 7.4.2201
+  set signcolumn=yes
+endif
 
 " easy align -----------------------------------------------------------
 
@@ -264,6 +266,7 @@ let g:undotree_WindowLayout = 2
 
 " gitgutter ------------------------------------------------------------
 
+let g:gitgutter_override_sign_column_highlight = 0
 let g:gitgutter_map_keys = 0
 set updatetime=1000
 
@@ -336,12 +339,18 @@ function! StatuslineColumn()
   let l:padding      = l:ruler_width - l:column_width
   let l:column       = ''
 
-  " no idea if there's a faster alternative
-  redir => l:signlist
-  silent! execute 'sign place buffer='. bufnr('%')
-  redir END
-  if strlen(l:signlist) > 18
-    let l:padding += 2
+  if exists('&signcolumn')
+    if &signcolumn == 'yes'
+      let l:padding += 2
+    endif
+  else
+    " no idea if there's a faster alternative
+    redir => l:signlist
+    silent! execute 'sign place buffer='. bufnr('%')
+    redir END
+    if strlen(l:signlist) > 18
+      let l:padding += 2
+    endif
   endif
 
   if l:padding > 0
