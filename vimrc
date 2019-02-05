@@ -181,7 +181,7 @@ Plug 'pangloss/vim-javascript'
 Plug 'groenewege/vim-less'
 Plug 'dag/vim-fish'
 
-Plug 'cvlmtg/vim-256noir'
+Plug 'Lokaltog/vim-monotone'
 
 call plug#end()
 
@@ -312,9 +312,16 @@ if !has('nvim')
   let &t_EI = "\e[2 q"
 end
 
-set cursorline
 set background=dark
-colorscheme 256_noir
+set cursorline
+
+let g:monotone_emphasize_whitespace = 1
+let g:monotone_contrast_factor = 1.1
+colorscheme monotone
+
+highlight TabLine cterm=underline ctermbg=NONE ctermfg=243
+highlight TabLineFill cterm=underline ctermbg=NONE ctermfg=243
+highlight TabLineSel cterm=underline,bold ctermbg=NONE ctermfg=248
 
 " customize spelling colors to avoid unreadable
 " combinations of background and foreground
