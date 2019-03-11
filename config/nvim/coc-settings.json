@@ -3,6 +3,8 @@
   "diagnostic.enable": true,
   "diagnostic.errorSign": "✖",
   "diagnostic.warningSign": "⚠",
+  "diagnostic.virtualText": false,
+  "diagnostic.messageTarget": "echo",
   "eslint.enable": true,
   "eslint.autoFixOnSave": false,
   "eslint.packageManager": "npm",
