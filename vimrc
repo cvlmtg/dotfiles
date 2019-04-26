@@ -164,7 +164,6 @@ Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
 Plug 'neoclide/coc.nvim', {'tag': '*', 'do': { -> coc#util#install()}}
 
-Plug 'ludovicchabant/vim-gutentags'
 Plug 'airblade/vim-gitgutter'
 Plug 'mbbill/undotree'
 Plug 'dyng/ctrlsf.vim'
@@ -290,6 +289,7 @@ set smartcase
 " live substitution preview
 if has('nvim')
   set inccommand=nosplit
+  set termguicolors
 endif
 
 " show available completions
