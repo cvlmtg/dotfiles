@@ -180,7 +180,7 @@ Plug 'pangloss/vim-javascript'
 Plug 'groenewege/vim-less'
 Plug 'dag/vim-fish'
 
-Plug 'Lokaltog/vim-monotone'
+Plug 'cvlmtg/vim-256noir'
 
 call plug#end()
 
@@ -289,7 +289,6 @@ set smartcase
 " live substitution preview
 if has('nvim')
   set inccommand=nosplit
-  set termguicolors
 endif
 
 " show available completions
@@ -302,26 +301,17 @@ set scrolloff=5
 " show matching brackets
 set showmatch
 
-" set codes for 24bit term colors
-let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
-let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
-
 " change cursor shape in insert mode
 if !has('nvim')
   let &t_SI = "\e[6 q"
   let &t_EI = "\e[2 q"
 end
 
+set termguicolors
 set background=dark
 set cursorline
 
-let g:monotone_emphasize_whitespace = 1
-let g:monotone_contrast_factor = 1.1
-colorscheme monotone
-
-highlight TabLine cterm=underline ctermbg=NONE ctermfg=243
-highlight TabLineFill cterm=underline ctermbg=NONE ctermfg=243
-highlight TabLineSel cterm=underline,bold ctermbg=NONE ctermfg=248
+colorscheme 256_noir
 
 " customize spelling colors to avoid unreadable
 " combinations of background and foreground
