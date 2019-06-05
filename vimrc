@@ -819,13 +819,3 @@ nnoremap <leader>m :call <SID>MakeSession()<CR>
 
 autocmd vimrc VimEnter * nested :call <SID>LoadSession()
 autocmd vimrc VimLeave * :call <SID>UpdateSession()
-
-" save and restore cursor position on file load
-function! s:ResCur()
-  if line("'\"") <= line('$')
-    normal! g`"
-    return 1
-  endif
-endfunction
-
-autocmd vimrc BufReadPost * call s:ResCur()
