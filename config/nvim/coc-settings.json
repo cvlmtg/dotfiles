@@ -1,5 +1,4 @@
 {
-  "codeLens.enable": false,
   "diagnostic.enable": true,
   "diagnostic.errorSign": "✖",
   "diagnostic.warningSign": "⚠",
@@ -9,5 +8,7 @@
   "eslint.autoFixOnSave": false,
   "eslint.packageManager": "npm",
   "typescript.validate.enable": false,
-  "javascript.validate.enable": false
+  "typescript.suggest.enabled": false,
+  "javascript.validate.enable": false,
+  "javascript.suggest.enabled": false
 }
