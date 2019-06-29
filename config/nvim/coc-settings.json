@@ -1,4 +1,5 @@
 {
+  "npm.binPath": "yarn",
   "diagnostic.enable": true,
   "diagnostic.errorSign": "✖",
   "diagnostic.warningSign": "⚠",
@@ -6,7 +7,7 @@
   "diagnostic.messageTarget": "echo",
   "eslint.enable": true,
   "eslint.autoFixOnSave": false,
-  "eslint.packageManager": "npm",
+  "eslint.packageManager": "yarn",
   "typescript.validate.enable": false,
   "typescript.suggest.enabled": false,
   "javascript.validate.enable": false,
