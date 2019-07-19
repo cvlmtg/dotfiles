@@ -316,13 +316,13 @@ colorscheme 256_noir
 " customize spelling colors to avoid unreadable
 " combinations of background and foreground
 highlight clear SpellBad
-highlight SpellBad term=underline cterm=underline
+highlight SpellBad term=underline cterm=underline gui=underline
 highlight clear SpellCap
-highlight SpellCap term=underline cterm=underline
+highlight SpellCap term=underline cterm=underline gui=underline
 highlight clear SpellRare
-highlight SpellRare term=underline cterm=underline
+highlight SpellRare term=underline cterm=underline gui=underline
 highlight clear SpellLocal
-highlight SpellLocal term=underline cterm=underline
+highlight SpellLocal term=underline cterm=underline gui=underline
 
 " ----------------------------------------------------------------------
 " STATUSLINE -----------------------------------------------------------
