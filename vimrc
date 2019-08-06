@@ -291,9 +291,6 @@ if has('nvim')
   set inccommand=nosplit
 endif
 
-" show available completions
-set wildmode=list:longest,full
-
 " keep more context when scrolling off the end of a buffer
 set scrolljump=5
 set scrolloff=5
