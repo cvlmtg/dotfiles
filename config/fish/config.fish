@@ -25,6 +25,17 @@ if test -d $HOME/Library/Android/sdk
   set PATH $PATH $ANDROID_HOME/tools $ANDROID_HOME/platform-tools
 end
 
+# questo serve per i deploy
+
+if test -f ~/.ssh/bsl_deployer_rsa
+  ssh-add -l | grep deployer > /dev/null
+
+  if test $status -eq 1
+    ssh-add -Kq
+    ssh-add -kq ~/.ssh/bsl_deployer_rsa
+  end
+end
+
 # rimuoviamo il messaggio di benvenuto
 
 set fish_greeting ""
