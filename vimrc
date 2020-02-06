@@ -335,10 +335,8 @@ function! StatuslineColumn()
   let l:padding      = l:ruler_width - l:column_width
   let l:column       = ''
 
-  if exists('&signcolumn')
-    if &signcolumn == 'yes'
-      let l:padding += 2
-    endif
+  if exists('&signcolumn') && &signcolumn == 'yes'
+    let l:padding += 2
   else
     " no idea if there's a faster alternative
     redir => l:signlist
@@ -383,6 +381,7 @@ function! StatuslinePath()
   " shorten file path if too long. available space depends on a
   " lot of things, so to keep this function simple let's assume
   " that 'a lot of things' is 50 characters long
+
   if strlen(l:path) > l:width
     let l:path = <SID>ShortenPath(l:path)
 
