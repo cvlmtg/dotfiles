@@ -15,7 +15,6 @@ end
 add_path ~/Library/Python/2.7/bin
 add_path ~/.rbenv/bin
 add_path ~/.rbenv/shims
-add_path ~/.fzf/bin
 add_path ~/bin
 
 # questo serve per react-native
