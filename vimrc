@@ -155,7 +155,7 @@ endif
 if empty(glob(s:base . '/autoload/plug.vim'))
   execute '!curl -fLso ' . s:base . '/autoload/plug.vim --create-dirs'
         \ 'https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
-  autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+  autocmd vimrc VimEnter * PlugInstall --sync | source $MYVIMRC
 endif
 
 call plug#begin()
@@ -709,10 +709,10 @@ autocmd vimrc FileType fish
 autocmd vimrc FileType css
       \ setlocal iskeyword+=-
 
-autocmd vimrc FileType javascript
+autocmd vimrc FileType javascript,javascriptreact
       \ nmap <buffer> <silent> <leader><Space> <Plug>(coc-definition)
 
-autocmd vimrc FileType javascript
+autocmd vimrc FileType javascript,javascriptreact
       \ setlocal include=\\%(\\<require\\s*(\\s*\\\|\\<import\\>[^;\"']*\\)[\"']\\zs[^\"']* |
       \ setlocal includeexpr=LoadNodeModule(v:fname) |
       \ setlocal expandtab textwidth=0 |
