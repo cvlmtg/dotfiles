@@ -773,6 +773,7 @@ endfunction
 
 " loads a session if it exists and we started without arguments
 let s:sessionloaded = 0
+
 function! s:LoadSession()
   if argc() == 0
     let b:sessiondir = <SID>getSessionDir()
@@ -789,24 +790,8 @@ function! s:LoadSession()
   endif
 endfunction
 
-function! s:GetCurrentGitBranch()
-  " http://stackoverflow.com/questions/2863756
-  let l:branch = <SID>sub(system('git rev-parse --abbrev-ref HEAD 2> /dev/null'), '\n$', '')
-  if empty(l:branch)
-    return ''
-  endif
-  return l:branch
-endfunction
-
-function! s:sub(str, pat, rep)
-  " borrowed from fugitive.vim by tpope
-  return substitute(a:str, '\v\C' . a:pat, a:rep, '')
-endfunction
-
 function! s:getSessionDir()
-  let l:branch = <SID>GetCurrentGitBranch()
-  let l:sessiondir = expand(g:sessiondir) . getcwd() . '/' . l:branch
-  return l:sessiondir
+  return expand(g:sessiondir) . getcwd()
 endfunction
 
 set sessionoptions=curdir,folds,tabpages
