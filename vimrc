@@ -229,8 +229,9 @@ nnoremap <leader>f :<C-u>FzfGitFiles --exclude-standard --cached --others<CR>
 " complete -------------------------------------------------------------
 
 function! s:check_back_space() abort
-  let col = col('.') - 1
-  return !col || getline('.')[col - 1]  =~# '\s'
+  let l:col = col('.') - 1
+
+  return !l:col || getline('.')[l:col - 1]  =~# '\s'
 endfunction
 
 " Use tab for trigger completion with characters ahead and navigate.
@@ -374,13 +375,13 @@ function! s:ShortenPath(path)
 endfunction
 
 function! StatuslinePath()
-  let l:width  = winwidth(0) - 50
+  let l:width  = winwidth(0) - 30
   let l:path   = expand('%')
   let l:bufnum = bufnr('%')
 
   " shorten file path if too long. available space depends on a
   " lot of things, so to keep this function simple let's assume
-  " that 'a lot of things' is 50 characters long
+  " that 'a lot of things' is 30 characters long
 
   if strlen(l:path) > l:width
     let l:path = <SID>ShortenPath(l:path)
@@ -446,8 +447,8 @@ inoremap jj <Esc>
 nnoremap <C-p> <C-i>
 
 " save the jump if large enough
-nnoremap <expr> k (v:count > 6 ? "m'" . v:count : '') . 'k'
-nnoremap <expr> j (v:count > 6 ? "m'" . v:count : '') . 'j'
+nnoremap <expr> k (v:count > 5 ? "m'" . v:count : '') . 'k'
+nnoremap <expr> j (v:count > 5 ? "m'" . v:count : '') . 'j'
 
 " map <Esc> in terminal mode (except when we use fzf)
 if has('nvim')
@@ -461,9 +462,8 @@ nnoremap <S-Tab> <C-W>W
 " next and previous tab or buffer when no tabs are open
 nnoremap <expr> ç tabpagenr('$') == 1 ? ':bprevious<CR>' : ':tabp<CR>'
 nnoremap <expr> ° tabpagenr('$') == 1 ? ':bnext<CR>' : ':tabn<CR>'
-" american keyboards. even if {} are useful motions, I never
-" use them with the italian keyboard, so remap them on the
-" american one.
+" even if {} are useful motions, I never use them with the italian
+" keyboard, so remap them on the american one.
 nnoremap <expr> { tabpagenr('$') == 1 ? ':bprevious<CR>' : ':tabp<CR>'
 nnoremap <expr> } tabpagenr('$') == 1 ? ':bnext<CR>' : ':tabn<CR>'
 " switch to last visited buffer
@@ -509,6 +509,7 @@ function! s:SuperStar()
 
   call histadd('/', l:w)
   let @/=l:w
+
   " http://stackoverflow.com/a/3766135
   return ":set hlsearch\<CR>:normal wb\<CR>"
 endfunction
@@ -682,14 +683,17 @@ endif
 
 " https://damien.pobel.fr/post/configure-neovim-vim-gf-javascript-import/
 function! LoadNodeModule(fname)
-  let nodeModules = "./node_modules/"
-  let packagePath = nodeModules . a:fname . "/package.json"
+  let l:main        = ''
+  let l:nodeModules = "./node_modules/"
+  let l:packagePath = l:nodeModules . a:fname . "/package.json"
 
-  if filereadable(packagePath)
-    return nodeModules . a:fname . "/" . json_decode(join(readfile(packagePath))).main
-  else
-    return nodeModules . a:fname
+  if filereadable(l:packagePath)
+    let l:file = join(readfile(l:packagePath))
+    let l:json = json_decode(l:file)
+    let l:main = "/" . l:json.main
   endif
+
+  return l:nodeModules . a:fname . l:main
 endfunction
 
 autocmd vimrc FileType ruby
@@ -713,7 +717,7 @@ autocmd vimrc FileType javascript,javascriptreact
       \ nmap <buffer> <silent> <leader><Space> <Plug>(coc-definition)
 
 autocmd vimrc FileType javascript,javascriptreact
-      \ setlocal include=\\%(\\<require\\s*(\\s*\\\|\\<import\\>[^;\"']*\\)[\"']\\zs[^\"']* |
+      \ setlocal include=\\(\\<require\\s*(\\s*\\\|\\<import\\>\\)[^;\"']*[\"']\\zs[^\"']* |
       \ setlocal includeexpr=LoadNodeModule(v:fname) |
       \ setlocal expandtab textwidth=0 |
       \ setlocal spell spelllang=it,en |
