@@ -673,28 +673,65 @@ let g:xml_syntax_folding = 1
 let g:php_folding = 2
 
 " ----------------------------------------------------------------------
-" FILE FORMATS ---------------------------------------------------------
+" FILE TYPES -----------------------------------------------------------
 " ----------------------------------------------------------------------
 
-" this should speed up vim a bit with rbenv
-if isdirectory($HOME . '/.rbenv')
-  let g:ruby_path = $HOME . '/.rbenv/shims'
-endif
+function! s:JsFindFile(name)
+  if a:name =~ '^\.'
+    let l:base = simplify(expand('%:h') . '/' . a:name)
+    let l:list = glob(l:base . '.*', 0, 1)
+    let l:file = get(l:list, 0, a:name)
 
-" https://damien.pobel.fr/post/configure-neovim-vim-gf-javascript-import/
-function! LoadNodeModule(fname)
-  let l:main        = ''
-  let l:nodeModules = "./node_modules/"
-  let l:packagePath = l:nodeModules . a:fname . "/package.json"
+    if filereadable(l:file)
+      return l:file
+    endif
 
-  if filereadable(l:packagePath)
-    let l:file = join(readfile(l:packagePath))
-    let l:json = json_decode(l:file)
-    let l:main = "/" . l:json.main
+    return a:name
   endif
 
-  return l:nodeModules . a:fname . l:main
+  " https://damien.pobel.fr/post/configure-neovim-vim-gf-javascript-import/
+  let l:nodeModules = './node_modules/' . a:name . '/'
+  let l:packagePath = l:nodeModules . 'package.json'
+
+  if filereadable(l:packagePath)
+    let l:json = json_decode(join(readfile(l:packagePath)))
+    let l:main = get(l:json, 'main', 'index.js')
+
+    return l:nodeModules . l:main
+  endif
+
+  return ''
 endfunction
+
+function! s:JsGotoFile(split, tab) abort
+  let l:name = matchstr(getline('.'), &include)
+  let l:file = <SID>JsFindFile(l:name)
+
+  " https://gist.github.com/romainl/2ecbf1aaf60b4c0e2c135569d516fbd8
+  if len(l:file) > 1
+    let l:cmds = {
+          \ "11": "silent tab vsplit ",
+          \ "10": "silent vsplit ",
+          \ "00": "silent edit "
+          \ }
+
+    execute l:cmds[a:split . a:tab] . l:file
+    return
+  endif
+
+  echohl WarningMsg
+  echo "Can't find file " . a:text
+  echohl None
+endfunction
+
+autocmd vimrc FileType javascript,javascriptreact
+      \ setlocal include=\\(\\<require\\s*(\\s*\\\|\\<import\\>\\)[^;\"']*[\"']\\zs[^\"']* |
+      \ nnoremap <silent> <buffer> gf      :call <SID>JsGotoFile(0, 0)<CR> |
+      \ nnoremap <silent> <buffer> <C-w>f  :call <SID>JsGotoFile(1, 0)<CR> |
+      \ nnoremap <silent> <buffer> <C-w>gf :call <SID>JsGotoFile(1, 1)<CR> |
+      \ setlocal suffixes=.js,.jsx,.ts,.tsx |
+      \ setlocal expandtab textwidth=0 |
+      \ setlocal spell spelllang=it,en
 
 autocmd vimrc FileType ruby
       \ setlocal expandtab textwidth=0 |
@@ -715,13 +752,6 @@ autocmd vimrc FileType css
 
 autocmd vimrc FileType javascript,javascriptreact
       \ nmap <buffer> <silent> <leader><Space> <Plug>(coc-definition)
-
-autocmd vimrc FileType javascript,javascriptreact
-      \ setlocal include=\\(\\<require\\s*(\\s*\\\|\\<import\\>\\)[^;\"']*[\"']\\zs[^\"']* |
-      \ setlocal includeexpr=LoadNodeModule(v:fname) |
-      \ setlocal expandtab textwidth=0 |
-      \ setlocal spell spelllang=it,en |
-      \ setlocal suffixesadd=.js,.jsx
 
 autocmd vimrc FileType cucumber
       \ setlocal spell spelllang=it,en |
@@ -746,6 +776,11 @@ autocmd vimrc FileType php
       \ setlocal spell spelllang=it,en |
       \ setlocal commentstring=//\ %s |
       \ setlocal iskeyword-=-,:$
+
+" this should speed up vim a bit with rbenv
+if isdirectory($HOME . '/.rbenv')
+  let g:ruby_path = $HOME . '/.rbenv/shims'
+endif
 
 " ----------------------------------------------------------------------
 " SESSION MANAGEMENT ---------------------------------------------------
