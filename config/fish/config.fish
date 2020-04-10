@@ -41,6 +41,7 @@ set fish_greeting ""
 
 # impostazioni varie
 
+set -x RUBY_CONFIGURE_OPTS '--with-openssl-dir=/usr/local/opt/openssl@1.1'
 set -x SHELL (which fish)
 
 if which fd > /dev/null
