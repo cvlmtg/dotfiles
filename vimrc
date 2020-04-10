@@ -175,6 +175,7 @@ Plug 'tpope/vim-surround'
 Plug 'wellle/targets.vim'
 Plug 'tpope/vim-repeat'
 
+Plug 'HerringtonDarkholme/yats.vim'
 Plug 'MaxMEllon/vim-jsx-pretty'
 Plug 'pangloss/vim-javascript'
 Plug 'groenewege/vim-less'
@@ -256,6 +257,14 @@ set shortmess+=c
 if exists('&signcolumn') " Vim 7.4.2201
   set signcolumn=yes
 endif
+
+let g:coc_global_extensions = [
+      \ 'coc-css',
+      \ 'coc-eslint',
+      \ 'coc-html',
+      \ 'coc-json',
+      \ 'coc-tsserver'
+      \ ]
 
 " easy align -----------------------------------------------------------
 
@@ -724,7 +733,7 @@ function! s:JsGotoFile(split, tab) abort
   echohl None
 endfunction
 
-autocmd vimrc FileType javascript,javascriptreact
+autocmd vimrc FileType javascript,javascriptreact,typescript,typescriptreact
       \ setlocal include=\\(\\<require\\s*(\\s*\\\|\\<import\\>\\)[^;\"']*[\"']\\zs[^\"']* |
       \ nnoremap <silent> <buffer> gf      :call <SID>JsGotoFile(0, 0)<CR> |
       \ nnoremap <silent> <buffer> <C-w>f  :call <SID>JsGotoFile(1, 0)<CR> |
