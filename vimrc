@@ -766,6 +766,9 @@ autocmd vimrc FileType cucumber
       \ setlocal spell spelllang=it,en |
       \ setlocal textwidth=76
 
+autocmd vimrc FileType markdown
+      \ setlocal spell spelllang=it,en
+
 autocmd vimrc Filetype gitcommit
       \ setlocal spell spelllang=it,en |
       \ setlocal textwidth=72
