@@ -8,8 +8,9 @@
 (package-initialize)
 
 (setq list-of-packages
-      '(evil evil-leader evil-surround evil-matchit evil-args
-             linum-relative))
+ '(
+   evil evil-leader evil-surround evil-matchit evil-args
+  ))
 
 (defun check-and-install-packages ()
   (interactive)
@@ -37,7 +38,7 @@
 ; APPEARANCE ---------------------------------------------------------------
 ; --------------------------------------------------------------------------
 
-(set-default-font "Droid Sans Mono-9")
+(set-default-font "JetBrains Mono")
 (load-theme 'wombat t)
 
 ; nascondiamo un po' di roba. alcune impostazioni sono condizionali
@@ -58,11 +59,9 @@
 
 ; mostra i numeri di riga nel buffer. cambiamo anche il
 ; formato se no sotto console sono appiccicati al testo
-(setq-default linum-relative-format " %3s ")
-(setq-default linum-format " %d ")
-; mostra numeri di riga relativi
-(require 'linum-relative)
-(global-linum-mode 1)
+(when (version<= "26.0.50" emacs-version)
+  (setq-default display-line-numbers 'relative
+      display-line-numbers-current-absolute t))
 
 ; evidenziamo la riga corrente disattivando l'underline
 (global-hl-line-mode 1)
@@ -82,6 +81,11 @@
 ; indent with two spaces, don't use tab
 (setq standard-indent 2)
 (setq-default indent-tabs-mode nil)
+
+;; Enable mouse support
+(unless window-system
+  (global-set-key (kbd "<mouse-4>") 'scroll-down-line)
+  (global-set-key (kbd "<mouse-5>") 'scroll-up-line))
 
 ; --------------------------------------------------------------------------
 ; EVIL! --------------------------------------------------------------------
