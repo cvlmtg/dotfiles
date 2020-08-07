@@ -738,6 +738,7 @@ autocmd vimrc FileType javascript,javascriptreact,typescript,typescriptreact
       \ nnoremap <silent> <buffer> gf      :call <SID>JsGotoFile(0, 0)<CR> |
       \ nnoremap <silent> <buffer> <C-w>f  :call <SID>JsGotoFile(1, 0)<CR> |
       \ nnoremap <silent> <buffer> <C-w>gf :call <SID>JsGotoFile(1, 1)<CR> |
+      \ nmap <buffer> <silent> <leader><Space> <Plug>(coc-definition)
       \ setlocal suffixes=.js,.jsx,.ts,.tsx |
       \ setlocal expandtab textwidth=0 |
       \ setlocal spell spelllang=it,en
@@ -758,9 +759,6 @@ autocmd vimrc FileType fish
 " '-' should be part of the word, not a separator
 autocmd vimrc FileType css
       \ setlocal iskeyword+=-
-
-autocmd vimrc FileType javascript,javascriptreact
-      \ nmap <buffer> <silent> <leader><Space> <Plug>(coc-definition)
 
 autocmd vimrc FileType cucumber
       \ setlocal spell spelllang=it,en |
