@@ -8,7 +8,7 @@
   "eslint.enable": true,
   "eslint.autoFixOnSave": false,
   "eslint.packageManager": "yarn",
-  "typescript.validate.enable": false,
+  "typescript.validate.enable": true,
   "typescript.suggest.enabled": false,
   "javascript.validate.enable": false,
   "javascript.suggest.enabled": false
