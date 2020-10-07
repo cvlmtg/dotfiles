@@ -220,6 +220,7 @@ nmap <leader>a :Rg <C-R><C-W><CR>
 
 set wildignore+=*/tmp/*,*/cache/*,*/node_modules/*,*/vendor/*
 
+let g:fzf_layout = { 'down': '40%' }
 let g:fzf_command_prefix = 'Fzf'
 
 nnoremap <leader>l :<C-u>FzfLines<CR>
