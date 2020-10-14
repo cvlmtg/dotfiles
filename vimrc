@@ -676,7 +676,7 @@ function! s:SmartFold()
   endif
 endfunction
 
-" use space in normal mode to toggle folding
+" use enter in normal mode to toggle folding
 nnoremap <silent> <expr> <Enter> <SID>SmartFold()
 
 let g:xml_syntax_folding = 1
@@ -736,10 +736,10 @@ endfunction
 
 autocmd vimrc FileType javascript,javascriptreact,typescript,typescriptreact
       \ setlocal include=\\(\\<require\\s*(\\s*\\\|\\<import\\>\\)[^;\"']*[\"']\\zs[^\"']* |
-      \ nnoremap <silent> <buffer> gf      :call <SID>JsGotoFile(0, 0)<CR> |
-      \ nnoremap <silent> <buffer> <C-w>f  :call <SID>JsGotoFile(1, 0)<CR> |
-      \ nnoremap <silent> <buffer> <C-w>gf :call <SID>JsGotoFile(1, 1)<CR> |
-      \ nmap <buffer> <silent> <leader><Space> <Plug>(coc-definition)
+      \ nnoremap <silent> <buffer> gf      :call <SID>JsGotoFile(0, 0)<CR>|
+      \ nnoremap <silent> <buffer> <C-w>f  :call <SID>JsGotoFile(1, 0)<CR>|
+      \ nnoremap <silent> <buffer> <C-w>gf :call <SID>JsGotoFile(1, 1)<CR>|
+      \ nmap <buffer> <leader><Space> <Plug>(coc-definition)|
       \ setlocal suffixes=.js,.jsx,.ts,.tsx |
       \ setlocal expandtab textwidth=0 |
       \ setlocal spell spelllang=it,en
