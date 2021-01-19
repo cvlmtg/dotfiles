@@ -442,7 +442,7 @@ set statusline=%#LineNr#%{StatuslineColumn()}%*
 set statusline+=\ %{StatuslinePath()}
 
 " paste mode and errors/warnings from the linter
-set statusline+=\ %#IncSearch#%{StatuslinePaste()}
+set statusline+=\ %#WarningMsg#%{StatuslinePaste()}
 set statusline+=%(\ %{LinterStatus()}\ %)
 set statusline+=%*
 
