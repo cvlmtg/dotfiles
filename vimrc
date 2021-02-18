@@ -441,10 +441,10 @@ function! LinterStatus() abort
   endif
 
   if get(l:info, 'error', 0)
-    call add(l:msgs, '✖' . info['error'])
+    call add(l:msgs, '✖ ' . info['error'])
   endif
   if get(l:info, 'warning', 0)
-    call add(l:msgs, '⚠' . info['warning'])
+    call add(l:msgs, '⚠ ' . info['warning'])
   endif
 
   return join(msgs, ' ')
