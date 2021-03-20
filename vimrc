@@ -292,6 +292,7 @@ let g:undotree_WindowLayout = 2
 " gitgutter ------------------------------------------------------------
 
 let g:gitgutter_override_sign_column_highlight = 0
+let g:gitgutter_show_msg_on_hunk_jumping = 0
 let g:gitgutter_map_keys = 0
 set updatetime=1000
 
