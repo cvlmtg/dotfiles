@@ -170,9 +170,10 @@ Plug 'dyng/ctrlsf.vim'
 
 Plug 'michaeljsmith/vim-indent-object'
 Plug 'junegunn/vim-easy-align'
-Plug 'machakann/vim-sandwich'
 Plug 'tpope/vim-commentary'
+Plug 'tpope/vim-surround'
 Plug 'wellle/targets.vim'
+Plug 'tpope/vim-repeat'
 
 Plug 'HerringtonDarkholme/yats.vim'
 Plug 'MaxMEllon/vim-jsx-pretty'
@@ -214,20 +215,6 @@ command! -nargs=* -complete=file Rg call SmartCtrlSF(<q-args>)
 
 " grep the word under the cursor
 nmap <leader>a :Rg <C-R><C-W><CR>
-
-" sandwich -------------------------------------------------------------
-
-runtime macros/sandwich/keymap/surround.vim
-
-let g:sandwich#recipes = deepcopy(g:sandwich#default_recipes)
-let g:sandwich#recipes += [
-      \   {'buns': ['{ ', ' }'], 'nesting': 1, 'match_syntax': 1, 'kind': ['add', 'replace'], 'action': ['add'], 'input': ['{']},
-      \   {'buns': ['[ ', ' ]'], 'nesting': 1, 'match_syntax': 1, 'kind': ['add', 'replace'], 'action': ['add'], 'input': ['[']},
-      \   {'buns': ['( ', ' )'], 'nesting': 1, 'match_syntax': 1, 'kind': ['add', 'replace'], 'action': ['add'], 'input': ['(']},
-      \   {'buns': ['{\s*', '\s*}'],   'nesting': 1, 'regex': 1, 'match_syntax': 1, 'kind': ['delete', 'replace', 'textobj'], 'action': ['delete'], 'input': ['{']},
-      \   {'buns': ['\[\s*', '\s*\]'], 'nesting': 1, 'regex': 1, 'match_syntax': 1, 'kind': ['delete', 'replace', 'textobj'], 'action': ['delete'], 'input': ['[']},
-      \   {'buns': ['(\s*', '\s*)'],   'nesting': 1, 'regex': 1, 'match_syntax': 1, 'kind': ['delete', 'replace', 'textobj'], 'action': ['delete'], 'input': ['(']},
-      \ ]
 
 " fzf ------------------------------------------------------------------
 
