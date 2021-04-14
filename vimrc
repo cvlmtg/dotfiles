@@ -429,10 +429,15 @@ function! LinterStatus() abort
   endif
 
   if get(l:info, 'error', 0)
-    call add(l:msgs, '✖ ' . info['error'])
+    call add(l:msgs, '✖ ' . l:info['error'])
   endif
-  if get(l:info, 'warning', 0)
-    call add(l:msgs, '⚠ ' . info['warning'])
+
+  let l:information = get(l:info, 'information', 0)
+  let l:warnings = get(l:info, 'warning', 0)
+  let l:total = l:information + l:warnings
+
+  if l:total
+    call add(l:msgs, '⚠ ' . l:total)
   endif
 
   return join(msgs, ' ')
