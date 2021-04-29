@@ -243,13 +243,16 @@ inoremap <silent><expr> <TAB>
       \ coc#refresh()
 inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
 
-" Use <cr> for confirm completion.
+" Use <cr> to confirm completion.
 " Coc only does snippet and additional edit on confirm.
 inoremap <expr> <cr> pumvisible() ? "\<C-y>\<CR>" : "\<C-g>u\<CR>"
 
 " move between linting errors
 nmap <silent> <C-k> <Plug>(coc-diagnostic-prev)
 nmap <silent> <C-j> <Plug>(coc-diagnostic-next)
+
+" show function signature
+nnoremap <silent> <leader>d :call CocAction('doHover')<CR>
 
 " suppress the annoying 'match x of y', 'The only match'
 " and 'Pattern not found' messages
