@@ -5,6 +5,7 @@
 	email = cvlmtg@gmail.com
 [alias]
 	tree = log --graph --oneline --decorate --date=relative --all
+	branches = for-each-ref --sort=-committerdate --format=\"%(color:blue)%(authordate:relative)\t%(color:red)%(authorname)\t%(color:white)%(color:bold)%(refname:short)\" refs/remotes
 [diff]
 	algorithm = patience
 [commit]
@@ -14,5 +15,8 @@
 	smudge = git-lfs smudge -- %f
 	process = git-lfs filter-process
 	required = true
+[core]
+	editor = vim
+	autocrlf = false
 [pull]
 	ff = only
