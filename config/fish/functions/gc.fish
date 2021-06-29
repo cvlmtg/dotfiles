@@ -1,8 +1,8 @@
 # git commit -m 'blabla'
 
 function gc
-  set -l has_staged_files (git status --porcelain ^/dev/null | egrep '^(M|A|D|R)' | wc -l)
-  set -l has_files (git status --porcelain ^/dev/null | egrep '^( M|\?\?)' | wc -l)
+  set -l has_staged_files (git status --porcelain 2>/dev/null | egrep '^(M|A|D|R)' | wc -l)
+  set -l has_files (git status --porcelain 2>/dev/null | egrep '^( M|\?\?)' | wc -l)
 
   if test $has_staged_files -gt 0
     if test -n "$argv"

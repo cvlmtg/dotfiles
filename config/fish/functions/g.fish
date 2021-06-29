@@ -1,8 +1,8 @@
 # git status (evitiamo gs per non mascherare ghostscript)
 
 function g
-  set -l has_staged_files (git status --porcelain ^/dev/null | egrep '^(M|A|D|R)' | wc -l)
-  set -l has_files (git status --porcelain ^/dev/null | egrep '^ M' | wc -l)
+  set -l has_staged_files (git status --porcelain 2>/dev/null | egrep '^(M|A|D|R)' | wc -l)
+  set -l has_files (git status --porcelain 2>/dev/null | egrep '^ M' | wc -l)
 
   if test -n "$argv"
     set -l file $argv[1]

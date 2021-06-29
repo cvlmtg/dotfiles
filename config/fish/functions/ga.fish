@@ -2,7 +2,7 @@
 # git commit --amend
 
 function ga
-  set -l has_staged_files (git status --porcelain ^/dev/null | egrep '^(M|A|D|R)' | wc -l)
+  set -l has_staged_files (git status --porcelain 2>/dev/null | egrep '^(M|A|D|R)' | wc -l)
 
   if test $has_staged_files -eq 0
     git add -A
