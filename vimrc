@@ -744,12 +744,12 @@ function! s:JsGotoFile(split, tab) abort
   endif
 
   echohl WarningMsg
-  echo "Can't find file " . a:text
+  echo "Can't find file " . l:name
   echohl None
 endfunction
 
 autocmd vimrc FileType javascript,javascriptreact,typescript,typescriptreact
-      \ setlocal include=\\(\\<require\\s*(\\s*\\\|\\<import\\>\\)[^;\"']*[\"']\\zs[^\"']* |
+      \ setlocal include=\\(\\<require\\s*(\\s*\\\|\\<import\\>\\\|\\<export\\>\\)[^;\"']*[\"']\\zs[^\"']* |
       \ nnoremap <silent> <buffer> gf      :call <SID>JsGotoFile(0, 0)<CR>|
       \ nnoremap <silent> <buffer> <C-w>f  :call <SID>JsGotoFile(1, 0)<CR>|
       \ nnoremap <silent> <buffer> <C-w>gf :call <SID>JsGotoFile(1, 1)<CR>|
