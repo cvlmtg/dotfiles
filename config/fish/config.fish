@@ -21,7 +21,10 @@ add_path ~/bin
 
 if test -d $HOME/Library/Android/sdk
   set -x ANDROID_HOME $HOME/Library/Android/sdk
-  set PATH $PATH $ANDROID_HOME/tools $ANDROID_HOME/platform-tools
+  set PATH $PATH $ANDROID_HOME/emulator
+  set PATH $PATH $ANDROID_HOME/tools
+  set PATH $PATH $ANDROID_HOME/tools/bin
+  set PATH $PATH $ANDROID_HOME/platform-tools
 end
 
 # questo serve per i deploy
