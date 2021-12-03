@@ -12,9 +12,8 @@ function add_path
   end
 end
 
-add_path ~/Library/Python/2.7/bin
-add_path ~/.rbenv/bin
 add_path ~/.rbenv/shims
+add_path ~/.rbenv/bin
 add_path ~/bin
 
 # questo serve per react-native
