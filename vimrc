@@ -158,7 +158,7 @@ if empty(glob(s:base . '/autoload/plug.vim'))
   autocmd vimrc VimEnter * PlugInstall --sync | source $MYVIMRC
 endif
 
-call plug#begin()
+call plug#begin(s:base . '/plugged')
 
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
