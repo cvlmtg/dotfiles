@@ -32,8 +32,8 @@ if test -f ~/.ssh/bsl_deployer_rsa
   ssh-add -l | grep deployer > /dev/null
 
   if test $status -eq 1
-    ssh-add -Kq
-    ssh-add -kq ~/.ssh/bsl_deployer_rsa
+    ssh-add -q
+    ssh-add -q ~/.ssh/bsl_deployer_rsa
   end
 end
 
