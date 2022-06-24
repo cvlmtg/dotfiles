@@ -2,10 +2,14 @@
 # git log
 
 function gl
-  set -l FILENAME $argv[1]
+  set -f FILENAME $argv[1]
+
+  if test $FILENAME = "--"
+    set FILENAME $argv[2]
+  end
 
   if test -n "$FILENAME"
-    git log --all --full-history -u $FILENAME
+    git log --all --full-history -u -- $FILENAME
   else
     git log
   end
