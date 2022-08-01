@@ -179,6 +179,7 @@ Plug 'HerringtonDarkholme/yats.vim'
 Plug 'MaxMEllon/vim-jsx-pretty'
 Plug 'pangloss/vim-javascript'
 Plug 'groenewege/vim-less'
+Plug 'ap/vim-css-color'
 Plug 'dag/vim-fish'
 
 Plug 'cvlmtg/vim-256noir'
@@ -231,21 +232,19 @@ nnoremap <leader>f :<C-u>FzfGitFiles --exclude-standard --cached --others<CR>
 " complete -------------------------------------------------------------
 
 function! s:check_back_space() abort
-  let l:col = col('.') - 1
-
-  return !l:col || getline('.')[l:col - 1]  =~# '\s'
+  let col = col('.') - 1
+  return !col || getline('.')[col - 1]  =~ '\s'
 endfunction
 
-" Use tab for trigger completion with characters ahead and navigate.
+" Insert <tab> when previous text is space, refresh completion if not.
 inoremap <silent><expr> <TAB>
-      \ pumvisible() ? "\<C-n>" :
+      \ coc#pum#visible() ? coc#pum#next(1) :
       \ <SID>check_back_space() ? "\<TAB>" :
       \ coc#refresh()
-inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
 
-" Use <cr> to confirm completion.
-" Coc only does snippet and additional edit on confirm.
-inoremap <expr> <cr> pumvisible() ? "\<C-y>\<CR>" : "\<C-g>u\<CR>"
+inoremap <expr> <S-TAB> coc#pum#visible() ? coc#pum#prev(1) : "\<C-h>"
+
+inoremap <expr> <CR> coc#pum#visible() ? coc#pum#confirm() : "\<CR>"
 
 " move between linting errors
 nmap <silent> <C-k> <Plug>(coc-diagnostic-prev)
@@ -264,7 +263,7 @@ endif
 
 let g:coc_global_extensions = [
       \ 'coc-css',
-      \ 'coc-eslint8',
+      \ 'coc-eslint',
       \ 'coc-html',
       \ 'coc-json',
       \ 'coc-tsserver'

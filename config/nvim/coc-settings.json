@@ -7,6 +7,7 @@
   "diagnostic.messageTarget": "echo",
   "eslint.autoFixOnSave": false,
   "eslint.packageManager": "yarn",
+  "suggest.noselect": true,
   "typescript.validate.enable": true,
   "typescript.suggest.enabled": false,
   "javascript.validate.enable": false,
