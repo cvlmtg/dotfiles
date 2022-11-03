@@ -16,6 +16,8 @@ add_path ~/.rbenv/shims
 add_path ~/.rbenv/bin
 add_path ~/bin
 
+eval (/opt/homebrew/bin/brew shellenv)
+
 # questo serve per react-native
 
 if test -d $HOME/Library/Android/sdk
