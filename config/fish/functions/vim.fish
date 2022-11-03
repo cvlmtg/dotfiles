@@ -1,5 +1,5 @@
 function vim
-  if [ -e /usr/local/bin/nvim ]
+  if which nvim > /dev/null
     nvim $argv
   else
     command vim $argv

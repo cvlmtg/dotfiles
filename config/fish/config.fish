@@ -16,8 +16,6 @@ add_path ~/.rbenv/shims
 add_path ~/.rbenv/bin
 add_path ~/bin
 
-eval (/opt/homebrew/bin/brew shellenv)
-
 # questo serve per react-native
 
 if test -d $HOME/Library/Android/sdk
@@ -45,9 +43,6 @@ set fish_greeting ""
 
 # impostazioni varie
 
-set -x RUBY_CONFIGURE_OPTS '--with-openssl-dir=/usr/local/opt/openssl@1.1'
-set -x SHELL (which fish)
-
 if which fd > /dev/null
   set -x FZF_DEFAULT_COMMAND 'fd --hidden --exclude ".git/"'
   set -x FZF_CTRL_T_COMMAND "$FZF_DEFAULT_COMMAND"
@@ -66,6 +61,10 @@ else
   set -x VISUAL vim
 end
 
-# nvm version manager for fish!
+set -x SHELL (which fish)
+
+# start stuff...
+
+eval (/opt/homebrew/bin/brew shellenv)
 
 if test -d ~/.nvf; nvf init; end
