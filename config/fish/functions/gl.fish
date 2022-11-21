@@ -4,7 +4,7 @@
 function gl
   set -f FILENAME $argv[1]
 
-  if test $FILENAME = "--"
+  if test "z$FILENAME" = "z--"
     set FILENAME $argv[2]
   end
 
