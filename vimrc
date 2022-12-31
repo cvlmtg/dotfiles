@@ -414,14 +414,6 @@ function! StatuslinePath()
   return l:path
 endfunction
 
-function! StatuslinePaste()
-  if exists('g:actual_curbuf') && g:actual_curbuf == bufnr('%') && &paste
-    return 'P'
-  endif
-
-  return ''
-endfunction
-
 function! LinterStatus() abort
   let l:info = get(b:, 'coc_diagnostic_info', {})
   let l:msgs = []
@@ -449,8 +441,7 @@ endfunction
 set statusline=%#LineNr#%{StatuslineColumn()}%*
 set statusline+=\ %{StatuslinePath()}
 
-" paste mode and errors/warnings from the linter
-set statusline+=\ %#WarningMsg#%{StatuslinePaste()}
+" errors/warnings from the linter
 set statusline+=%(\ %{LinterStatus()}\ %)
 set statusline+=%*
 
