@@ -163,6 +163,7 @@ call plug#begin(s:base . '/plugged')
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
+Plug 'github/copilot.vim'
 
 Plug 'airblade/vim-gitgutter'
 Plug 'mbbill/undotree'
@@ -192,6 +193,11 @@ if !exists('g:loaded_matchit') && findfile('plugin/matchit.vim', &rtp) ==# ''
 endif
 
 let loaded_netrwPlugin = 1
+
+" copilot --------------------------------------------------------------
+
+imap <silent><script><expr> <C-\> copilot#Accept("\<CR>")
+let g:copilot_no_tab_map = v:true
 
 " ctrlsf ---------------------------------------------------------------
 
