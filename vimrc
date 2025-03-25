@@ -106,10 +106,6 @@ cabbrev Q q
 cabbrev E e
 cabbrev R r
 
-set completeopt-=preview
-" http://stackoverflow.com/questions/2169645/
-set complete=.,w,b,t
-
 " use the mouse but don't put us in visual mode
 set mouse=nicr
 
@@ -161,9 +157,11 @@ endif
 call plug#begin(s:base . '/plugged')
 
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
-Plug 'junegunn/fzf.vim'
+Plug 'ibhagwan/fzf-lua'
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
 Plug 'github/copilot.vim'
+Plug 'nvim-lua/plenary.nvim'
+Plug 'CopilotC-Nvim/CopilotChat.nvim'
 
 Plug 'airblade/vim-gitgutter'
 Plug 'mbbill/undotree'
@@ -199,41 +197,28 @@ let loaded_netrwPlugin = 1
 imap <silent><script><expr> <C-\> copilot#Accept("\<CR>")
 let g:copilot_no_tab_map = v:true
 
-" ctrlsf ---------------------------------------------------------------
+if has('nvim')
+lua << EOF
+  require('CopilotChat').setup {}
+EOF
+endif
 
-let g:ctrlsf_regex_pattern = 1
-let g:ctrlsf_winsize = '30%'
-let g:ctrlsf_auto_close = {
-      \ "normal" : 0,
-      \ "compact": 0
-      \}
-
-" just a little shortcut
-function! SmartCtrlSF(args)
-  if &columns < 120
-    let g:ctrlsf_position = 'bottom'
-  else
-    let g:ctrlsf_position = 'left'
-  endif
-  call ctrlsf#Search(a:args, 0)
-endfunction
-
-command! -nargs=* -complete=file Rg call SmartCtrlSF(<q-args>)
-
-" grep the word under the cursor
-nmap <leader>a :Rg <C-R><C-W><CR>
+nmap <leader>c :CopilotChatToggle<CR>
 
 " fzf ------------------------------------------------------------------
 
 set wildignore+=*/tmp/*,*/cache/*,*/node_modules/*,*/vendor/*
 
-let g:fzf_layout = { 'down': '40%' }
-let g:fzf_command_prefix = 'Fzf'
+nnoremap <leader>l :<C-u>FzfLua lines<CR>
+nnoremap <leader>b :<C-u>FzfLua buffers<CR>
+nnoremap <leader>h :<C-u>FzfLua helptags<CR>
+nnoremap <leader>f :<C-u>FzfLua git_files --exclude-standard --cached --others<CR>
 
-nnoremap <leader>l :<C-u>FzfLines<CR>
-nnoremap <leader>b :<C-u>FzfBuffers<CR>
-nnoremap <leader>h :<C-u>FzfHelptags<CR>
-nnoremap <leader>f :<C-u>FzfGitFiles --exclude-standard --cached --others<CR>
+if has('nvim')
+lua << EOF
+  require('fzf-lua').register_ui_select()
+EOF
+endif
 
 " complete -------------------------------------------------------------
 
@@ -267,6 +252,14 @@ if exists('&signcolumn') " Vim 7.4.2201
   set signcolumn=yes
 endif
 
+" http://stackoverflow.com/questions/2169645/
+set complete=.,w,b,t
+
+set completeopt-=preview
+set completeopt+=noinsert
+set completeopt+=noselect
+set completeopt+=popup
+
 let g:coc_global_extensions = [
       \ 'coc-css',
       \ 'coc-eslint',
@@ -274,6 +267,30 @@ let g:coc_global_extensions = [
       \ 'coc-json',
       \ 'coc-tsserver'
       \ ]
+
+" ctrlsf ---------------------------------------------------------------
+
+let g:ctrlsf_regex_pattern = 1
+let g:ctrlsf_winsize = '30%'
+let g:ctrlsf_auto_close = {
+      \ "normal" : 0,
+      \ "compact": 0
+      \}
+
+" just a little shortcut
+function! SmartCtrlSF(args)
+  if &columns < 120
+    let g:ctrlsf_position = 'bottom'
+  else
+    let g:ctrlsf_position = 'left'
+  endif
+  call ctrlsf#Search(a:args, 0)
+endfunction
+
+command! -nargs=* -complete=file Rg call SmartCtrlSF(<q-args>)
+
+" grep the word under the cursor
+nmap <leader>a :Rg <C-R><C-W><CR>
 
 " easy align -----------------------------------------------------------
 
