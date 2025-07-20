@@ -157,11 +157,7 @@ endif
 call plug#begin(s:base . '/plugged')
 
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
-Plug 'ibhagwan/fzf-lua'
-Plug 'neoclide/coc.nvim', {'branch': 'release'}
-Plug 'github/copilot.vim'
-Plug 'nvim-lua/plenary.nvim'
-Plug 'CopilotC-Nvim/CopilotChat.nvim'
+Plug 'junegunn/fzf.vim'
 
 Plug 'airblade/vim-gitgutter'
 Plug 'mbbill/undotree'
@@ -174,13 +170,6 @@ Plug 'tpope/vim-surround'
 Plug 'wellle/targets.vim'
 Plug 'tpope/vim-repeat'
 
-Plug 'HerringtonDarkholme/yats.vim'
-Plug 'MaxMEllon/vim-jsx-pretty'
-Plug 'pangloss/vim-javascript'
-Plug 'groenewege/vim-less'
-Plug 'ap/vim-css-color'
-Plug 'dag/vim-fish'
-
 Plug 'cvlmtg/vim-256noir'
 
 call plug#end()
@@ -192,81 +181,17 @@ endif
 
 let loaded_netrwPlugin = 1
 
-" copilot --------------------------------------------------------------
-
-imap <silent><script><expr> <C-\> copilot#Accept("\<CR>")
-let g:copilot_no_tab_map = v:true
-
-if has('nvim')
-lua << EOF
-  require('CopilotChat').setup {}
-EOF
-endif
-
-nmap <leader>c :CopilotChatToggle<CR>
-
 " fzf ------------------------------------------------------------------
 
 set wildignore+=*/tmp/*,*/cache/*,*/node_modules/*,*/vendor/*
 
-nnoremap <leader>l :<C-u>FzfLua lines<CR>
-nnoremap <leader>b :<C-u>FzfLua buffers<CR>
-nnoremap <leader>h :<C-u>FzfLua helptags<CR>
-nnoremap <leader>f :<C-u>FzfLua git_files --exclude-standard --cached --others<CR>
+let g:fzf_layout = { 'down': '40%' }
+let g:fzf_command_prefix = 'Fzf'
 
-if has('nvim')
-lua << EOF
-  require('fzf-lua').register_ui_select()
-EOF
-endif
-
-" complete -------------------------------------------------------------
-
-function! s:check_back_space() abort
-  let col = col('.') - 1
-  return !col || getline('.')[col - 1]  =~ '\s'
-endfunction
-
-" Insert <tab> when previous text is space, refresh completion if not.
-inoremap <silent><expr> <TAB>
-      \ coc#pum#visible() ? coc#pum#next(1) :
-      \ <SID>check_back_space() ? "\<TAB>" :
-      \ coc#refresh()
-
-inoremap <expr> <S-TAB> coc#pum#visible() ? coc#pum#prev(1) : "\<C-h>"
-
-inoremap <expr> <CR> coc#pum#visible() ? coc#pum#confirm() : "\<CR>"
-
-" move between linting errors
-nmap <silent> <C-k> <Plug>(coc-diagnostic-prev)
-nmap <silent> <C-j> <Plug>(coc-diagnostic-next)
-
-" show function signature
-nnoremap <silent> <leader>d :call CocAction('doHover')<CR>
-
-" suppress the annoying 'match x of y', 'The only match'
-" and 'Pattern not found' messages
-set shortmess+=c
-
-if exists('&signcolumn') " Vim 7.4.2201
-  set signcolumn=yes
-endif
-
-" http://stackoverflow.com/questions/2169645/
-set complete=.,w,b,t
-
-set completeopt-=preview
-set completeopt+=noinsert
-set completeopt+=noselect
-set completeopt+=popup
-
-let g:coc_global_extensions = [
-      \ 'coc-css',
-      \ 'coc-eslint',
-      \ 'coc-html',
-      \ 'coc-json',
-      \ 'coc-tsserver'
-      \ ]
+nnoremap <leader>l :<C-u>FzfLines<CR>
+nnoremap <leader>b :<C-u>FzfBuffers<CR>
+nnoremap <leader>h :<C-u>FzfHelptags<CR>
+nnoremap <leader>f :<C-u>FzfGitFiles --exclude-standard --cached --others<CR>
 
 " ctrlsf ---------------------------------------------------------------
 
@@ -438,26 +363,7 @@ function! StatuslinePath()
 endfunction
 
 function! LinterStatus() abort
-  let l:info = get(b:, 'coc_diagnostic_info', {})
-  let l:msgs = []
-
-  if empty(l:info)
-    return ''
-  endif
-
-  if get(l:info, 'error', 0)
-    call add(l:msgs, '✖ ' . l:info['error'])
-  endif
-
-  let l:information = get(l:info, 'information', 0)
-  let l:warnings = get(l:info, 'warning', 0)
-  let l:total = l:information + l:warnings
-
-  if l:total
-    call add(l:msgs, '⚠ ' . l:total)
-  endif
-
-  return join(msgs, ' ')
+  return ''
 endfunction
 
 " set the statusline format
@@ -471,8 +377,6 @@ set statusline+=%*
 " ----------------------------------------------------------------------
 " REMAPS ---------------------------------------------------------------
 " ----------------------------------------------------------------------
-
-inoremap jj <Esc>
 
 " since <C-i> is the same as <Tab>, use <C-p> to
 " move forward the jump list (it's near <C-o>)
@@ -787,10 +691,6 @@ autocmd vimrc FileType fish
 " '-' should be part of the word, not a separator
 autocmd vimrc FileType css
       \ setlocal iskeyword+=-
-
-autocmd vimrc FileType cucumber
-      \ setlocal spell spelllang=it,en |
-      \ setlocal textwidth=76
 
 autocmd vimrc FileType markdown
       \ setlocal spell spelllang=it,en
