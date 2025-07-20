@@ -1,6 +1,4 @@
-if !has('nvim')
-  set nocompatible
-endif
+set nocompatible
 
 " disable the magic "vim: .." lines in files
 set nomodeline
@@ -11,71 +9,52 @@ set nomodeline
 " try to live without them
 set noswapfile
 
-if has('nvim')
-  if has('mac') " speeds up neovim startup on macos
-    let g:clipboard = {
-          \ 'name': 'pbcopy',
-          \ 'copy': {
-          \    '+': 'pbcopy',
-          \    '*': 'pbcopy',
-          \  },
-          \ 'paste': {
-          \    '+': 'pbpaste',
-          \    '*': 'pbpaste',
-          \ },
-          \ 'cache_enabled': 0,
-          \ }
+set clipboard=unnamed,unnamedplus
+
+" http://vim.wikia.com/wiki/Working_with_Unicode
+if has('multi_byte')
+  if &termencoding == ''
+    let &termencoding = &encoding
   endif
-
-  set clipboard+=unnamedplus
-else
-  set clipboard=unnamed,unnamedplus
-
-  " http://vim.wikia.com/wiki/Working_with_Unicode
-  if has('multi_byte')
-    if &termencoding == ''
-      let &termencoding = &encoding
-    endif
-    set encoding=utf-8
-    scriptencoding utf-8
-    setglobal fileencoding=utf-8
-    set fileencodings=ucs-bom,utf-8,latin1
-  endif
-
-  " allow backspacing over everything in insert mode
-  set backspace=indent,eol,start
-
-  " fish shell is supported since vim 7.4.276
-  if version < 704 || (version == 704 && !has('patch276'))
-    if &shell =~# 'fish$'
-      set shell=bash
-    endif
-  endif
-
-  " remove comments symbols when joining lines
-  if version > 703 || (version == 703 && has('patch541'))
-    set formatoptions+=j
-  endif
-
-  " for screens bigger than 232 columns
-  if has('mouse_sgr')
-    set ttymouse=sgr
-  endif
-
-  " do highlight as you search
-  set incsearch
-  set hlsearch
-
-  " always show the status line
-  set laststatus=2
-
-  set autoindent
-  set smarttab
-
-  syntax enable
-  set wildmenu
-  set ttyfast
+  set encoding=utf-8
+  scriptencoding utf-8
+  setglobal fileencoding=utf-8
+  set fileencodings=ucs-bom,utf-8,latin1
 endif
+
+" allow backspacing over everything in insert mode
+set backspace=indent,eol,start
+
+" fish shell is supported since vim 7.4.276
+if version < 704 || (version == 704 && !has('patch276'))
+  if &shell =~# 'fish$'
+    set shell=bash
+  endif
+endif
+
+" remove comments symbols when joining lines
+if version > 703 || (version == 703 && has('patch541'))
+  set formatoptions+=j
+endif
+
+" for screens bigger than 232 columns
+if has('mouse_sgr')
+  set ttymouse=sgr
+endif
+
+" do highlight as you search
+set incsearch
+set hlsearch
+
+" always show the status line
+set laststatus=2
+
+set autoindent
+set smarttab
+
+syntax enable
+set wildmenu
+set ttyfast
 
 " don't reload a file when it's changed from the outside
 set noautoread
@@ -120,7 +99,7 @@ augroup END
 " FOLDER MANAGEMENT ----------------------------------------------------
 " ----------------------------------------------------------------------
 
-let s:base = has('nvim') ? '~/.config/nvim' : '~/.vim'
+let s:base = '~/.vim'
 
 function! s:EnsureExists(path)
   let l:dir = expand(a:path)
@@ -156,30 +135,10 @@ endif
 
 call plug#begin(s:base . '/plugged')
 
-Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
-Plug 'ibhagwan/fzf-lua'
-Plug 'neoclide/coc.nvim', {'branch': 'release'}
-Plug 'github/copilot.vim'
-Plug 'nvim-lua/plenary.nvim'
-Plug 'CopilotC-Nvim/CopilotChat.nvim'
-
-Plug 'airblade/vim-gitgutter'
-Plug 'mbbill/undotree'
-Plug 'dyng/ctrlsf.vim'
-
-Plug 'michaeljsmith/vim-indent-object'
-Plug 'junegunn/vim-easy-align'
 Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-surround'
 Plug 'wellle/targets.vim'
 Plug 'tpope/vim-repeat'
-
-Plug 'HerringtonDarkholme/yats.vim'
-Plug 'MaxMEllon/vim-jsx-pretty'
-Plug 'pangloss/vim-javascript'
-Plug 'groenewege/vim-less'
-Plug 'ap/vim-css-color'
-Plug 'dag/vim-fish'
 
 Plug 'cvlmtg/vim-256noir'
 
@@ -192,122 +151,6 @@ endif
 
 let loaded_netrwPlugin = 1
 
-" copilot --------------------------------------------------------------
-
-imap <silent><script><expr> <C-\> copilot#Accept("\<CR>")
-let g:copilot_no_tab_map = v:true
-
-if has('nvim')
-lua << EOF
-  require('CopilotChat').setup {}
-EOF
-endif
-
-nmap <leader>c :CopilotChatToggle<CR>
-
-" fzf ------------------------------------------------------------------
-
-set wildignore+=*/tmp/*,*/cache/*,*/node_modules/*,*/vendor/*
-
-nnoremap <leader>l :<C-u>FzfLua lines<CR>
-nnoremap <leader>b :<C-u>FzfLua buffers<CR>
-nnoremap <leader>h :<C-u>FzfLua helptags<CR>
-nnoremap <leader>f :<C-u>FzfLua git_files --exclude-standard --cached --others<CR>
-
-if has('nvim')
-lua << EOF
-  require('fzf-lua').register_ui_select()
-EOF
-endif
-
-" complete -------------------------------------------------------------
-
-function! s:check_back_space() abort
-  let col = col('.') - 1
-  return !col || getline('.')[col - 1]  =~ '\s'
-endfunction
-
-" Insert <tab> when previous text is space, refresh completion if not.
-inoremap <silent><expr> <TAB>
-      \ coc#pum#visible() ? coc#pum#next(1) :
-      \ <SID>check_back_space() ? "\<TAB>" :
-      \ coc#refresh()
-
-inoremap <expr> <S-TAB> coc#pum#visible() ? coc#pum#prev(1) : "\<C-h>"
-
-inoremap <expr> <CR> coc#pum#visible() ? coc#pum#confirm() : "\<CR>"
-
-" move between linting errors
-nmap <silent> <C-k> <Plug>(coc-diagnostic-prev)
-nmap <silent> <C-j> <Plug>(coc-diagnostic-next)
-
-" show function signature
-nnoremap <silent> <leader>d :call CocAction('doHover')<CR>
-
-" suppress the annoying 'match x of y', 'The only match'
-" and 'Pattern not found' messages
-set shortmess+=c
-
-if exists('&signcolumn') " Vim 7.4.2201
-  set signcolumn=yes
-endif
-
-" http://stackoverflow.com/questions/2169645/
-set complete=.,w,b,t
-
-set completeopt-=preview
-set completeopt+=noinsert
-set completeopt+=noselect
-set completeopt+=popup
-
-let g:coc_global_extensions = [
-      \ 'coc-css',
-      \ 'coc-eslint',
-      \ 'coc-html',
-      \ 'coc-json',
-      \ 'coc-tsserver'
-      \ ]
-
-" ctrlsf ---------------------------------------------------------------
-
-let g:ctrlsf_regex_pattern = 1
-let g:ctrlsf_winsize = '30%'
-let g:ctrlsf_auto_close = {
-      \ "normal" : 0,
-      \ "compact": 0
-      \}
-
-" just a little shortcut
-function! SmartCtrlSF(args)
-  if &columns < 120
-    let g:ctrlsf_position = 'bottom'
-  else
-    let g:ctrlsf_position = 'left'
-  endif
-  call ctrlsf#Search(a:args, 0)
-endfunction
-
-command! -nargs=* -complete=file Rg call SmartCtrlSF(<q-args>)
-
-" grep the word under the cursor
-nmap <leader>a :Rg <C-R><C-W><CR>
-
-" easy align -----------------------------------------------------------
-
-vmap <Enter> <Plug>(EasyAlign)
-
-" undotree -------------------------------------------------------------
-
-nnoremap <leader>u :UndotreeToggle<CR>
-let g:undotree_WindowLayout = 2
-
-" gitgutter ------------------------------------------------------------
-
-let g:gitgutter_override_sign_column_highlight = 0
-let g:gitgutter_show_msg_on_hunk_jumping = 0
-let g:gitgutter_map_keys = 0
-set updatetime=1000
-
 " ----------------------------------------------------------------------
 " APPEARANCE -----------------------------------------------------------
 " ----------------------------------------------------------------------
@@ -315,7 +158,7 @@ set updatetime=1000
 set synmaxcol=1000
 
 set number
-if has('nvim') || version > 702
+if version > 702
   set relativenumber
 endif
 
@@ -325,11 +168,6 @@ set nojoinspaces
 set ignorecase
 set smartcase
 
-" live substitution preview
-if has('nvim')
-  set inccommand=nosplit
-endif
-
 " keep more context when scrolling off the end of a buffer
 set scrolljump=5
 set scrolloff=5
@@ -338,27 +176,14 @@ set scrolloff=5
 set showmatch
 
 " change cursor shape in insert mode
-if !has('nvim')
-  let &t_SI = "\e[6 q"
-  let &t_EI = "\e[2 q"
-end
+let &t_SI = "\e[6 q"
+let &t_EI = "\e[2 q"
 
 set termguicolors
 set background=dark
 set cursorline
 
 colorscheme 256_noir
-
-" customize spelling colors to avoid unreadable
-" combinations of background and foreground
-highlight clear SpellBad
-highlight SpellBad term=underline cterm=underline gui=underline
-highlight clear SpellCap
-highlight SpellCap term=underline cterm=underline gui=underline
-highlight clear SpellRare
-highlight SpellRare term=underline cterm=underline gui=underline
-highlight clear SpellLocal
-highlight SpellLocal term=underline cterm=underline gui=underline
 
 " ----------------------------------------------------------------------
 " STATUSLINE -----------------------------------------------------------
@@ -437,42 +262,14 @@ function! StatuslinePath()
   return l:path
 endfunction
 
-function! LinterStatus() abort
-  let l:info = get(b:, 'coc_diagnostic_info', {})
-  let l:msgs = []
-
-  if empty(l:info)
-    return ''
-  endif
-
-  if get(l:info, 'error', 0)
-    call add(l:msgs, '✖ ' . l:info['error'])
-  endif
-
-  let l:information = get(l:info, 'information', 0)
-  let l:warnings = get(l:info, 'warning', 0)
-  let l:total = l:information + l:warnings
-
-  if l:total
-    call add(l:msgs, '⚠ ' . l:total)
-  endif
-
-  return join(msgs, ' ')
-endfunction
-
 " set the statusline format
 set statusline=%#LineNr#%{StatuslineColumn()}%*
 set statusline+=\ %{StatuslinePath()}
-
-" errors/warnings from the linter
-set statusline+=%(\ %{LinterStatus()}\ %)
 set statusline+=%*
 
 " ----------------------------------------------------------------------
 " REMAPS ---------------------------------------------------------------
 " ----------------------------------------------------------------------
-
-inoremap jj <Esc>
 
 " since <C-i> is the same as <Tab>, use <C-p> to
 " move forward the jump list (it's near <C-o>)
@@ -481,11 +278,6 @@ nnoremap <C-p> <C-i>
 " save the jump if large enough
 nnoremap <expr> k (v:count > 5 ? "m'" . v:count : '') . 'k'
 nnoremap <expr> j (v:count > 5 ? "m'" . v:count : '') . 'j'
-
-" map <Esc> in terminal mode (except when we use fzf)
-if has('nvim')
-  tnoremap <silent><expr> <Esc> (b:term_title =~# 'bin/fzf' ? '<Esc>' : '<C-\><C-n>')
-endif
 
 " to switch splits
 nnoremap <Tab> <C-W>w
@@ -706,9 +498,6 @@ endfunction
 " use enter in normal mode to toggle folding
 nnoremap <silent> <expr> <Enter> <SID>SmartFold()
 
-let g:xml_syntax_folding = 1
-let g:php_folding = 2
-
 " ----------------------------------------------------------------------
 " FILE TYPES -----------------------------------------------------------
 " ----------------------------------------------------------------------
@@ -771,49 +560,9 @@ autocmd vimrc FileType javascript,javascriptreact,typescript,typescriptreact
       \ setlocal expandtab textwidth=0 |
       \ setlocal spell spelllang=it,en
 
-autocmd vimrc FileType ruby
-      \ setlocal expandtab textwidth=0 |
-      \ setlocal spell spelllang=it,en |
-      \ setlocal suffixesadd=.rb
-
-autocmd vimrc FileType xml
-      \ setlocal foldmethod=syntax |
-      \ setlocal foldnestmax=20
-
-autocmd vimrc FileType fish
-      \ setlocal formatoptions+=ro |
-      \ setlocal iskeyword+=-
-
-" '-' should be part of the word, not a separator
-autocmd vimrc FileType css
-      \ setlocal iskeyword+=-
-
-autocmd vimrc FileType cucumber
-      \ setlocal spell spelllang=it,en |
-      \ setlocal textwidth=76
-
-autocmd vimrc FileType markdown
-      \ setlocal spell spelllang=it,en
-
 autocmd vimrc Filetype gitcommit
       \ setlocal spell spelllang=it,en |
       \ setlocal textwidth=72
-
-" Syntax highlight HTML code inside PHP strings.
-let g:php_htmlInStrings = 1
-" Syntax highlight SQL code inside PHP strings.
-let g:php_sql_query = 1
-" Disable PHP short tags.
-let g:php_noShortTags = 1
-" indentiamo gli switch come si deve
-let g:PHP_vintage_case_default_indent = 1
-
-" remove "$" and "-" for broken js/css/html syntax plugins
-" remove ":" as it is considered a separator
-autocmd vimrc FileType php
-      \ setlocal spell spelllang=it,en |
-      \ setlocal commentstring=//\ %s |
-      \ setlocal iskeyword-=-,:$
 
 " this should speed up vim a bit with rbenv
 if isdirectory($HOME . '/.rbenv')
