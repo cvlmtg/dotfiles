@@ -94,6 +94,7 @@ vim.o.showmatch = true
 -- show border on floating windows
 vim.o.winborder = 'rounded'
 
+vim.o.background = 'dark'
 vim.o.termguicolors = true
 vim.o.joinspaces = false
 vim.o.relativenumber = true
@@ -606,10 +607,17 @@ require('lazy').setup({
 ------------------------------------------------------------------------
 
   {
-    'cvlmtg/vim-256noir',
+    'alligator/accent.vim',
     priority = 1000,
+    lazy = false,
     config = function()
-      vim.cmd.colorscheme '256_noir'
+      vim.g.accent_no_bg = 1
+      vim.cmd.colorscheme('accent')
+      vim.cmd([[
+        highlight LineNr guifg=#666666 guibg=#000000
+        highlight StatusLine guifg=#000000 gui=bold
+        highlight Type guifg=#dfdfef gui=bold
+      ]])
     end,
   },
   {
