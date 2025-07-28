@@ -245,9 +245,6 @@ vim.keymap.set("n", "Q", "@q", { desc = 'Execute the macro recorded on "q"' })
 -- spellcheck, easier to remember
 vim.keymap.set("n", "<leader>s", "z=", { desc = 'Spellcheck the current word' })
 
--- show all TODO comments etc
-vim.keymap.set("n", "<leader>t", '<cmd>TodoTelescope keywords=TODO,FIXME<cr>', { silent = true })
-
 -- save files owned by root
 vim.keymap.set("c", "w!!", function()
   return "%!sudo tee > /dev/null %"
@@ -625,15 +622,17 @@ require('lazy').setup({
   },
   {
     'junegunn/vim-easy-align',
-    config = function()
-      vim.keymap.set("v", "<Enter>", '<Plug>(EasyAlign)')
-    end
+    keys = {
+      { "<Enter>", '<Plug>(EasyAlign)', mode = 'v' },
+    },
   },
   {
     'mbbill/undotree',
+    keys = {
+      { '<leader>u', '<cmd>UndotreeToggle<CR>' },
+    },
     config = function()
       vim.g.undotree_WindowLayout = 2
-      vim.keymap.set("n", "<leader>u", ':UndotreeToggle<CR>')
     end
   },
   {
@@ -652,6 +651,10 @@ require('lazy').setup({
     'folke/todo-comments.nvim',
     dependencies = { 'nvim-lua/plenary.nvim' },
     main = 'todo-comments',
+    event = 'VimEnter',
+    keys = {
+      { '<leader>t', '<cmd>TodoTelescope keywords=TODO,FIXME<cr>', 'Show all TODO / FIXME comments' },
+    },
     opts = {
       merge_keywords = false,
       keywords = {
@@ -764,13 +767,21 @@ require('lazy').setup({
         return builtin.grep_string({ word_match = '-w' })
       end
 
-      vim.keymap.set('n', '<leader>f', builtin.git_files, { desc = 'Search [F]iles' })
-      vim.keymap.set('n', '<leader>a', grep_word, { desc = 'Search [A]ll occurences of the current word' })
-      vim.keymap.set('n', '<leader>b', builtin.buffers, { desc = 'Find existing [B]uffers' })
-      vim.keymap.set('n', '<leader>e', builtin.diagnostics, { desc = 'Search [D]iagnostics' })
-
-      vim.keymap.set('n', '<leader>d', vim.lsp.buf.hover,
-        { silent = true, desc = 'Show symbol type' })
+      vim.keymap.set('n', '<leader>f', builtin.git_files, {
+        desc = 'Search [F]iles'
+      })
+      vim.keymap.set('n', '<leader>a', grep_word, {
+        desc = 'Search [A]ll occurences of the current word'
+      })
+      vim.keymap.set('n', '<leader>b', builtin.buffers, {
+        desc = 'Search existing [B]uffers'
+      })
+      vim.keymap.set('n', '<leader>e', builtin.diagnostics, {
+        desc = 'Search [E]rrors / Warnings'
+      })
+      vim.keymap.set('n', '<leader>g', builtin.live_grep, {
+        desc = 'Live [G]rep'
+      })
     end,
   },
 
@@ -828,10 +839,15 @@ require('lazy').setup({
       cmdline = {
         sources = { 'cmdline', 'buffer' },
         enabled = true,
+        completion = {
+          list = {
+            selection = { preselect = false },
+          },
+        },
         keymap = {
           preset = 'inherit',
           ['<Tab>'] = { 'show_and_insert', 'select_next', 'fallback' },
-          ['<CR>'] = {
+          ['<Right>'] = {
             function(cmp)
               local item = cmp.get_selected_item()
 
@@ -840,10 +856,11 @@ require('lazy').setup({
                 return cmp.accept()
               end
 
-              return cmp.accept_and_enter()
+              return false
             end,
             'fallback'
-          }
+          },
+          ['<CR>'] = {},
         },
       },
       sources = {
@@ -862,7 +879,14 @@ require('lazy').setup({
           },
         },
       },
-      fuzzy = { implementation = 'lua' },
+      fuzzy = {
+        implementation = 'lua',
+        sorts = {
+          'exact',
+          'score',
+          'sort_text',
+        }
+      },
       signature = { enabled = true },
     },
   },
@@ -975,13 +999,23 @@ require('lazy').setup({
       local builtin = require('telescope.builtin')
 
       vim.api.nvim_create_autocmd('LspAttach', {
-        group = vim.api.nvim_create_augroup('kickstart-lsp-attach', { clear = true }),
+        group = vim.api.nvim_create_augroup('lsp-attach', { clear = true }),
 
         callback = function(event)
           local map = function(keys, func, desc, mode)
             mode = mode or 'n'
             vim.keymap.set(mode, keys, func, { buffer = event.buf, desc = 'LSP: ' .. desc })
           end
+
+          map('<leader>d', vim.lsp.buf.hover, 'Show symbol type')
+
+          -- Jump to the definition of the word under your cursor.
+          -- This is where a variable was first declared, or where
+          -- a function is defined, etc. To jump back, press <C-t>.
+          map('<leader><Space>', builtin.lsp_definitions, 'Goto Definition')
+
+          -- Find references for the word under your cursor.
+          map('<leader>r', builtin.lsp_references, 'Goto [R]eferences')
 
           -- Rename the variable under your cursor.
           -- Most Language Servers support renaming across files, etc.
@@ -992,18 +1026,15 @@ require('lazy').setup({
           -- to activate.
           map('gra', vim.lsp.buf.code_action, '[G]oto Code [A]ction', { 'n', 'x' })
 
-          -- Find references for the word under your cursor.
-          map('grr', builtin.lsp_references, '[G]oto [R]eferences')
-
           -- Jump to the implementation of the word under your cursor.
           -- Useful when your language has ways of declaring types
           -- without an actual implementation.
           map('gri', builtin.lsp_implementations, '[G]oto [I]mplementation')
 
-          -- Jump to the definition of the word under your cursor.
-          -- This is where a variable was first declared, or where
-          -- a function is defined, etc. To jump back, press <C-t>.
-          map('<leader><Space>', builtin.lsp_definitions, '[G]oto [D]efinition')
+          -- Jump to the type of the word under your cursor. Useful when
+          -- you're not sure what type a variable is and you want to see
+          -- the definition of its *type*, not where it was *defined*.
+          map('grt', builtin.lsp_type_definitions, '[G]oto [T]ype Definition')
 
           -- WARN: This is not Goto Definition, this is Goto Declaration.
           -- For example, in C this would take you to the header.
@@ -1017,11 +1048,6 @@ require('lazy').setup({
           -- Similar to document symbols, except searches over your
           -- entire project.
           map('gW', builtin.lsp_dynamic_workspace_symbols, 'Open Workspace Symbols')
-
-          -- Jump to the type of the word under your cursor. Useful when
-          -- you're not sure what type a variable is and you want to see
-          -- the definition of its *type*, not where it was *defined*.
-          map('grt', builtin.lsp_type_definitions, '[G]oto [T]ype Definition')
 
           -- Resolve a difference between neovim 0.11 and 0.10
           local function client_supports_method(client, method, bufnr)
@@ -1042,7 +1068,7 @@ require('lazy').setup({
           local client = vim.lsp.get_client_by_id(event.data.client_id)
 
           if client and client_supports_method(client, vim.lsp.protocol.Methods.textDocument_documentHighlight, event.buf) then
-            local highlight_augroup = vim.api.nvim_create_augroup('kickstart-lsp-highlight', { clear = false })
+            local highlight_augroup = vim.api.nvim_create_augroup('lsp-highlight', { clear = false })
             vim.api.nvim_create_autocmd({ 'CursorHold', 'CursorHoldI' }, {
               buffer = event.buf,
               group = highlight_augroup,
@@ -1056,10 +1082,10 @@ require('lazy').setup({
             })
 
             vim.api.nvim_create_autocmd('LspDetach', {
-              group = vim.api.nvim_create_augroup('kickstart-lsp-detach', { clear = true }),
+              group = vim.api.nvim_create_augroup('lsp-detach', { clear = true }),
               callback = function(event2)
                 vim.lsp.buf.clear_references()
-                vim.api.nvim_clear_autocmds { group = 'kickstart-lsp-highlight', buffer = event2.buf }
+                vim.api.nvim_clear_autocmds { group = 'lsp-highlight', buffer = event2.buf }
               end,
             })
           end
