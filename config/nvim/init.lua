@@ -245,6 +245,9 @@ vim.keymap.set("n", "Q", "@q", { desc = 'Execute the macro recorded on "q"' })
 -- spellcheck, easier to remember
 vim.keymap.set("n", "<leader>s", "z=", { desc = 'Spellcheck the current word' })
 
+-- show all TODO comments etc
+vim.keymap.set("n", "<leader>t", '<cmd>TodoTelescope keywords=TODO,FIXME<cr>', { silent = true })
+
 -- save files owned by root
 vim.keymap.set("c", "w!!", function()
   return "%!sudo tee > /dev/null %"
@@ -642,6 +645,29 @@ require('lazy').setup({
         delete = { text = '_' },
         topdelete = { text = '‾' },
         changedelete = { text = '~' },
+      },
+    },
+  },
+  {
+    'folke/todo-comments.nvim',
+    dependencies = { 'nvim-lua/plenary.nvim' },
+    main = 'todo-comments',
+    opts = {
+      merge_keywords = false,
+      keywords = {
+        FIXME = { icon = 'F', color = 'error', },
+        TODO = { icon = 'T', color = 'info' },
+        XXX = { icon = 'X', color = 'warning' },
+        NOTE = { icon = '!', color = 'hint', },
+      },
+      highlight = {
+        pattern = [[(KEYWORDS)]],
+        comments_only = true,
+        max_line_len = 200,
+        keyword = 'bg',
+      },
+      search = {
+        pattern = [[\b(KEYWORDS)\b]],
       },
     },
   },
