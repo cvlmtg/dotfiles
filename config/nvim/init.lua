@@ -1,17 +1,14 @@
 -- Adapted from: https://github.com/nvim-lua/kickstart.nvim
 
 -----------------------------------------------------------------------
--- Auto commands
------------------------------------------------------------------------
--- See `:help lua-guide-autocommands`
-
-local vimrc = vim.api.nvim_create_augroup("vimrc", { clear = true })
-
------------------------------------------------------------------------
 -- Options
 -----------------------------------------------------------------------
 -- See `:help vim.o`
 -- For more options, you can see `:help option-list`
+
+-- disable netrw
+vim.g.loaded_netrwPlugin = 1
+vim.g.loaded_netrw = 1
 
 -- Set <space> as the leader key
 -- See `:help mapleader`
@@ -152,6 +149,13 @@ vim.o.tabstop = 2
 -- indent / un-indent selected text
 vim.keymap.set("x", "<S-Tab>", "<gv", { desc = 'Un-indent selected text' })
 vim.keymap.set("x", "<Tab>", ">gv", { desc = 'Indent selected text' })
+
+-----------------------------------------------------------------------
+-- Auto commands
+-----------------------------------------------------------------------
+-- See `:help lua-guide-autocommands`
+
+local vimrc = vim.api.nvim_create_augroup("vimrc", { clear = true })
 
 -----------------------------------------------------------------------
 -- Search / Movement
