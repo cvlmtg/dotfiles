@@ -16,27 +16,6 @@ add_path ~/.rbenv/shims
 add_path ~/.rbenv/bin
 add_path ~/bin
 
-# questo serve per react-native
-
-if test -d $HOME/Library/Android/sdk
-  set -x ANDROID_HOME $HOME/Library/Android/sdk
-  set PATH $PATH $ANDROID_HOME/emulator
-  set PATH $PATH $ANDROID_HOME/tools
-  set PATH $PATH $ANDROID_HOME/tools/bin
-  set PATH $PATH $ANDROID_HOME/platform-tools
-end
-
-# questo serve per i deploy
-
-if test -f ~/.ssh/bsl_deployer_rsa
-  ssh-add -l | grep deployer > /dev/null
-
-  if test $status -eq 1
-    ssh-add -q
-    ssh-add -q ~/.ssh/bsl_deployer_rsa
-  end
-end
-
 # rimuoviamo il messaggio di benvenuto
 
 set fish_greeting ""
