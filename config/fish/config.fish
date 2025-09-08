@@ -44,6 +44,6 @@ set -x SHELL (which fish)
 
 # start stuff...
 
-eval (/opt/homebrew/bin/brew shellenv)
+eval (brew shellenv)
 
 if test -d ~/.nvf; nvf init; end
