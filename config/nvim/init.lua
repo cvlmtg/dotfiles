@@ -269,6 +269,14 @@ vim.keymap.set("n", "gV", function()
   return "`[" .. string.sub(vim.fn.getregtype(), 1, 1) .. "`]"
 end, { expr = true })
 
+vim.keymap.set("i", "<C-Right>", function()
+  require('copilot.suggestion').accept_word()
+end, { desc = 'Accept Copilot suggestion (Word)' })
+
+vim.keymap.set("i", "<C-Down>", function()
+  require('copilot.suggestion').accept()
+end, { desc = 'Accept Copilot suggestion' })
+
 -- yank to end of line
 -- http://stackoverflow.com/questions/5010162
 vim.api.nvim_create_autocmd("VimEnter", {
@@ -790,6 +798,38 @@ require('lazy').setup({
   },
 
 ------------------------------------------------------------------------
+--- Copilot
+------------------------------------------------------------------------
+
+  {
+    'zbirenbaum/copilot.lua',
+    cmd = 'Copilot',
+    build = ':Copilot auth',
+    event = 'BufReadPost',
+    opts = {
+      suggestion = {
+        enabled = not vim.g.ai_cmp,
+        auto_trigger = true,
+        hide_during_completion = vim.g.ai_cmp,
+        keymap = {
+          accept = false, -- handled by nvim-cmp / blink.cmp
+          next = "<M-]>",
+          prev = "<M-[>",
+        },
+      },
+      panel = { enabled = false },
+      filetypes = {
+        typescriptreact = true,
+        javascriptreact = true,
+        typescript = true,
+        javascript = true,
+        markdown = true,
+        json = true,
+      },
+    },
+  },
+
+------------------------------------------------------------------------
 --- Auto completion
 ------------------------------------------------------------------------
 
@@ -798,6 +838,7 @@ require('lazy').setup({
     event = 'VimEnter',
     version = '1.*',
     dependencies = {
+      'giuxtaposition/blink-cmp-copilot',
       'folke/lazydev.nvim',
     },
     --- @module 'blink.cmp'
@@ -868,7 +909,7 @@ require('lazy').setup({
         },
       },
       sources = {
-        default = { 'lsp', 'path', 'lazydev', 'buffer' },
+        default = { 'lsp', 'path', 'lazydev', 'buffer', 'copilot' },
         providers = {
           path = {
             module = 'blink.cmp.sources.path',
@@ -880,6 +921,12 @@ require('lazy').setup({
           lazydev = {
             module = 'lazydev.integrations.blink',
             score_offset = 100
+          },
+          copilot = {
+            name = 'copilot',
+            module = 'blink-cmp-copilot',
+            score_offset = 100,
+            async = true,
           },
         },
       },
