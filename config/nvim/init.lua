@@ -828,6 +828,27 @@ require('lazy').setup({
       },
     },
   },
+  {
+    'CopilotC-Nvim/CopilotChat.nvim',
+    dependencies = {
+      { 'nvim-lua/plenary.nvim', branch = 'master' },
+    },
+    build = 'make tiktoken',
+    opts = {
+      model = 'claude-sonnet-4', -- AI model to use
+      temperature = 0.1,         -- Lower = focused, higher = creative
+      window = {
+        layout = 'vertical',     -- 'vertical', 'horizontal', 'float'
+        width = 70,
+      },
+      headers = {
+        assistant = '🤖 Copilot ',
+        tool = '🔧 Tool ',
+        user = '👤 You ',
+      },
+      auto_insert_mode = true, -- Enter insert mode when opening
+    },
+  },
 
 ------------------------------------------------------------------------
 --- Auto completion
