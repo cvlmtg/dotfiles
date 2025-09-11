@@ -6,9 +6,9 @@
 -- See `:help vim.o`
 -- For more options, you can see `:help option-list`
 
--- disable netrw
-vim.g.loaded_netrwPlugin = 1
-vim.g.loaded_netrw = 1
+-- disable netrw (this will make downlading spell files fail)
+-- vim.g.loaded_netrwPlugin = 1
+-- vim.g.loaded_netrw = 1
 
 -- Set <space> as the leader key
 -- See `:help mapleader`
