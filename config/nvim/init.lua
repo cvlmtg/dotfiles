@@ -409,6 +409,8 @@ function StatuslinePath()
     end
   end
 
+  path = path .. ' [' .. vim.bo.fileformat .. ']'
+
   if vim.fn.getbufvar(bufnum, '&modified') == 1 then
     path = path .. ' +'
   end
