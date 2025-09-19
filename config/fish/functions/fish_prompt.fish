@@ -1,14 +1,14 @@
 function git_prompt
-    if command git rev-parse --show-toplevel >/dev/null 2>/dev/null
-        set -l branch (command git branch 2>/dev/null | sed -n '/\* /s///p')
-        set -l dirty  (command git status --porcelain 2>/dev/null | wc -l)
+    if git rev-parse --is-inside-work-tree &>/dev/null
+        set -l branch (git branch --show-current 2>/dev/null)
+        set -l dirty (git status --porcelain 2>/dev/null)
         set -l color
 
         # uncommitted changes or untracked files
-        if test $dirty -ne 0
+        if test -n "$dirty"
             set color (set_color red)
         else
-            set -l ahead (command git log '@{u}..HEAD' --oneline 2>/dev/null | wc -l)
+            set -l ahead (git status --porcelain --branch 2>/dev/null | grep -c '\[ahead ')
 
             # we are ahead of the remote branch (unpushed commits)
             if test $ahead -ne 0
