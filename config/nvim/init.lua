@@ -836,6 +836,9 @@ require('lazy').setup({
       { 'nvim-lua/plenary.nvim', branch = 'master' },
     },
     build = 'make tiktoken',
+    keys = {
+      { '<leader>c', '<cmd>CopilotChatToggle<CR>' },
+    },
     opts = {
       model = 'claude-sonnet-4', -- AI model to use
       temperature = 0.1,         -- Lower = focused, higher = creative
