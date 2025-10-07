@@ -844,14 +844,14 @@ require('lazy').setup({
       temperature = 0.1,         -- Lower = focused, higher = creative
       window = {
         layout = 'vertical',     -- 'vertical', 'horizontal', 'float'
-        width = 70,
+        width = 0.5,
       },
       headers = {
         assistant = '🤖 Copilot ',
         tool = '🔧 Tool ',
         user = '👤 You ',
       },
-      auto_insert_mode = true, -- Enter insert mode when opening
+      auto_insert_mode = false, -- Enter insert mode when opening
     },
   },
 
