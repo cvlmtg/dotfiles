@@ -1,0 +1,145 @@
+#!/bin/bash
+
+alias vim="nvim"
+
+# GIT UTILITIES -------------------------------------------------------
+
+# git status
+function g() {
+  local has_staged_files=$(git status --porcelain 2>/dev/null | egrep '^(M|A|D|R)' | wc -l)
+  local has_files=$(git status --porcelain 2>/dev/null | egrep '^ M' | wc -l)
+
+  if [[ -n "$1" ]]; then
+    local file="$1"
+
+    if [[ -f "$file" || -d "$file" ]]; then
+      git add "$@"
+    else
+      git "$@"
+    fi
+    return
+  fi
+
+  if [[ $has_staged_files -gt 0 ]]; then
+    git diff --staged
+    git status
+    return
+  fi
+
+  if [[ $has_files -gt 0 ]]; then
+    if [[ -n "$1" ]]; then
+      git diff "$@"
+    else
+      git diff
+      git status
+    fi
+    return
+  fi
+
+  git status
+}
+
+# git add -A
+# git commit --amend
+function ga() {
+  local has_staged_files=$(git status --porcelain 2>/dev/null | egrep '^(M|A|D|R)' | wc -l)
+
+  if [[ $has_staged_files -eq 0 ]]; then
+    git add -A
+  fi
+
+  git commit --amend
+}
+
+# git commit -m 'blabla'
+function gc() {
+  local has_staged_files=$(git status --porcelain 2>/dev/null | egrep '^(M|A|D|R)' | wc -l)
+  local has_files=$(git status --porcelain 2>/dev/null | egrep '^( M|\?\?)' | wc -l)
+
+  if [[ $has_staged_files -gt 0 ]]; then
+    if [[ -n "$*" ]]; then
+      git commit -m "$*"
+    else
+      git commit
+    fi
+    return
+  fi
+
+  if [[ $has_files -gt 0 ]]; then
+    git add -A
+
+    if [[ -n "$*" ]]; then
+      git commit -m "$*"
+    else
+      git commit
+    fi
+    return
+  fi
+
+  git commit -m 'show git error message'
+}
+
+# git checkout blabla
+function gco() {
+  git checkout "$@"
+}
+
+# git show (evitiamo gs per non mascherare ghostscript)
+function gg() {
+  git show "$@"
+}
+
+# git log -u FILENAME
+# git log
+function gl() {
+  local FILENAME="$1"
+
+  if [[ "$FILENAME" == "--" ]]; then
+    FILENAME="$2"
+  fi
+
+  if [[ -n "$FILENAME" ]]; then
+    git log --all --full-history -u -- "$FILENAME"
+  else
+    git log
+  fi
+}
+
+# git tree
+function gt() {
+  git log --graph --oneline --exclude=refs/stash --all --date-order
+}
+
+# PROMPT --------------------------------------------------------------
+
+shorten_path() {
+  pwd | sed -E -e "s:^${HOME}:~:" -e "s:([^/\.])[^/]+/:\1/:g"
+}
+
+parse_git_branch() {
+  if git rev-parse --is-inside-work-tree &>/dev/null; then
+    local BRANCH=$(git branch --show-current 2>/dev/null)
+    local DIRTY=$(git status --porcelain 2>/dev/null)
+    local COLOR=""
+
+    # uncommitted changes or untracked files
+    if [ -n "$DIRTY" ]; then
+      COLOR="\e[31m"  # red
+    else
+      AHEAD=$(git status --porcelain --branch 2>/dev/null | grep -c '\[ahead ')
+
+      # we are ahead of the remote branch (unpushed commits)
+      if [ $AHEAD -ne 0 ]; then
+        COLOR="\e[34m"  # blue
+      else
+        COLOR="\e[33m"  # yellow
+      fi
+    fi
+
+    echo -e "("$COLOR$BRANCH"\e[0m)"
+  fi
+
+  echo ""
+}
+
+PS1="\$(parse_git_branch) \[\033[32m\]\$(shorten_path)\[\033[00m\] "
