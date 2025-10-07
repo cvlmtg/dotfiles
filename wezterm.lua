@@ -2,15 +2,37 @@ local wezterm = require("wezterm")
 local config = wezterm.config_builder()
 local action = wezterm.action
 
+-- https://github.com/wez/wezterm/discussions/4728
+local is_windows = wezterm.target_triple:find("windows") ~= nil
+local is_mac = wezterm.target_triple:find("darwin") ~= nil
+
+config.font = wezterm.font("Fira Code")
+config.term = "xterm-256color"
+config.initial_cols = 100
+config.initial_rows = 40
+
+if is_mac == true then
+  config.window_decorations = "INTEGRATED_BUTTONS|RESIZE"
+  config.window_frame = {
+    inactive_titlebar_bg = '#000000',
+    active_titlebar_bg = '#000000',
+    font_size = 15
+  }
+  config.font_size = 15
+else
+  config.use_fancy_tab_bar = false
+  config.tab_bar_at_bottom = true
+end
+
 config.colors = {
   tab_bar = {
-    background = '#3a3a3a',
+    background = is_mac and '#000000' or '#3a3a3a',
 
     active_tab = {
-      bg_color = '#000000',
-      fg_color = '#909090',
-      italic = false,
+      bg_color = is_mac and '#000000' or '#000000',
+      fg_color = is_mac and '#ffffff' or '#909090',
       strikethrough = false,
+      italic = false,
 
       -- "Half", "Normal" or "Bold"
       intensity = 'Bold',
@@ -20,7 +42,7 @@ config.colors = {
     },
 
     inactive_tab = {
-      bg_color = '#3a3a3a',
+      bg_color = is_mac and '#000000' or '#3a3a3a',
       fg_color = '#808080',
     },
 
@@ -30,7 +52,7 @@ config.colors = {
     },
 
     new_tab = {
-      bg_color = '#3a3a3a',
+      bg_color = is_mac and '#000000' or '#3a3a3a',
       fg_color = '#808080',
     },
 
@@ -47,13 +69,6 @@ config.window_padding = {
   top = 4,
   bottom = 4,
 }
-
-config.font = wezterm.font("Fira Code")
-config.term = "xterm-256color"
-config.use_fancy_tab_bar = false
-config.tab_bar_at_bottom = true
-config.initial_cols = 100
-config.initial_rows = 40
 
 config.leader = { key = "a", mods = "CTRL", timeout_milliseconds = 1000 }
 config.keys = {
@@ -78,17 +93,21 @@ for i = 1, 9 do
   table.insert(config.keys, { key = tostring(i), mods = "LEADER", action = action.ActivateTab(i - 1) })
 end
 
-config.launch_menu = {
-  {
-    label = "Git Bash",
-    args = { "C:\\Program Files\\Git\\bin\\bash.exe", "--login", "-i" },
-  },
-  {
-    label = "Powershell",
-    args = { "C:\\Program Files\\PowerShell\\7\\pwsh.exe" },
-  },
-}
+if is_windows == true then
+  config.launch_menu = {
+    {
+      label = "Git Bash",
+      args = { "C:\\Program Files\\Git\\bin\\bash.exe", "--login", "-i" },
+    },
+    {
+      label = "Powershell",
+      args = { "C:\\Program Files\\PowerShell\\7\\pwsh.exe" },
+    },
+  }
 
-config.default_prog = { "C:\\Program Files\\Git\\bin\\bash.exe", "--login", "-i" }
+  config.default_prog = { "C:\\Program Files\\Git\\bin\\bash.exe", "--login", "-i" }
+else
+  config.default_prog = { "/opt/homebrew/bin/fish", "--login" }
+end
 
 return config
