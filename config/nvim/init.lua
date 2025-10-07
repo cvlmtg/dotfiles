@@ -6,7 +6,7 @@
 -- See `:help vim.o`
 -- For more options, you can see `:help option-list`
 
--- disable netrw (this will make downlading spell files fail)
+-- disable netrw (this will make downloading spell files fail)
 -- vim.g.loaded_netrwPlugin = 1
 -- vim.g.loaded_netrw = 1
 
@@ -835,7 +835,13 @@ require('lazy').setup({
     dependencies = {
       { 'nvim-lua/plenary.nvim', branch = 'master' },
     },
-    build = 'make tiktoken',
+    build = function ()
+      if vim.fn.executable('make') == 0 then
+        vim.notify('Warning: tiktoken not installed. Please install tiktoken manually.', vim.log.levels.WARN)
+        return
+      end
+      vim.fn.execute('make tiktoken')
+    end,
     keys = {
       { '<leader>c', '<cmd>CopilotChatToggle<CR>' },
     },
