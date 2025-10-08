@@ -12,6 +12,7 @@ config.initial_cols = 100
 config.initial_rows = 40
 
 if is_mac == true then
+  config.quit_when_all_windows_are_closed = false
   config.window_decorations = "INTEGRATED_BUTTONS|RESIZE"
   config.window_frame = {
     inactive_titlebar_bg = '#000000',
