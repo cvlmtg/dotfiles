@@ -262,11 +262,6 @@ vim.keymap.set("c", "%%", function()
   return vim.fn.getcmdtype() == ':' and vim.fn.expand('%:p:h') .. '/' or '%%'
 end, { expr = true })
 
--- use ctrl-v to paste in the command line
-vim.keymap.set("c", "<C-v>", function()
-  return vim.fn.getcmdtype():match("[/?:]") and "<C-r>\"" or "<C-v>"
-end, { expr = true })
-
 -- visually select the text that was last edited/pasted
 vim.keymap.set("n", "gV", function()
   return "`[" .. string.sub(vim.fn.getregtype(), 1, 1) .. "`]"
@@ -279,6 +274,17 @@ end, { desc = 'Accept Copilot suggestion (Word)' })
 vim.keymap.set("i", "<C-Down>", function()
   require('copilot.suggestion').accept()
 end, { desc = 'Accept Copilot suggestion' })
+
+-- on windows, use ctrl-v to paste (we are using wezterm,
+-- other terminals may not work)
+-- on other platforms, use ctrl-v in the command line
+if vim.fn.has('win32') == 1 or vim.fn.has('win64') == 1 then
+  vim.keymap.set({ 'i', 'c' }, '<C-v>', '<C-r>+', { noremap = true })
+else
+  vim.keymap.set("c", "<C-v>", function()
+    return vim.fn.getcmdtype():match("[/?:]") and "<C-r>\"" or "<C-v>"
+  end, { expr = true })
+end
 
 -- yank to end of line
 -- http://stackoverflow.com/questions/5010162

@@ -2,6 +2,20 @@
 
 alias vim="nvim"
 
+function rg() {
+  if command -v bat > /dev/null 2>&1; then
+    PAGER="bat -p"
+  else
+    PAGER="less -R"
+  fi
+
+  if [ -t 1 ]; then
+    command rg --smart-case --heading --path-separator // --pretty -g "!*.min.js" -g "!*.map" "$@" | tr -d "\017" | eval "$PAGER"
+  else
+    command rg --smart-case --path-separator // "$@"
+  fi
+}
+
 # GIT UTILITIES -------------------------------------------------------
 
 # git status
