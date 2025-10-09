@@ -55,6 +55,9 @@ vim.o.confirm = true
 -- try to live without them
 vim.o.swapfile = false
 
+-- on windows we need this to avoid mixed slashes in file paths
+vim.o.shellslash = true
+
 -- common mistakes
 vim.cmd([[
   abbreviate lenght length
@@ -531,13 +534,18 @@ vim.api.nvim_create_autocmd("FileType", {
 
 vim.opt.sessionoptions = { "curdir", "folds", "tabpages" }
 
-local function get_session_dir()
-  return vim.fn.expand('~/.cache/vim_session') .. vim.fn.getcwd()
+local function get_session_dir(filename)
+  local file = filename and "/" .. filename or ""
+  -- on windows can't use : in file names (e.g. D:\foo)
+  local cwd = vim.fn.substitute(vim.fn.getcwd(), ":", "/", "g")
+  local path = vim.fn.expand("~/.cache/vim_session") .. "/" .. cwd .. file
+
+  return vim.fn.resolve(path)
 end
 
 local function make_session()
+  local filename = get_session_dir("session.vim")
   local sessiondir = get_session_dir()
-  local filename = sessiondir .. "/session.vim"
 
   if vim.fn.filewritable(sessiondir) ~= 2 then
     vim.fn.mkdir(sessiondir, "p")
@@ -553,8 +561,7 @@ local sessionloaded = 0
 
 local function update_session()
   if sessionloaded == 1 then
-    local sessiondir = get_session_dir()
-    local filename = sessiondir .. "/session.vim"
+    local filename = get_session_dir("session.vim")
 
     if vim.fn.filereadable(filename) == 1 then
       vim.cmd("mksession! " .. filename)
@@ -568,8 +575,7 @@ local function load_session()
     return
   end
 
-  local sessiondir = get_session_dir()
-  local filename = sessiondir .. "/session.vim"
+  local filename = get_session_dir("session.vim")
 
   if vim.fn.filereadable(filename) == 1 then
     vim.cmd("source " .. filename)
