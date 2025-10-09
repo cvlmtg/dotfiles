@@ -291,27 +291,30 @@ local restore_reg = ""
 
 local function restore_register()
   if vim.o.clipboard == "unnamed" then
-    vim.fn.setreg('*', restore_reg)
+    vim.fn.setreg("*", restore_reg)
   elseif vim.o.clipboard == "unnamedplus" then
-    vim.fn.setreg('+', restore_reg)
+    vim.fn.setreg("+", restore_reg)
   else
     vim.fn.setreg('"', restore_reg)
   end
-  return ''
+  return ""
 end
 
-vim.keymap.set("x", "p", function()
+local function save_register()
   if vim.o.clipboard == "unnamed" then
-    restore_reg = vim.fn.getreg('*')
+    restore_reg = vim.fn.getreg("*")
   elseif vim.o.clipboard == "unnamedplus" then
-    restore_reg = vim.fn.getreg('+')
+    restore_reg = vim.fn.getreg("+")
   else
     restore_reg = vim.fn.getreg('"')
   end
   return "p@=v:lua.restore_register()<CR>"
-end, { silent = true })
+end
 
-vim.g.restore_register = restore_register
+-- expose restore_register globally so it can be called from <expr> mapping
+_G.restore_register = restore_register
+
+vim.keymap.set("x", "p", save_register, { expr = true, silent = true })
 
 -----------------------------------------------------------------------
 -- Folding
