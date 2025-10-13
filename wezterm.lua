@@ -25,6 +25,7 @@ else
   config.tab_bar_at_bottom = true
 end
 
+config.color_scheme = "GitHub Dark High Contrast"
 config.colors = {
   tab_bar = {
     background = is_mac and '#000000' or '#3a3a3a',
