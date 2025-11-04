@@ -72,7 +72,7 @@ config.window_padding = {
   bottom = 4,
 }
 
-config.leader = { key = "a", mods = "CTRL", timeout_milliseconds = 1000 }
+config.leader = { key = "a", mods = "CTRL", timeout_milliseconds = 2000 }
 config.keys = {
   { key = 'a', mods = 'LEADER', action = action.SendKey { key = 'a', mods = 'CTRL' } },
   { key = 'a', mods = 'LEADER|CTRL', action = action.ActivateLastTab },
@@ -81,35 +81,51 @@ config.keys = {
   { key = 'm', mods = 'LEADER', action = action.TogglePaneZoomState },
   { key = "LeftArrow", mods = "LEADER", action = action.ActivatePaneDirection("Left") },
   { key = "h", mods = "LEADER", action = action.ActivatePaneDirection("Left") },
+  { key = "DownArrow", mods = "LEADER", action = action.ActivatePaneDirection("Down") },
   { key = "j", mods = "LEADER", action = action.ActivatePaneDirection("Down") },
+  { key = "UpArrow", mods = "LEADER", action = action.ActivatePaneDirection("Up") },
   { key = "k", mods = "LEADER", action = action.ActivatePaneDirection("Up") },
-  { key = "l", mods = "LEADER", action = action.ActivatePaneDirection("Right") },
   { key = "RightArrow", mods = "LEADER", action = action.ActivatePaneDirection("Right") },
+  { key = "l", mods = "LEADER", action = action.ActivatePaneDirection("Right") },
   { key = "c", mods = "LEADER", action = action.SpawnTab("CurrentPaneDomain") },
   { key = "p", mods = "LEADER", action = action.ActivateTabRelative(-1) },
   { key = "n", mods = "LEADER", action = action.ActivateTabRelative(1) },
   { key = "n", mods = "LEADER", action = action.ActivateTabRelative(1) },
+  { key = "r", mods = "LEADER", action = action.RotatePanes('Clockwise') },
 }
 
 for i = 1, 9 do
   table.insert(config.keys, { key = tostring(i), mods = "LEADER", action = action.ActivateTab(i - 1) })
 end
 
-if is_windows == true then
+if is_windows == false then
+  config.default_prog = { "/opt/homebrew/bin/fish", "--login" }
+else
+  local bash = { "C:\\Program Files\\Git\\bin\\bash.exe", "--login", "-i" }
+  local pwsh = { "C:\\Program Files\\PowerShell\\7\\pwsh.exe" }
+
   config.launch_menu = {
     {
       label = "Git Bash",
-      args = { "C:\\Program Files\\Git\\bin\\bash.exe", "--login", "-i" },
+      args = bash,
     },
     {
       label = "Powershell",
-      args = { "C:\\Program Files\\PowerShell\\7\\pwsh.exe" },
+      args = pwsh,
     },
   }
 
-  config.default_prog = { "C:\\Program Files\\Git\\bin\\bash.exe", "--login", "-i" }
-else
-  config.default_prog = { "/opt/homebrew/bin/fish", "--login" }
+  -- Add key binding to launch PowerShell with leader+shift+c on Windows
+  table.insert(config.keys, {
+    key = "c", mods = "LEADER|SHIFT", action = action.SpawnCommandInNewTab({ args = pwsh })
+  })
+
+  -- Paste with Ctrl+V
+  table.insert(config.keys, {
+    key = "v", mods = "CTRL", action = action.PasteFrom('Clipboard'),
+  })
+
+  config.default_prog = bash
 end
 
 return config

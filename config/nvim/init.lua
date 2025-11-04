@@ -25,7 +25,7 @@ end)
 vim.o.undofile = true
 
 -- Enable mouse mode
-vim.o.mouse = 'nicr'
+vim.o.mouse = 'a'
 
 -- Decrease update time
 vim.o.updatetime = 250
@@ -57,6 +57,16 @@ vim.o.swapfile = false
 
 -- on windows we need this to avoid mixed slashes in file paths
 vim.o.shellslash = true
+
+-- command line autocompletion settings
+vim.o.wildmenu = true
+vim.o.wildoptions = 'pum'
+vim.opt.wildmode = { "longest:full", "full" }
+vim.opt.wildignore = {
+  "*.o", "*.obj", "*.dylib", "*.bin", "*.dll", "*.exe",
+  "*.jpg", "*.jpeg", "*.png", "*.gif", "*.pdf",
+  "*/.git/*", "*/.svn/*", "*/.DS_Store",
+}
 
 -- common mistakes
 vim.cmd([[
@@ -929,31 +939,7 @@ require('lazy').setup({
         },
       },
       cmdline = {
-        sources = { 'cmdline', 'buffer' },
-        enabled = true,
-        completion = {
-          list = {
-            selection = { preselect = false },
-          },
-        },
-        keymap = {
-          preset = 'inherit',
-          ['<Tab>'] = { 'show_and_insert', 'select_next', 'fallback' },
-          ['<Right>'] = {
-            function(cmp)
-              local item = cmp.get_selected_item()
-
-              -- check if the item ends with a slash
-              if item and string.sub(item.label, -1) == '/' then
-                return cmp.accept()
-              end
-
-              return false
-            end,
-            'fallback'
-          },
-          ['<CR>'] = {},
-        },
+        enabled = false,
       },
       sources = {
         default = { 'lsp', 'path', 'lazydev', 'buffer', 'copilot' },
