@@ -617,6 +617,7 @@ vim.api.nvim_create_autocmd("VimEnter", {
 vim.api.nvim_create_autocmd("VimLeave", {
   group = vimrc,
   callback = update_session,
+  nested = true,
 })
 
 -----------------------------------------------------------------------
@@ -772,8 +773,10 @@ require('lazy').setup({
               lines = vim.api.nvim_buf_get_lines(bufnr, start_line, end_line, false)
             end
 
+            local line = cursor_line - 1
+
             vim.api.nvim_buf_set_lines(self.state.bufnr, 0, -1, false, lines)
-            vim.api.nvim_buf_add_highlight(self.state.bufnr, -1, "Visual", cursor_line - 1, 0, -1)
+            vim.hl.range(self.state.bufnr, 1, "Visual", { line, 0 }, { line, -1 })
           end,
         })
       end
