@@ -654,7 +654,7 @@ require('lazy').setup({
       vim.g.accent_no_bg = 1
       vim.cmd.colorscheme('accent')
       vim.cmd([[
-        highlight LineNr guifg=#666666 guibg=#000000
+        highlight LineNr guifg=#666666 guibg=#212121
         highlight StatusLine guifg=#000000 gui=bold
         highlight Type guifg=#dfdfef gui=bold
       ]])
