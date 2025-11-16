@@ -103,13 +103,24 @@ if is_windows == false then
 else
   local bash = { "C:\\Program Files\\Git\\bin\\bash.exe", "--login", "-i" }
   local pwsh = { "C:\\Program Files\\PowerShell\\7\\pwsh.exe" }
+  local wsl  = { "C:\\Windows\\system32\\wsl.exe -d Ubuntu-24.04" }
+  local wsl_domain = "WSL:Ubuntu-24.04"
 
+  config.default_domain = wsl_domain
+  config.default_prog = wsl
   config.launch_menu = {
     {
+      domain = { DomainName = wsl_domain },
+      label = wsl_domain,
+      args = wsl,
+    },
+    {
+      domain = { DomainName = "local" },
       label = "Git Bash",
       args = bash,
     },
     {
+      domain = { DomainName = "local" },
       label = "Powershell",
       args = pwsh,
     },
@@ -124,8 +135,6 @@ else
   table.insert(config.keys, {
     key = "v", mods = "CTRL", action = action.PasteFrom('Clipboard'),
   })
-
-  config.default_prog = bash
 end
 
 return config
