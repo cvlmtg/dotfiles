@@ -6,6 +6,7 @@ local action = wezterm.action
 local is_windows = wezterm.target_triple:find("windows") ~= nil
 local is_mac = wezterm.target_triple:find("darwin") ~= nil
 
+config.force_reverse_video_cursor = true
 config.font = wezterm.font("Fira Code")
 config.term = "xterm-256color"
 config.initial_cols = 100
