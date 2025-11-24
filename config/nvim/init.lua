@@ -240,8 +240,15 @@ vim.api.nvim_create_autocmd("FileType", {
 -- a bit more experience.
 vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
 
--- switch to last visited buffer
-vim.keymap.set("n", "\\", ":b#<CR>", { desc = 'Switch to the last visisted buffer' })
+vim.keymap.set("c", "w!!", function()
+  return "%!sudo tee > /dev/null %"
+end, { expr = true, desc = "Save file as root" })
+
+vim.keymap.set('n', '<leader>p', function()
+  vim.fn.setreg('+', vim.fn.expand('%'))
+end, { desc = 'Copy current file path to clipboard' })
+
+vim.keymap.set("n", "\\", ":b#<CR>", { desc = 'Switch to the last visited buffer' })
 
 -- even if {} are useful motions, I never use them
 vim.keymap.set("n", "{", function()
@@ -260,12 +267,7 @@ vim.keymap.set("n", "<Tab>", "<C-W>w", { desc = "Goto next split" })
 vim.keymap.set("n", "Q", "@q", { desc = 'Execute the macro recorded on "q"' })
 
 -- spellcheck, easier to remember
-vim.keymap.set("n", "<leader>s", "z=", { desc = 'Spellcheck the current word' })
-
--- save files owned by root
-vim.keymap.set("c", "w!!", function()
-  return "%!sudo tee > /dev/null %"
-end, { expr = true })
+vim.keymap.set("n", "<leader>s", "z=", { desc = "Spellcheck the current word" })
 
 -- use ":e %%" to insert the current file path
 vim.keymap.set("c", "%%", function()
@@ -277,6 +279,7 @@ vim.keymap.set("n", "gV", function()
   return "`[" .. string.sub(vim.fn.getregtype(), 1, 1) .. "`]"
 end, { expr = true })
 
+-- Copilot keymaps
 vim.keymap.set("i", "<C-Right>", function()
   require('copilot.suggestion').accept_word()
 end, { desc = 'Accept Copilot suggestion (Word)' })
