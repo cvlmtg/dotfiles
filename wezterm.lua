@@ -104,7 +104,7 @@ if is_windows == false then
 else
   local bash = { "C:\\Program Files\\Git\\bin\\bash.exe", "--login", "-i" }
   local pwsh = { "C:\\Program Files\\PowerShell\\7\\pwsh.exe" }
-  local wsl  = { "C:\\Windows\\system32\\wsl.exe -d Ubuntu-24.04" }
+  local wsl = { "C:\\Windows\\system32\\wsl.exe", "-d", "Ubuntu-24.04" }
   local wsl_domain = "WSL:Ubuntu-24.04"
 
   config.default_domain = wsl_domain
@@ -129,7 +129,13 @@ else
 
   -- Add key binding to launch PowerShell with leader+shift+c on Windows
   table.insert(config.keys, {
-    key = "c", mods = "LEADER|SHIFT", action = action.SpawnCommandInNewTab({ args = pwsh })
+    key = "c", mods = "LEADER|SHIFT", action = action.SpawnCommandInNewTab { args = pwsh, domain = { DomainName = "local" } }
+  })
+  table.insert(config.keys, {
+    key = "v", mods = "LEADER|SHIFT", action = action.SplitHorizontal { args = pwsh, domain = { DomainName = "local" } }
+  })
+  table.insert(config.keys, {
+    key = "s", mods = "LEADER|SHIFT", action = action.SplitVertical { args = pwsh, domain = { DomainName = "local" } }
   })
 
   -- Paste with Ctrl+V
