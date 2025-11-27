@@ -16,8 +16,8 @@ if is_mac == true then
   config.quit_when_all_windows_are_closed = false
   config.window_decorations = "INTEGRATED_BUTTONS|RESIZE"
   config.window_frame = {
-    inactive_titlebar_bg = '#000000',
-    active_titlebar_bg = '#000000',
+    inactive_titlebar_bg = "#000000",
+    active_titlebar_bg = "#000000",
     font_size = 15
   }
   config.font_size = 15
@@ -29,39 +29,39 @@ end
 config.color_scheme = "MaterialDarker"
 config.colors = {
   tab_bar = {
-    background = is_mac and '#000000' or '#3a3a3a',
+    background = is_mac and "#000000" or "#3a3a3a",
 
     active_tab = {
-      bg_color = is_mac and '#000000' or '#000000',
-      fg_color = is_mac and '#ffffff' or '#909090',
+      bg_color = is_mac and "#000000" or "#000000",
+      fg_color = is_mac and "#ffffff" or "#909090",
       strikethrough = false,
       italic = false,
 
       -- "Half", "Normal" or "Bold"
-      intensity = 'Bold',
+      intensity = "Bold",
 
       -- "None", "Single" or "Double"
-      underline = 'None',
+      underline = "None",
     },
 
     inactive_tab = {
-      bg_color = is_mac and '#000000' or '#3a3a3a',
-      fg_color = '#808080',
+      bg_color = is_mac and "#000000" or "#3a3a3a",
+      fg_color = "#808080",
     },
 
     inactive_tab_hover = {
-      bg_color = '#2a2a2a',
-      fg_color = '#808080',
+      bg_color = "#2a2a2a",
+      fg_color = "#808080",
     },
 
     new_tab = {
-      bg_color = is_mac and '#000000' or '#3a3a3a',
-      fg_color = '#808080',
+      bg_color = is_mac and "#000000" or "#3a3a3a",
+      fg_color = "#808080",
     },
 
     new_tab_hover = {
-      bg_color = '#2a2a2a',
-      fg_color = '#808080',
+      bg_color = "#2a2a2a",
+      fg_color = "#808080",
     },
   },
 }
@@ -75,11 +75,9 @@ config.window_padding = {
 
 config.leader = { key = "a", mods = "CTRL", timeout_milliseconds = 2000 }
 config.keys = {
-  { key = 'a', mods = 'LEADER', action = action.SendKey { key = 'a', mods = 'CTRL' } },
-  { key = 'a', mods = 'LEADER|CTRL', action = action.ActivateLastTab },
-  { key = "s", mods = "LEADER", action = action.SplitVertical { domain = 'CurrentPaneDomain' } },
-  { key = "v", mods = "LEADER", action = action.SplitHorizontal { domain = 'CurrentPaneDomain' } },
-  { key = 'm', mods = 'LEADER', action = action.TogglePaneZoomState },
+  { key = "a", mods = "LEADER", action = action.SendKey { key = "a", mods = "CTRL" } },
+  { key = "a", mods = "LEADER|CTRL", action = action.ActivateLastTab },
+  { key = "z", mods = "LEADER", action = action.TogglePaneZoomState },
   { key = "LeftArrow", mods = "LEADER", action = action.ActivatePaneDirection("Left") },
   { key = "h", mods = "LEADER", action = action.ActivatePaneDirection("Left") },
   { key = "DownArrow", mods = "LEADER", action = action.ActivatePaneDirection("Down") },
@@ -89,10 +87,12 @@ config.keys = {
   { key = "RightArrow", mods = "LEADER", action = action.ActivatePaneDirection("Right") },
   { key = "l", mods = "LEADER", action = action.ActivatePaneDirection("Right") },
   { key = "c", mods = "LEADER", action = action.SpawnTab("CurrentPaneDomain") },
+  { key = "v", mods = "LEADER", action = action.SplitHorizontal { domain = "DefaultDomain" } },
+  { key = "s", mods = "LEADER", action = action.SplitVertical { domain = "DefaultDomain" } },
   { key = "p", mods = "LEADER", action = action.ActivateTabRelative(-1) },
   { key = "n", mods = "LEADER", action = action.ActivateTabRelative(1) },
   { key = "n", mods = "LEADER", action = action.ActivateTabRelative(1) },
-  { key = "r", mods = "LEADER", action = action.RotatePanes('Clockwise') },
+  { key = "r", mods = "LEADER", action = action.RotatePanes("Clockwise") },
 }
 
 for i = 1, 9 do
@@ -134,7 +134,7 @@ else
 
   -- Paste with Ctrl+V
   table.insert(config.keys, {
-    key = "v", mods = "CTRL", action = action.PasteFrom('Clipboard'),
+    key = "v", mods = "CTRL", action = action.PasteFrom("Clipboard"),
   })
 end
 
