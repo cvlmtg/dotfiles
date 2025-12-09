@@ -107,8 +107,8 @@ else
   local wsl = { "C:\\Windows\\system32\\wsl.exe", "-d", "Ubuntu-24.04" }
   local wsl_domain = "WSL:Ubuntu-24.04"
 
-  config.default_domain = wsl_domain
-  config.default_prog = wsl
+  config.default_domain = "local"
+  config.default_prog = bash
   config.launch_menu = {
     {
       domain = { DomainName = wsl_domain },
