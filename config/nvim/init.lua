@@ -680,6 +680,7 @@ require('lazy').setup({
   },
   {
     'lewis6991/gitsigns.nvim',
+    event = { 'BufReadPre', 'BufNewFile' },
     opts = {
       signs = {
         add = { text = '+' },
@@ -737,7 +738,7 @@ require('lazy').setup({
 
   {
     'nvim-telescope/telescope.nvim',
-    event = 'VimEnter',
+    event = 'VeryLazy',
     dependencies = {
       'nvim-lua/plenary.nvim',
       {
@@ -784,7 +785,7 @@ require('lazy').setup({
         })
       end
 
-      require('telescope').setup({
+      telescope.setup({
         defaults = {
           layout_strategy = "vertical",
           mappings = {
@@ -898,7 +899,7 @@ require('lazy').setup({
 
   {
     'saghen/blink.cmp',
-    event = 'VimEnter',
+    event = 'VeryLazy',
     version = '1.*',
     dependencies = {
       'giuxtaposition/blink-cmp-copilot',
@@ -987,6 +988,7 @@ require('lazy').setup({
 
   {
     'nvim-treesitter/nvim-treesitter',
+    event = { 'BufReadPre', 'BufNewFile' },
     build = ':TSUpdate',
     main = 'nvim-treesitter.configs',
     dependencies = {
@@ -1079,6 +1081,7 @@ require('lazy').setup({
   },
   {
     'neovim/nvim-lspconfig',
+    event = 'VeryLazy',
     dependencies = {
       { 'mason-org/mason.nvim', opts = {} },
       'WhoIsSethDaniel/mason-tool-installer.nvim',
