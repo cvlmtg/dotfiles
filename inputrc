@@ -2,7 +2,8 @@
 set input-meta on
 set output-meta on
 
-#set editing-mode vi
+# Delete only "bar/" from "foo/bar/" with ctrl-w
+"\C-w": backward-kill-word
 
 "\e[A": history-search-backward
 "\e[B": history-search-forward
