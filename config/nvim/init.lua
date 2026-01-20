@@ -878,7 +878,7 @@ require('lazy').setup({
       { '<leader>c', '<cmd>CopilotChatToggle<CR>' },
     },
     opts = {
-      model = 'claude-sonnet-4', -- AI model to use
+      model = 'gpt-5.1-codex-max', -- AI model to use
       temperature = 0.1,         -- Lower = focused, higher = creative
       window = {
         layout = 'vertical',     -- 'vertical', 'horizontal', 'float'
