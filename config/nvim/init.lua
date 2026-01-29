@@ -21,8 +21,10 @@ vim.schedule(function()
   vim.o.clipboard = 'unnamedplus'
 end)
 
--- Save undo history
+-- Save undo history and increase undo levels, we have plenty of ram
 vim.o.undofile = true
+vim.o.undolevels = 10000
+vim.o.undoreload = 10000
 
 -- Enable mouse mode
 vim.o.mouse = 'a'
