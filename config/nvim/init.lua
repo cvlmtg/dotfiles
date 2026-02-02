@@ -555,24 +555,50 @@ vim.api.nvim_create_autocmd("FileType", {
 
 vim.opt.sessionoptions = { "curdir", "folds", "tabpages" }
 
-local function get_session_dir(filename)
-  local file = filename and "/" .. filename or ""
-  -- on windows can't use : in file names (e.g. D:\foo)
-  local cwd = vim.fn.substitute(vim.fn.getcwd(), ":", "/", "g")
-  local path = vim.fn.expand("~/.cache/vim_session") .. "/" .. cwd .. file
+local function safe_notify(msg, level)
+  vim.schedule(function()
+    vim.notify(msg, level or vim.log.levels.INFO)
+  end)
+end
 
-  return vim.fn.resolve(path)
+local function get_session_dir(filename)
+  local cache_root = vim.fn.stdpath("cache")
+  local cwd = vim.fn.getcwd()
+  -- make cwd filesystem-safe for Windows (e.g., D:\ -> D/ )
+  local normalized_cwd = vim.fn.substitute(cwd, ":", "/", "g")
+  local session_root = vim.fs.joinpath(cache_root, "vim_session", normalized_cwd)
+
+  if filename and filename ~= "" then
+    return vim.fs.joinpath(session_root, filename)
+  end
+
+  return session_root
+end
+
+local function ensure_dir(dirpath)
+  if vim.fn.isdirectory(dirpath) == 1 then
+    return true
+  end
+
+  local ok, err = pcall(vim.fn.mkdir, dirpath, "p")
+
+  if not ok then
+    safe_notify(("Failed to create session dir: %s"):format(err), vim.log.levels.ERROR)
+    return false
+  end
+  return true
 end
 
 local function make_session()
-  local filename = get_session_dir("session.vim")
   local sessiondir = get_session_dir()
 
-  if vim.fn.filewritable(sessiondir) ~= 2 then
-    vim.fn.mkdir(sessiondir, "p")
-    vim.cmd("redraw!")
+  if not ensure_dir(sessiondir) then
+    return
   end
-  vim.cmd("mksession! " .. filename)
+
+  local filename = get_session_dir("session.vim")
+
+  vim.cmd("mksession! " .. vim.fn.fnameescape(filename))
 end
 
 -- updates a session, BUT ONLY IF IT ALREADY EXISTS
@@ -581,12 +607,14 @@ end
 local sessionloaded = 0
 
 local function update_session()
-  if sessionloaded == 1 then
-    local filename = get_session_dir("session.vim")
+  if sessionloaded ~= 1 then
+    return
+  end
 
-    if vim.fn.filereadable(filename) == 1 then
-      vim.cmd("mksession! " .. filename)
-    end
+  local filename = get_session_dir("session.vim")
+
+  if vim.fn.filereadable(filename) == 1 then
+    vim.cmd("mksession! " .. vim.fn.fnameescape(filename))
   end
 end
 
@@ -599,10 +627,10 @@ local function load_session()
   local filename = get_session_dir("session.vim")
 
   if vim.fn.filereadable(filename) == 1 then
-    vim.cmd("source " .. filename)
+    vim.cmd("source " .. vim.fn.fnameescape(filename))
     sessionloaded = 1
   else
-    vim.cmd("echo 'No session loaded.'")
+    safe_notify("No session loaded.")
   end
 end
 
