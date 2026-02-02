@@ -865,33 +865,24 @@ require('lazy').setup({
     },
   },
   {
-    'CopilotC-Nvim/CopilotChat.nvim',
-    dependencies = {
-      { 'nvim-lua/plenary.nvim', branch = 'master' },
-    },
-    build = function ()
-      if vim.fn.executable('make') == 0 then
-        vim.notify('Warning: tiktoken not installed. Please install tiktoken manually.', vim.log.levels.WARN)
-        return
-      end
-      vim.fn.execute('make tiktoken')
-    end,
+    "olimorris/codecompanion.nvim",
+    version = "^18.0.0",
     keys = {
-      { '<leader>c', '<cmd>CopilotChatToggle<CR>' },
+      { "<leader>c", "<cmd>CodeCompanionChat Toggle<CR>" },
     },
     opts = {
-      model = 'gpt-5.2-codex', -- AI model to use
-      temperature = 0.1, -- Lower = focused, higher = creative
-      window = {
-        layout = 'vertical', -- 'vertical', 'horizontal', 'float'
-        width = 0.5,
+      interactions = {
+        chat = {
+          adapter = {
+            model = "gpt-5.2-codex",
+            name = "copilot",
+          },
+        },
       },
-      headers = {
-        assistant = '🤖 Copilot ',
-        tool = '🔧 Tool ',
-        user = '👤 You ',
-      },
-      auto_insert_mode = false, -- Enter insert mode when opening
+    },
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+      "nvim-treesitter/nvim-treesitter",
     },
   },
 
