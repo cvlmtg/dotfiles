@@ -496,7 +496,7 @@ local function js_find_file(name)
       return file
     end
 
-    return name
+    return ""
   end
 
   -- https://damien.pobel.fr/post/configure-neovim-vim-gf-javascript-import/
@@ -504,7 +504,16 @@ local function js_find_file(name)
   local package_path = node_modules .. "package.json"
 
   if vim.fn.filereadable(package_path) == 1 then
-    local json = vim.fn.json_decode(table.concat(vim.fn.readfile(package_path), "\n"))
+    local ok_read, data = pcall(vim.fn.readfile, package_path)
+    if not ok_read then
+      return ""
+    end
+
+    local ok_json, json = pcall(vim.fn.json_decode, table.concat(data, "\n"))
+    if not ok_json or type(json) ~= "table" then
+      return ""
+    end
+
     local main = json.main or "index.js"
     return node_modules .. main
   end
@@ -514,6 +523,11 @@ end
 
 local function js_goto_file(split, tab)
   local name = vim.fn.matchstr(vim.fn.getline("."), vim.o.include)
+  if name == nil or name == "" then
+    vim.api.nvim_echo({ { "Can't find file name under cursor.", "WarningMsg" } }, false, {})
+    return
+  end
+
   local file = js_find_file(name)
 
   -- https://gist.github.com/romainl/2ecbf1aaf60b4c0e2c135569d516fbd8
@@ -660,7 +674,7 @@ vim.api.nvim_create_autocmd("VimLeave", {
 local lazypath = vim.fn.stdpath "data" .. "/lazy/lazy.nvim"
 local lazyrepo = "https://github.com/folke/lazy.nvim.git"
 
-if not vim.loop.fs_stat(lazypath) then
+if not vim.uv.fs_stat(lazypath) then
   vim.fn.system({
     "git",
     "clone",
@@ -793,6 +807,11 @@ require("lazy").setup({
           define_preview = function(self, entry)
             -- if entry.bufnr isn't present, get bufnr from file name
             local bufnr = entry.bufnr or vim.fn.bufnr(entry.filename, false)
+            if bufnr == -1 or not vim.api.nvim_buf_is_valid(bufnr) then
+              vim.api.nvim_buf_set_lines(self.state.bufnr, 0, -1, false, { "Buffer not found" })
+              return
+            end
+
             local total = vim.api.nvim_buf_line_count(bufnr)
             local current = entry.lnum or 1
             local context = 5
@@ -801,16 +820,13 @@ require("lazy").setup({
             local end_line = math.min(current + context, total)
             local cursor_line = current - start_line
 
-            local lines = { "Buffer not found" }
-
-            if bufnr ~= -1 then
-              lines = vim.api.nvim_buf_get_lines(bufnr, start_line, end_line, false)
-            end
-
-            local line = cursor_line - 1
-
+            local lines = vim.api.nvim_buf_get_lines(bufnr, start_line, end_line, false)
             vim.api.nvim_buf_set_lines(self.state.bufnr, 0, -1, false, lines)
-            vim.hl.range(self.state.bufnr, 1, "Visual", { line, 0 }, { line, -1 })
+
+            local line = math.max(cursor_line - 1, 0)
+            if #lines > 0 then
+              vim.hl.range(self.state.bufnr, 1, "Visual", { line, 0 }, { line, -1 })
+            end
           end,
         })
       end
@@ -1117,8 +1133,12 @@ require("lazy").setup({
 
         callback = function(event)
           local map = function(keys, func, desc, mode)
-            mode = mode or "n"
-            vim.keymap.set(mode, keys, func, { buffer = event.buf, desc = "LSP: " .. desc })
+            local opts = { buffer = event.buf, desc = 'LSP: ' .. desc }
+            if mode then
+              vim.keymap.set(mode, keys, func, opts)
+            else
+              vim.keymap.set('n', keys, func, opts)
+            end
           end
 
           map("<leader>d", vim.lsp.buf.hover, "Show symbol type")
