@@ -9,7 +9,7 @@ function gl
   end
 
   if test -n "$FILENAME"
-    git log --all --full-history -u -- $FILENAME
+    git log --full-history --follow -u -- $FILENAME
   else
     git log
   end
