@@ -2,6 +2,70 @@ local wezterm = require("wezterm")
 local config = wezterm.config_builder()
 local action = wezterm.action
 
+local function shorten_path(path)
+  -- normalize to forward slashes
+  local p = path:gsub("\\", "/")
+
+  -- normalize drive letters to "/D" or "/d"
+  p = p:gsub("^/?([a-zA-Z]):", "/%1")
+
+  -- collapse multiple slashes
+  p = p:gsub("/+", "/")
+
+  -- strip trailing slash (but keep root "/")
+  if #p > 1 then
+    p = p:gsub("/$", "")
+  end
+
+  -- split
+  local parts = {}
+  for part in p:gmatch("[^/]+") do
+    table.insert(parts, part)
+  end
+
+  if #parts == 0 then
+    return p
+  end
+
+  -- shorten all but last to first letter
+  for i = 1, #parts - 1 do
+    parts[i] = parts[i]:sub(1, 1)
+  end
+
+  return "/" .. table.concat(parts, "/")
+end
+
+wezterm.on('format-tab-title', function(tab, _, _, _, _, max_width)
+  local cwd_uri = tab.active_pane.current_working_dir
+  local cwd = ''
+
+  if cwd_uri then
+    -- Convert file:// URI to a readable path by stripping the 'file://' prefix
+    cwd = cwd_uri.file_path or cwd_uri:sub(8)
+  end
+
+  -- Show only the last part of the path for brevity
+  local short_path = shorten_path(cwd)
+
+  -- Account for padding. I assume I'll never have more than 9 tabs
+  local max = max_width - 2
+  local index = tab.tab_index + 1
+  local prefix = " " .. index .. ":"
+
+  if string.len(short_path) > max then
+    -- Truncate the path accounting for the prefix and ellipsis
+    local truncated = wezterm.truncate_left(short_path, max - 5)
+
+    return {
+      { Text = prefix .. "..." .. truncated .. " " },
+    }
+  end
+
+  return {
+    { Text = prefix .. short_path .. " "},
+  }
+end)
+
 -- https://github.com/wez/wezterm/discussions/4728
 local is_windows = wezterm.target_triple:find("windows") ~= nil
 local is_mac = wezterm.target_triple:find("darwin") ~= nil
