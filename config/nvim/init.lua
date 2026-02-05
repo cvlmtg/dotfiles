@@ -473,12 +473,39 @@ function LinterStatus()
   return table.concat(msgs, " ")
 end
 
+function CodeCompanionChatStatus()
+  local ft = vim.bo.filetype
+
+  if ft ~= "codecompanion" then
+    return ""
+  end
+
+  local bufnr = vim.api.nvim_get_current_buf()
+
+  ---@diagnostic disable-next-line: undefined-field
+  local meta = _G.codecompanion_chat_metadata and _G.codecompanion_chat_metadata[bufnr] or nil
+  local adapter = meta and meta.adapter and meta.adapter.name or ""
+  local model = meta and meta.adapter and meta.adapter.model or ""
+
+  if adapter == "" and model == "" then
+    return ""
+  end
+
+  if model ~= "" then
+    return ("%s/%s "):format(adapter, model)
+  end
+
+  return ("%s "):format(adapter)
+end
+
 vim.o.statusline = table.concat({
   "%#LineNr#",
   "%{v:lua.StatuslineColumn()}",
   "%*",
   " %{v:lua.StatuslinePath()}",
   "%( %{v:lua.LinterStatus()} %)",
+  "%=",
+  "%{v:lua.CodeCompanionChatStatus()}",
   "%*"
 })
 
