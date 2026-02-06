@@ -2,7 +2,11 @@ local wezterm = require("wezterm")
 local config = wezterm.config_builder()
 local action = wezterm.action
 
-local function shorten_path(path)
+local function normalize_path(path)
+  if not path or path == "" then
+    return path or ""
+  end
+
   -- normalize to forward slashes
   local p = path:gsub("\\", "/")
 
@@ -15,6 +19,18 @@ local function shorten_path(path)
   -- strip trailing slash (but keep root "/")
   if #p > 1 then
     p = p:gsub("/$", "")
+  end
+
+  return p
+end
+
+local normalized_home = normalize_path(wezterm.home_dir)
+
+local function shorten_path(path)
+  local p = normalize_path(path)
+
+  if p == normalized_home then
+    return "~"
   end
 
   -- split
