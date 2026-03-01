@@ -16,16 +16,16 @@ function g
   end
 
   if test $has_staged_files -gt 0
-    git diff --staged
+    git diff --staged --ignore-cr-at-eol
     git status
     return
   end
 
   if test $has_files -gt 0
     if test -n "$argv"
-      git diff $argv
+      git diff --ignore-cr-at-eol $argv
     else
-      git diff
+      git diff --ignore-cr-at-eol
       git status
     end
     return

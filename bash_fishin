@@ -41,16 +41,16 @@ function g() {
   fi
 
   if [[ $has_staged_files -gt 0 ]]; then
-    git diff --staged
+    git diff --staged --ignore-cr-at-eol
     git status
     return
   fi
 
   if [[ $has_files -gt 0 ]]; then
     if [[ -n "$1" ]]; then
-      git diff "$@"
+      git diff --ignore-cr-at-eol "$@"
     else
-      git diff
+      git diff --ignore-cr-at-eol
       git status
     fi
     return
