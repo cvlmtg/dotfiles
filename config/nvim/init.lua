@@ -57,8 +57,7 @@ vim.o.confirm = true
 -- try to live without them
 vim.o.swapfile = false
 
--- on windows we need this to avoid mixed slashes in file paths
-vim.o.shellslash = true
+vim.o.shellslash = false
 
 -- command line autocompletion settings
 vim.o.wildmenu = true
@@ -422,7 +421,7 @@ end
 
 function StatuslinePath()
   local width = vim.fn.winwidth(0) - 30
-  local path = vim.fn.expand("%")
+  local path = vim.fn.expand("%"):gsub("\\", "/")
   local bufnum = vim.fn.bufnr("%")
 
   -- shorten file path if too long. available space depends on a
@@ -812,6 +811,7 @@ require("lazy").setup({
     event = "VeryLazy",
     dependencies = {
       "nvim-lua/plenary.nvim",
+      { "nvim-telescope/telescope-ui-select.nvim" },
       {
         "nvim-telescope/telescope-fzf-native.nvim",
         build = "make",
@@ -819,7 +819,6 @@ require("lazy").setup({
           return vim.fn.executable "make" == 1
         end,
       },
-      { "nvim-telescope/telescope-ui-select.nvim" },
     },
     config = function()
       local previewers = require("telescope.previewers")
@@ -858,9 +857,51 @@ require("lazy").setup({
         })
       end
 
+      local function set_telescope_highlights()
+        local accent = vim.api.nvim_get_hl(0, { name = "StatusLine", link = false })
+        local title = { fg = accent.fg, bg = accent.bg, bold = true }
+        local background = { bg = "#303030" }
+
+        -- Main telescope windows
+        vim.api.nvim_set_hl(0, "TelescopeNormal", background)
+        vim.api.nvim_set_hl(0, "TelescopePromptNormal", background)
+        vim.api.nvim_set_hl(0, "TelescopeResultsNormal", background)
+        vim.api.nvim_set_hl(0, "TelescopePreviewNormal", background)
+
+        -- Titles
+        vim.api.nvim_set_hl(0, "TelescopeTitle", title)
+        vim.api.nvim_set_hl(0, "TelescopePromptTitle", title)
+        vim.api.nvim_set_hl(0, "TelescopeResultsTitle", title)
+        vim.api.nvim_set_hl(0, "TelescopePreviewTitle", title)
+
+        -- Keep prompt border/title consistent
+        vim.api.nvim_set_hl(0, "TelescopeBorder", background)
+        vim.api.nvim_set_hl(0, "TelescopePromptBorder", background)
+        vim.api.nvim_set_hl(0, "TelescopeResultsBorder", background)
+        vim.api.nvim_set_hl(0, "TelescopePreviewBorder", background)
+
+        -- Selected entry uses accent
+        vim.api.nvim_set_hl(0, "TelescopeSelection", {
+          fg = accent.fg,
+          bg = accent.bg,
+          bold = accent.bold,
+          italic = accent.italic,
+          underline = accent.underline,
+        })
+      end
+
       telescope.setup({
         defaults = {
           layout_strategy = "vertical",
+          prompt_prefix = "   ",
+          borderchars = { " ", " ", " ", " ", " ", " ", " ", " " },
+          border = true,
+          path_display = function(_, path)
+            -- vim.fn.fnamemodify handles Windows paths correctly,
+            -- unlike telescope's transform_path which misidentifies
+            -- 'C:/...' paths as URIs on Windows with shellslash enabled
+            return (vim.fn.fnamemodify(path, ":~:."):gsub("\\", "/"))
+          end,
           mappings = {
             i = {
               ["<Esc>"] = actions.close,
@@ -879,21 +920,35 @@ require("lazy").setup({
         },
       })
 
+      set_telescope_highlights()
       pcall(telescope.load_extension, "fzf")
       pcall(telescope.load_extension, "ui-select")
+
+      local function find_project_files()
+        local ok = pcall(builtin.git_files, {
+          show_untracked = true,
+        })
+        if not ok then
+          builtin.find_files()
+        end
+      end
 
       local function grep_word()
         return builtin.grep_string({ word_match = "-w" })
       end
 
-      vim.keymap.set("n", "<leader>f", builtin.git_files, {
+      vim.keymap.set("n", "<leader>b", function()
+        builtin.buffers({
+          sort_mru = true,
+        })
+      end, {
+        desc = "Search existing [B]uffers",
+      })
+      vim.keymap.set("n", "<leader>f", find_project_files, {
         desc = "Search [F]iles"
       })
       vim.keymap.set("n", "<leader>a", grep_word, {
         desc = "Search [A]ll occurences of the current word"
-      })
-      vim.keymap.set("n", "<leader>b", builtin.buffers, {
-        desc = "Search existing [B]uffers"
       })
       vim.keymap.set("n", "<leader>e", builtin.diagnostics, {
         desc = "Search [E]rrors / Warnings"
@@ -937,23 +992,35 @@ require("lazy").setup({
   },
   {
     "olimorris/codecompanion.nvim",
-    version = "^18.0.0",
+    version = "^19.0.0",
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+      "nvim-treesitter/nvim-treesitter",
+      "franco-ruggeri/codecompanion-spinner.nvim",
+    },
     keys = {
       { "<leader>c", "<cmd>CodeCompanionChat Toggle<CR>" },
+      { "<leader>x", "<cmd>CodeCompanionActions<CR>" },
     },
     opts = {
+      extensions = {
+        spinner = {},
+      },
       interactions = {
         chat = {
           adapter = {
-            model = "gpt-5.2-codex",
+            model = "claude-sonnet-4.6",
             name = "copilot",
           },
         },
       },
-    },
-    dependencies = {
-      "nvim-lua/plenary.nvim",
-      "nvim-treesitter/nvim-treesitter",
+      prompt_library = {
+        markdown = {
+          dirs = {
+            "~/.prompts"
+          },
+        },
+      },
     },
   },
 
