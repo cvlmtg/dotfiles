@@ -57,7 +57,9 @@ vim.o.confirm = true
 -- try to live without them
 vim.o.swapfile = false
 
-vim.o.shellslash = false
+if vim.fn.has("win32") == 1 or vim.fn.has("win64") == 1 then
+  vim.o.shellslash = false
+end
 
 -- command line autocompletion settings
 vim.o.wildmenu = true
