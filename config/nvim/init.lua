@@ -806,6 +806,12 @@ require("lazy").setup({
   {
     "michaeljsmith/vim-indent-object",
   },
+  {
+    "YouSame2/inlinediff-nvim",
+    lazy = true,
+    cmd = "InlineDiff",
+    opts = {},
+  },
 
 ------------------------------------------------------------------------
 --- Fuzzy Finder
