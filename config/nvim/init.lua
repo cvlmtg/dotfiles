@@ -132,7 +132,7 @@ vim.o.number = true
 vim.opt.listchars = { tab = "» ", trail = "·", nbsp = "␣" }
 vim.o.list = true
 
-local function strip_whitespaces()
+vim.api.nvim_create_user_command("StripTrailingWhitespaces", function()
   -- preparation: save last search and cursor position.
   local last_search = vim.fn.getreg("/")
   local cur_line = vim.fn.line(".")
@@ -143,9 +143,12 @@ local function strip_whitespaces()
   -- restore previous search history and cursor position
   vim.fn.setreg("/", last_search)
   vim.fn.cursor(cur_line, cur_col)
-end
+end, {})
 
-vim.api.nvim_create_user_command("StripTrailingWhitespaces", strip_whitespaces, {})
+vim.api.nvim_create_user_command("Diff", function(opts)
+  local spec = opts.args ~= "" and opts.args or "HEAD"
+  require("gitsigns").diffthis(spec)
+end, { nargs = "?" })
 
 -----------------------------------------------------------------------
 -- Indenting
