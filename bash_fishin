@@ -32,8 +32,8 @@ function g() {
   if [[ -n "$1" ]]; then
     local file="$1"
 
-    if [[ -f "$file" || -d "$file" ]]; then
-      git add "$@"
+    if [[ -f "$file" || -d "$file" || -n "$(git ls-files "$file" 2>/dev/null)" ]]; then
+      git add -A -- "$@"
     else
       git "$@"
     fi

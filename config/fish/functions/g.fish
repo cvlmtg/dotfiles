@@ -7,8 +7,8 @@ function g
   if test -n "$argv"
     set -l file $argv[1]
 
-    if test -f "$file" -o -d "$file"
-      git add $argv
+    if test -f "$file" -o -d "$file" -o -n "$(git ls-files "$file" 2>/dev/null)"
+      git add -A -- $argv
     else
       git $argv
     end
