@@ -173,6 +173,7 @@ config.keys = {
   { key = "n", mods = "LEADER", action = action.ActivateTabRelative(1) },
   { key = "n", mods = "LEADER", action = action.ActivateTabRelative(1) },
   { key = "r", mods = "LEADER", action = action.RotatePanes("Clockwise") },
+  { key="Enter", mods="SHIFT", action=wezterm.action.SendString("\n") },
 }
 
 for i = 1, 9 do
