@@ -1013,26 +1013,41 @@ require("lazy").setup({
       { "<leader>c", "<cmd>CodeCompanionChat Toggle<CR>" },
       { "<leader>x", "<cmd>CodeCompanionActions<CR>" },
     },
-    opts = {
-      extensions = {
-        spinner = {},
-      },
-      interactions = {
-        chat = {
-          adapter = {
-            model = "claude-sonnet-4.6",
-            name = "copilot",
+    opts = function()
+      -- If ANTHROPIC_API_KEY is set, use Anthropic/Claude; otherwise use GitHub Copilot.
+      -- Override the Copilot model with the CODECOMPANION_MODEL env var.
+      local adapter
+
+      if vim.env.ANTHROPIC_API_KEY then
+        adapter = {
+          name = "anthropic",
+          model = "claude-sonnet-4.6",
+        }
+      else
+        adapter = {
+          name = "copilot",
+          model = vim.env.CODECOMPANION_MODEL or "gpt-5-mini",
+        }
+      end
+
+      return {
+        extensions = {
+          spinner = {},
+        },
+        interactions = {
+          chat = {
+            adapter = adapter,
           },
         },
-      },
-      prompt_library = {
-        markdown = {
-          dirs = {
-            "~/.prompts"
+        prompt_library = {
+          markdown = {
+            dirs = {
+              "~/.prompts"
+            },
           },
         },
-      },
-    },
+      }
+    end,
   },
 
 ------------------------------------------------------------------------
