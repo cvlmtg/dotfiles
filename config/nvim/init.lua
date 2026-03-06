@@ -807,10 +807,14 @@ require("lazy").setup({
     "michaeljsmith/vim-indent-object",
   },
   {
-    "YouSame2/inlinediff-nvim",
-    lazy = true,
-    cmd = "InlineDiff",
-    opts = {},
+    "cvlmtg/inline-diff.nvim",
+    keys = {
+      {
+        "<leader>i",
+        "<cmd>InlineDiff staged<CR>",
+        { desc = "Show inline diff for the current file against staged changes" }
+      },
+    },
   },
 
 ------------------------------------------------------------------------
