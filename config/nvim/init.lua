@@ -808,6 +808,7 @@ require("lazy").setup({
   },
   {
     "cvlmtg/inline-diff.nvim",
+    cmd = "InlineDiff",
     keys = {
       {
         "<leader>i",
