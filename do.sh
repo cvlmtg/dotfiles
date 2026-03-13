@@ -1,7 +1,22 @@
 #!/bin/bash
 
-source=~/dotfiles
+srcdir=~/dotfiles
 backup=~/dotfiles/backup
+
+# On Windows, symlinks require either Admin or Developer Mode
+if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "cygwin" || -n "$WINDIR" ]]; then
+    # Check Developer Mode via registry
+    devmode=$(reg query "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock" \
+        /v AllowDevelopmentWithoutDevLicense 2>/dev/null | grep -o "0x[0-9a-fA-F]*" | tail -1)
+    is_admin=$(net session 2>&1 | grep -c "There are no entries")
+
+    if [[ "$devmode" != "0x1" && "$is_admin" -eq 0 ]]; then
+        echo "ERROR: On Windows, symlinks require either:"
+        echo "  - Developer Mode enabled (Settings > System > For Developers)"
+        echo "  - Running as Administrator"
+        exit 1
+    fi
+fi
 
 install () {
     for file in ${@}; do
@@ -12,6 +27,9 @@ install () {
         # some paths are special
         if [[ "$path" == "bin" ]] || [[ "$path" == "Library" ]]; then
             dest="$HOME/$file"
+        elif [[ "$OSTYPE" == "msys" || "$OSTYPE" == "cygwin" || -n "$WINDIR" ]] && [[ "$file" == config/nvim/* ]]; then
+            # On Windows, nvim config lives in ~/AppData/Local/nvim/ instead of ~/.config/nvim/
+            dest="$HOME/AppData/Local/nvim/${file#config/nvim/}"
         else
             dest="$HOME/.$file"
         fi
@@ -30,13 +48,13 @@ install () {
             rm "$dest"
         fi
 
-        echo "  symlinking $source/$file to $dest"
+        echo "  symlinking $srcdir/$file to $dest"
 
         if [[ ! -d "$dir" ]]; then
             mkdir -p $dir
         fi
 
-        ln -s "$source/$file" "$dest"
+        ln -s "$srcdir/$file" "$dest"
     done
 }
 
@@ -46,8 +64,11 @@ uninstall () {
         base="$(basename $file)"
         path="$(dirname $file)"
 
-        if [[ "$path" == "bin" ]]; then
+        if [[ "$path" == "bin" ]] || [[ "$path" == "Library" ]]; then
             dest="$HOME/$file"
+        elif [[ "$OSTYPE" == "msys" || "$OSTYPE" == "cygwin" || -n "$WINDIR" ]] && [[ "$file" == config/nvim/* ]]; then
+            # On Windows, nvim config lives in ~/AppData/Local/nvim/ instead of ~/.config/nvim/
+            dest="$HOME/AppData/Local/nvim/${file#config/nvim/}"
         else
             dest="$HOME/.$file"
         fi
@@ -66,8 +87,8 @@ uninstall () {
     done
 }
 
-cd "$source"
-files=`find * -type f ! -name 'do.sh' ! -name '.gitignore' ! -path 'backup/*' ! -path '.git/*' -a -print`
+cd "$srcdir"
+files=`find . -type f ! -name 'do.sh' ! -name '.gitignore' ! -path 'backup/*' ! -path '.git/*' -a -print | sed 's|^\./||'`
 
 case $1 in
     install)
