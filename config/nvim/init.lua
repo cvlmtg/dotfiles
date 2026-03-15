@@ -972,6 +972,9 @@ require("lazy").setup({
       vim.keymap.set("n", "<leader>g", builtin.live_grep, {
         desc = "Live [G]rep"
       })
+      vim.keymap.set("n", "<leader>m", builtin.git_status, {
+        desc = "Git [M]odified files (staged/unstaged)"
+      })
     end,
   },
 
