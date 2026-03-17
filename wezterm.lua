@@ -102,8 +102,13 @@ if is_mac == true then
   }
   config.font_size = 15
 else
+  config.window_decorations = "INTEGRATED_BUTTONS|RESIZE"
   config.use_fancy_tab_bar = false
   config.tab_bar_at_bottom = true
+  config.window_frame = {
+    active_titlebar_bg = "#3a3a3a",
+    active_titlebar_fg = "#909090",
+  }
 end
 
 config.color_scheme = "MaterialDarker"
