@@ -12,6 +12,7 @@ function add_path
   end
 end
 
+add_path ~/.local/bin
 add_path ~/.rbenv/shims
 add_path ~/.rbenv/bin
 add_path ~/bin
