@@ -46,9 +46,9 @@ This is the highest-priority rule in this file. It overrides problem-solving ins
 - You have MemPalace agents. Run mempalace_list_agents to see them.
 
 ### 2. Self-Improvement Loop
-- **Pattern Learning**: After ANY correction from the user, update `tasks/lessons.md` with the corrective pattern.
+- **Pattern Learning**: After ANY correction from the user, update `LESSONS.md` with the corrective pattern.
 - **Rule Evolution**: Write rules for yourself to prevent the same mistake from recurring.
-- **Session Review**: Review `tasks/lessons.md` at the start of each session.
+- **Session Review**: Review `LESSONS.md` at the start of each session.
 
 ### 3. Autonomous Execution
 - **Bug Fixing**: Fix the cause, not just the symptom. Add defensive checks or logging to make future failures obvious.
@@ -57,12 +57,10 @@ This is the highest-priority rule in this file. It overrides problem-solving ins
 - **Scope Boundary**: Autonomous execution applies ONLY within the bounds of the current plan step. If a fix requires changing the approach, trigger the HARD STOP rule.
 
 ## Task Management Protocol
-1. **Session Start**: Read `tasks/lessons.md` before any work begins. Apply patterns listed there proactively.
-2. **Plan First**: Document the execution plan in `PLAN.md` with checkable items. Keep steps small and concrete.
+1. **Session Start**: Read `LESSONS.md` before any work begins. Apply patterns listed there proactively.
 3. **Verify Plan**: Wait for a "go-ahead" before starting the implementation.
 4. **Step-by-Step Confirmation**: After completing each plan step, briefly report what was done and confirm alignment before moving to the next step.
 5. **Track & Document**:
-    - Mark items complete in `PLAN.md` as you progress.
+    - Mark items complete in `ROADMAP.md` or `SPEC.md` as you progress.
     - Provide a high-level summary of changes at each step.
-    - Add a review/reflection section to `PLAN.md` upon completion.
 6. **Final Validation**: Never mark a task as done without proof of correctness (logs, tests, or diff behavior).
