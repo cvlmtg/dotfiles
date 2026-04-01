@@ -1127,7 +1127,7 @@ require("lazy").setup({
           -- Jump to the definition of the word under your cursor.
           -- This is where a variable was first declared, or where
           -- a function is defined, etc. To jump back, press <C-t>.
-          map("<leader><Space>", function() require("mini.extra").pickers.lsp({ scope = "definition" }) end, "Goto Definition")
+          map("<leader><Space>", function() require("pick").goto_definition_smart() end, "Goto Definition")
 
           -- Find references for the word under your cursor.
           map("<leader>r", function() require("mini.extra").pickers.lsp({ scope = "references" }) end, "Goto [R]eferences")
