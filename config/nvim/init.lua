@@ -1,4 +1,4 @@
--- Adapted from: https://github.com/nvim-lua/kickstart.nvim
+﻿-- Adapted from: https://github.com/nvim-lua/kickstart.nvim
 
 -----------------------------------------------------------------------
 -- Options
@@ -772,7 +772,7 @@ require("lazy").setup({
     main = "todo-comments",
     event = "VimEnter",
     keys = {
-      { "<leader>t", "<cmd>TodoTelescope keywords=TODO,FIXME<cr>", "Show all TODO / FIXME comments" },
+      { "<leader>t", function() require("pick").todo_pick() end, desc = "Show all TODO / FIXME comments" },
     },
     opts = {
       merge_keywords = false,
@@ -823,157 +823,15 @@ require("lazy").setup({
 ------------------------------------------------------------------------
 
   {
-    "nvim-telescope/telescope.nvim",
+    "echasnovski/mini.pick",
+    version = false,
     event = "VeryLazy",
-    dependencies = {
-      "nvim-lua/plenary.nvim",
-      { "nvim-telescope/telescope-ui-select.nvim" },
-      {
-        "nvim-telescope/telescope-fzf-native.nvim",
-        build = "make",
-        cond = function()
-          return vim.fn.executable "make" == 1
-        end,
-      },
-    },
+    dependencies = { "echasnovski/mini.extra" },
     config = function()
-      local previewers = require("telescope.previewers")
-      local builtin = require("telescope.builtin")
-      local actions = require("telescope.actions")
-      local telescope = require("telescope")
-
-      -- show the current content of the buffer, even if unsaved
-      local function buffer_previewer()
-        return previewers.new_buffer_previewer({
-          title = "Buffer Preview",
-          define_preview = function(self, entry)
-            -- if entry.bufnr isn't present, get bufnr from file name
-            local bufnr = entry.bufnr or vim.fn.bufnr(entry.filename, false)
-            if bufnr == -1 or not vim.api.nvim_buf_is_valid(bufnr) then
-              vim.api.nvim_buf_set_lines(self.state.bufnr, 0, -1, false, { "Buffer not found" })
-              return
-            end
-
-            local total = vim.api.nvim_buf_line_count(bufnr)
-            local current = entry.lnum or 1
-            local context = 5
-
-            local start_line = math.max(current - context - 1, 0)
-            local end_line = math.min(current + context, total)
-            local cursor_line = current - start_line
-
-            local lines = vim.api.nvim_buf_get_lines(bufnr, start_line, end_line, false)
-            vim.api.nvim_buf_set_lines(self.state.bufnr, 0, -1, false, lines)
-
-            local line = math.max(cursor_line - 1, 0)
-            if #lines > 0 then
-              vim.hl.range(self.state.bufnr, 1, "Visual", { line, 0 }, { line, -1 })
-            end
-          end,
-        })
-      end
-
-      local function set_telescope_highlights()
-        local accent = vim.api.nvim_get_hl(0, { name = "StatusLine", link = false })
-        local title = { fg = accent.fg, bg = accent.bg, bold = true }
-        local background = { bg = "#303030" }
-
-        -- Main telescope windows
-        vim.api.nvim_set_hl(0, "TelescopeNormal", background)
-        vim.api.nvim_set_hl(0, "TelescopePromptNormal", background)
-        vim.api.nvim_set_hl(0, "TelescopeResultsNormal", background)
-        vim.api.nvim_set_hl(0, "TelescopePreviewNormal", background)
-
-        -- Titles
-        vim.api.nvim_set_hl(0, "TelescopeTitle", title)
-        vim.api.nvim_set_hl(0, "TelescopePromptTitle", title)
-        vim.api.nvim_set_hl(0, "TelescopeResultsTitle", title)
-        vim.api.nvim_set_hl(0, "TelescopePreviewTitle", title)
-
-        -- Keep prompt border/title consistent
-        vim.api.nvim_set_hl(0, "TelescopeBorder", background)
-        vim.api.nvim_set_hl(0, "TelescopePromptBorder", background)
-        vim.api.nvim_set_hl(0, "TelescopeResultsBorder", background)
-        vim.api.nvim_set_hl(0, "TelescopePreviewBorder", background)
-
-        -- Selected entry uses accent
-        vim.api.nvim_set_hl(0, "TelescopeSelection", {
-          fg = accent.fg,
-          bg = accent.bg,
-          bold = accent.bold,
-          italic = accent.italic,
-          underline = accent.underline,
-        })
-      end
-
-      telescope.setup({
-        defaults = {
-          layout_strategy = "vertical",
-          prompt_prefix = "   ",
-          borderchars = { " ", " ", " ", " ", " ", " ", " ", " " },
-          border = true,
-          path_display = function(_, path)
-            -- vim.fn.fnamemodify handles Windows paths correctly,
-            -- unlike telescope's transform_path which misidentifies
-            -- 'C:/...' paths as URIs on Windows with shellslash enabled
-            return (vim.fn.fnamemodify(path, ":~:."):gsub("\\", "/"))
-          end,
-          mappings = {
-            i = {
-              ["<Esc>"] = actions.close,
-            },
-          },
-        },
-        extensions = {
-          ["ui-select"] = {
-            require("telescope.themes").get_dropdown(),
-          },
-        },
-        pickers = {
-          diagnostics = {
-            previewer = buffer_previewer()
-          },
-        },
-      })
-
-      set_telescope_highlights()
-      pcall(telescope.load_extension, "fzf")
-      pcall(telescope.load_extension, "ui-select")
-
-      local function find_project_files()
-        local ok = pcall(builtin.git_files, {
-          show_untracked = true,
-        })
-        if not ok then
-          builtin.find_files()
-        end
-      end
-
-      local function grep_word()
-        return builtin.grep_string({ word_match = "-w" })
-      end
-
-      vim.keymap.set("n", "<leader>b", function()
-        builtin.buffers({
-          sort_mru = true,
-        })
-      end, {
-        desc = "Search existing [B]uffers",
-      })
-      vim.keymap.set("n", "<leader>f", find_project_files, {
-        desc = "Search [F]iles"
-      })
-      vim.keymap.set("n", "<leader>a", grep_word, {
-        desc = "Search [A]ll occurences of the current word"
-      })
-      vim.keymap.set("n", "<leader>e", builtin.diagnostics, {
-        desc = "Search [E]rrors / Warnings"
-      })
-      vim.keymap.set("n", "<leader>g", builtin.git_status, {
-        desc = "[G]it modified files (staged/unstaged)"
-      })
+      require("pick").setup()
     end,
   },
+
 
 ------------------------------------------------------------------------
 --- Copilot
@@ -1251,8 +1109,6 @@ require("lazy").setup({
       "saghen/blink.cmp",
     },
     config = function()
-      local builtin = require("telescope.builtin")
-
       vim.api.nvim_create_autocmd("LspAttach", {
         group = vim.api.nvim_create_augroup("lsp-attach", { clear = true }),
 
@@ -1271,10 +1127,10 @@ require("lazy").setup({
           -- Jump to the definition of the word under your cursor.
           -- This is where a variable was first declared, or where
           -- a function is defined, etc. To jump back, press <C-t>.
-          map("<leader><Space>", builtin.lsp_definitions, "Goto Definition")
+          map("<leader><Space>", function() require("mini.extra").pickers.lsp({ scope = "definition" }) end, "Goto Definition")
 
           -- Find references for the word under your cursor.
-          map("<leader>r", builtin.lsp_references, "Goto [R]eferences")
+          map("<leader>r", function() require("mini.extra").pickers.lsp({ scope = "references" }) end, "Goto [R]eferences")
 
           -- Rename the variable under your cursor.
           -- Most Language Servers support renaming across files, etc.
@@ -1288,12 +1144,12 @@ require("lazy").setup({
           -- Jump to the implementation of the word under your cursor.
           -- Useful when your language has ways of declaring types
           -- without an actual implementation.
-          map("gri", builtin.lsp_implementations, "[G]oto [I]mplementation")
+          map("gri", function() require("mini.extra").pickers.lsp({ scope = "implementation" }) end, "[G]oto [I]mplementation")
 
           -- Jump to the type of the word under your cursor. Useful when
           -- you"re not sure what type a variable is and you want to see
           -- the definition of its *type*, not where it was *defined*.
-          map("grt", builtin.lsp_type_definitions, "[G]oto [T]ype Definition")
+          map("grt", function() require("mini.extra").pickers.lsp({ scope = "type_definition" }) end, "[G]oto [T]ype Definition")
 
           -- WARN: This is not Goto Definition, this is Goto Declaration.
           -- For example, in C this would take you to the header.
@@ -1301,12 +1157,12 @@ require("lazy").setup({
 
           -- Fuzzy find all the symbols in your current document.
           -- Symbols are things like variables, functions, types, etc.
-          map("gO", builtin.lsp_document_symbols, "Open Document Symbols")
+          map("gO", function() require("mini.extra").pickers.lsp({ scope = "document_symbol" }) end, "Open Document Symbols")
 
           -- Fuzzy find all the symbols in your current workspace.
           -- Similar to document symbols, except searches over your
           -- entire project.
-          map("gW", builtin.lsp_dynamic_workspace_symbols, "Open Workspace Symbols")
+          map("gW", function() require("mini.extra").pickers.lsp({ scope = "workspace_symbol_live" }) end, "Open Workspace Symbols")
 
           -- Resolve a difference between neovim 0.11 and 0.10
           local function client_supports_method(client, method, bufnr)
