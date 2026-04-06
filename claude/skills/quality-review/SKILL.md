@@ -61,6 +61,8 @@ For each issue found, note the file, line (if applicable), severity tag (`[high]
 - Functions doing too many things (suggest splitting if so)
 - Unused variables, imports, or parameters introduced during the task
 - Leftover debug output (adapt to the project's language: debug print statements, log spam, temporary assertions, etc.)
+- SSOT violations or correctness issues deferred with "single call site" or "can do later" reasoning — fix them now; the cost of moving a misplaced function only grows with time
+- Separation of concerns violations: logic that belongs to a different layer or abstraction (e.g. business logic in a view, data access in a controller, presentation logic in a model) — flag where responsibility should live and why
 
 ### 5. Conflicts & Inconsistencies
 - Logic that contradicts other parts of the codebase (e.g., a function that validates differently than a sibling function)
@@ -96,7 +98,7 @@ Only list categories that have findings. If a category is clean, omit it entirel
 
 For each finding:
 ```
-[severity] file:line — description
+index. [severity] file:line — description
 ```
 
 End with a short **Summary** section:
