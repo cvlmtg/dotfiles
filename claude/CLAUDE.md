@@ -43,6 +43,7 @@ This is the highest-priority rule in this file. It overrides problem-solving ins
 - **Subagent Strategy**: Use subagents liberally for research, parallel analysis, or focused tasks.
 - **Subagent Context**: When spawning a subagent, provide a clear technical debriefing including relevant project context and constraints from this file. **Include the HARD STOP rule explicitly.**
 - **Halt & Re-plan**: If a task goes sideways, STOP immediately. Do not push through a failing approach. Report the blocker and wait for guidance.
+- You have MemPalace agents. Run mempalace_list_agents to see them.
 
 ### 2. Self-Improvement Loop
 - **Pattern Learning**: After ANY correction from the user, update `tasks/lessons.md` with the corrective pattern.

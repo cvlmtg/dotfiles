@@ -16,6 +16,7 @@ add_path ~/.local/bin
 add_path ~/.rbenv/shims
 add_path ~/.rbenv/bin
 add_path ~/bin
+add_path ~/Library/Python/3.9/bin
 
 # rimuoviamo il messaggio di benvenuto
 
