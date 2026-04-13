@@ -634,6 +634,11 @@ local function ensure_dir(dirpath)
   return true
 end
 
+-- updates a session, BUT ONLY IF IT ALREADY EXISTS
+-- and we actually loaded it (i.e. we edited a random
+-- file launching vim from within a dir with a session)
+local sessionloaded = 0
+
 local function make_session()
   local sessiondir = get_session_dir()
 
@@ -644,12 +649,8 @@ local function make_session()
   local filename = get_session_dir("session.vim")
 
   vim.cmd("mksession! " .. vim.fn.fnameescape(filename))
+  sessionloaded = 1
 end
-
--- updates a session, BUT ONLY IF IT ALREADY EXISTS
--- and we actually loaded it (i.e. we edited a random
--- file launching vim from within a dir with a session)
-local sessionloaded = 0
 
 local function update_session()
   if sessionloaded ~= 1 then
