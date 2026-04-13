@@ -1099,7 +1099,6 @@ require("lazy").setup({
     event = "VeryLazy",
     dependencies = {
       { "mason-org/mason.nvim", opts = {} },
-      "WhoIsSethDaniel/mason-tool-installer.nvim",
       "mason-org/mason-lspconfig.nvim",
       "saghen/blink.cmp",
     },
@@ -1231,15 +1230,17 @@ require("lazy").setup({
         lua_ls = {},
       }
 
-      -- Ensure the servers and tools above are installed
-      --
-      -- To check the current status of installed tools and/or
-      -- manually install other tools, you can run
-      --    :Mason
-      --
-      -- You can press `g?` for help in this menu.
-      --
-      require("mason-tool-installer").setup { ensure_installed = { "stylua" } }
+      -- Auto-install non-LSP Mason tools using Mason's registry API directly.
+      -- To install more tools manually: :MasonInstall <package>
+      local registry = require("mason-registry")
+      registry.refresh(function()
+        for _, name in ipairs({ "stylua" }) do
+          local ok, pkg = pcall(registry.get_package, name)
+          if ok and not pkg:is_installed() then
+            pkg:install()
+          end
+        end
+      end)
 
       require("mason-lspconfig").setup {
         automatic_enable = true,
