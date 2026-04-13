@@ -25,19 +25,23 @@ local function buffers_mru()
   local bufinfo = vim.fn.getbufinfo({ buflisted = 1 })
   table.sort(bufinfo, function(a, b) return a.lastused > b.lastused end)
 
-  local items = vim.tbl_filter(
-    function(x) return x ~= "" end,
-    vim.tbl_map(function(buf)
-      return vim.fn.fnamemodify(buf.name, ":~:."):gsub("\\", "/")
-    end, bufinfo)
-  )
+  local items = {}
+  for _, buf in ipairs(bufinfo) do
+    local name = vim.fn.fnamemodify(buf.name, ":~:."):gsub("\\", "/")
+    if name ~= "" then
+      table.insert(items, { text = name, bufnr = buf.bufnr })
+    end
+  end
+
+  local orig_win = vim.api.nvim_get_current_win()
 
   require("mini.pick").start({
     source = {
       name = "Buffers (MRU)",
       items = items,
       choose = function(item)
-        vim.cmd("edit " .. vim.fn.fnameescape(item))
+        vim.api.nvim_win_set_buf(orig_win, item.bufnr)
+        vim.api.nvim_set_current_win(orig_win)
       end,
     },
   })
@@ -75,12 +79,15 @@ local function diagnostics()
     return a.text < b.text
   end)
 
+  local orig_win = vim.api.nvim_get_current_win()
+
   require("mini.pick").start({
     source = {
       name = "Diagnostics",
       items = items,
       choose = function(item)
-        vim.cmd("buffer " .. item.bufnr)
+        vim.api.nvim_win_set_buf(orig_win, item.bufnr)
+        vim.api.nvim_set_current_win(orig_win)
         vim.fn.cursor(item.lnum, 1)
       end,
       preview = function(buf_id, item)
