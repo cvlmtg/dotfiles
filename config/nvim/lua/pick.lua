@@ -124,40 +124,20 @@ end
 -- Go to definition: jump directly when there is exactly one result,
 -- open a picker when there are multiple.
 local function goto_definition_smart()
-  local win = vim.api.nvim_get_current_win()
-  -- Collect offset encodings per client so jump_to_location uses the right one.
-  local clients = vim.lsp.get_clients({ bufnr = vim.api.nvim_win_get_buf(win) })
-  local encoding_by_client = {}
-  for _, client in ipairs(clients) do
-    encoding_by_client[client.id] = client.offset_encoding or "utf-8"
-  end
-
-  local params = vim.lsp.util.make_position_params(win, "utf-8")
-  vim.lsp.buf_request_all(0, "textDocument/definition", params, function(results)
-    local locations = {}
-    local first_encoding = "utf-8"
-    for client_id, res in pairs(results) do
-      if res.result then
-        local enc = encoding_by_client[client_id] or "utf-8"
-        if vim.islist(res.result) then
-          for _, loc in ipairs(res.result) do
-            table.insert(locations, { location = loc, encoding = enc })
-          end
-        else
-          table.insert(locations, { location = res.result, encoding = enc })
-        end
-        first_encoding = enc
+  vim.lsp.buf.definition({
+    on_list = function(result)
+      local items = result.items
+      if #items == 0 then
+        vim.notify("No definition found", vim.log.levels.INFO)
+      elseif #items == 1 then
+        local item = items[1]
+        vim.cmd("edit " .. vim.fn.fnameescape(item.filename))
+        vim.fn.cursor(item.lnum, item.col)
+      else
+        require("mini.extra").pickers.lsp({ scope = "definition" })
       end
-    end
-
-    if #locations == 0 then
-      vim.notify("No definition found", vim.log.levels.INFO)
-    elseif #locations == 1 then
-      vim.lsp.util.jump_to_location(locations[1].location, locations[1].encoding)
-    else
-      require("mini.extra").pickers.lsp({ scope = "definition" })
-    end
-  end)
+    end,
+  })
 end
 
 function M.setup()
