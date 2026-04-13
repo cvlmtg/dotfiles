@@ -349,7 +349,7 @@ vim.keymap.set("x", "p", save_register, { expr = true, silent = true })
 -----------------------------------------------------------------------
 
 vim.o.foldmethod = "expr"
-vim.o.foldexpr = "nvim_treesitter#foldexpr()"
+vim.o.foldexpr = "v:lua.vim.treesitter.foldexpr()"
 vim.o.foldnestmax = 8
 vim.o.foldlevel = 99
 
@@ -1007,82 +1007,77 @@ require("lazy").setup({
 ------------------------------------------------------------------------
 
   {
+    -- nvim-treesitter was rewritten on the `main` branch for nvim 0.12.
+    -- The old `master` branch (nvim-treesitter.configs module) is frozen.
+    -- Highlighting and indentation are now enabled via a FileType autocmd;
+    -- ensure_installed is handled by calling the install API in config.
     "nvim-treesitter/nvim-treesitter",
-    event = { "BufReadPre", "BufNewFile" },
+    branch = "main",
+    lazy = false,
     build = ":TSUpdate",
-    main = "nvim-treesitter.configs",
     dependencies = {
-      "nvim-treesitter/nvim-treesitter-textobjects",
+      { "nvim-treesitter/nvim-treesitter-textobjects", branch = "main" },
     },
-    opts = {
-      ensure_installed = {
-        "bash",
-        "diff",
-        "html",
-        "lua",
-        "luadoc",
-        "markdown",
-        "markdown_inline",
-        "vim",
-        "vimdoc",
-        "typescript",
-        "tsx",
-      },
-      auto_install = true,
-      highlight = {
-        -- Some languages depend on vim"s regex highlighting system
-        -- (such as Ruby) for indent rules. If you are experiencing
-        -- weird indenting issues, add the language to the list of
-        -- additional_vim_regex_highlighting and disabled languages
-        -- for indent.
-        enable = true,
-        additional_vim_regex_highlighting = { "ruby" },
-      },
-      indent = {
-        enable = true,
-        disable = { "ruby" }
-      },
-      fold = {
-        enable = true,
-      },
-      textobjects = {
+    init = function()
+      -- Register at startup so the autocmd is in place before any FileType fires.
+      vim.api.nvim_create_autocmd("FileType", {
+        callback = function(ev)
+          local ft = vim.bo[ev.buf].filetype
+          -- Ruby relies on vim regex for correct indent rules; skip treesitter there.
+          if ft == "" or ft == "ruby" then return end
+          pcall(vim.treesitter.start)
+          vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+        end,
+      })
+    end,
+    config = function()
+      if vim.fn.has("win32") == 1 then
+        vim.env.CC = "zigcc.cmd"
+      end
+
+      -- Install any missing parsers (replaces ensure_installed option).
+      local want = {
+        "bash", "diff", "html", "lua", "luadoc",
+        "markdown", "markdown_inline", "vim", "vimdoc",
+        "typescript", "tsx",
+      }
+      local have = require("nvim-treesitter.config").get_installed()
+      local missing = vim.tbl_filter(function(p)
+        return not vim.tbl_contains(have, p)
+      end, want)
+      if #missing > 0 then
+        require("nvim-treesitter").install(missing)
+      end
+
+      -- textobjects are now configured via the plugin's own setup().
+      require("nvim-treesitter-textobjects").setup({
         select = {
           enable = true,
-
-          -- Automatically jump forward to textobj, similar to
-          -- targets.vim
-          lookahead = true,
-
+          lookahead = true, -- automatically jump forward to textobj (like targets.vim)
           keymaps = {
             ["af"] = { query = "@function.outer", desc = "Select outer part of a function" },
             ["if"] = { query = "@function.inner", desc = "Select inner part of a function" },
-            ["ac"] = { query = "@class.outer", desc = "Select outer part of a class region" },
-            ["ic"] = { query = "@class.inner", desc = "Select inner part of a class region" },
+            ["ac"] = { query = "@class.outer",    desc = "Select outer part of a class region" },
+            ["ic"] = { query = "@class.inner",    desc = "Select inner part of a class region" },
             ["aa"] = { query = "@parameter.outer", desc = "Select outer part of a function argument" },
             ["ia"] = { query = "@parameter.inner", desc = "Select inner part of a function argument" },
-            -- You can use captures from other query groups like `locals.scm`
             ["as"] = { query = "@local.scope", query_group = "locals", desc = "Select language scope" },
           },
-          -- You can choose the select mode (default is charwise "v")
           selection_modes = {
-            ["@function.outer"] = "V", -- linewise
+            ["@function.outer"] = "V",
             ["@function.inner"] = "V",
-            ["@class.outer"] = "V",
-            ["@class.inner"] = "V",
+            ["@class.outer"]    = "V",
+            ["@class.inner"]    = "V",
           },
           include_surrounding_whitespace = true,
         },
         swap = {
           enable = true,
-          swap_next = {
-            ["gsn"] = "@parameter.inner",
-          },
-          swap_previous = {
-            ["gsp"] = "@parameter.inner",
-          },
+          swap_next     = { ["gsn"] = "@parameter.inner" },
+          swap_previous = { ["gsp"] = "@parameter.inner" },
         },
-      },
-    },
+      })
+    end,
   },
 
 ------------------------------------------------------------------------
@@ -1164,13 +1159,9 @@ require("lazy").setup({
           -- entire project.
           map("gW", function() require("mini.extra").pickers.lsp({ scope = "workspace_symbol_live" }) end, "Open Workspace Symbols")
 
-          -- Resolve a difference between neovim 0.11 and 0.10
+          -- client:supports_method uses colon syntax (available since 0.11)
           local function client_supports_method(client, method, bufnr)
-            if vim.fn.has "nvim-0.11" == 1 then
-              return client:supports_method(method, bufnr)
-            else
-              return client.supports_method(method, { bufnr = bufnr })
-            end
+            return client:supports_method(method, bufnr)
           end
 
           -- The following two autocommands are used to highlight
@@ -1279,7 +1270,6 @@ require("lazy").setup({
         -- "matchparen",
         -- "netrwPlugin",
         "tarPlugin",
-        "tohtml",
         "tutor",
         "zipPlugin",
       },
