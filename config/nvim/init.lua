@@ -1239,17 +1239,11 @@ require("lazy").setup({
       --
       -- You can press `g?` for help in this menu.
       --
-      local ensure_installed = vim.tbl_keys(servers or {})
-
-      vim.list_extend(ensure_installed, {
-        "stylua",
-      })
-
-      require("mason-tool-installer").setup { ensure_installed = ensure_installed }
+      require("mason-tool-installer").setup { ensure_installed = { "stylua" } }
 
       require("mason-lspconfig").setup {
         automatic_enable = true,
-        ensure_installed = {},
+        ensure_installed = vim.tbl_keys(servers),
       }
 
       for server, config in pairs(servers) do
