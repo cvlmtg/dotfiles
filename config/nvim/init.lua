@@ -824,10 +824,13 @@ require("lazy").setup({
 ------------------------------------------------------------------------
 
   {
-    "echasnovski/mini.pick",
-    version = false,
+    "nvim-mini/mini.pick",
+    version = "*",
     event = "VeryLazy",
-    dependencies = { "echasnovski/mini.extra" },
+    dependencies = {
+      "nvim-mini/mini.extra",
+      version = "*"
+    },
     config = function()
       require("pick").setup()
     end,
