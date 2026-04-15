@@ -145,15 +145,21 @@ function M.setup()
     },
     window = {
       -- Match the position and width of the current window when the picker opens.
-      -- Subtract 2 from width to account for left + right border characters.
       config = function()
         local win = vim.api.nvim_get_current_win()
         local col = vim.api.nvim_win_get_position(win)[2]
-        local width = vim.api.nvim_win_get_width(win) - 2
-        return { col = col, width = width }
+        local width = vim.api.nvim_win_get_width(win)
+        return {
+          col = col,
+          width = width,
+          border = { "", "─", "", "", "", "─", "", "" },
+        }
       end,
     },
   })
+
+  vim.api.nvim_set_hl(0, "MiniPickNormal", { link = "Normal" })
+  vim.api.nvim_set_hl(0, "MiniPickBorder", { link = "Normal" })
 
 
   -- Replace vim.ui.select (used by LSP code actions, etc.)
