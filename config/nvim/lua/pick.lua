@@ -33,15 +33,12 @@ local function buffers_mru()
     end
   end
 
-  local orig_win = vim.api.nvim_get_current_win()
-
   require("mini.pick").start({
     source = {
       name = "Buffers (MRU)",
       items = items,
       choose = function(item)
-        vim.api.nvim_win_set_buf(orig_win, item.bufnr)
-        vim.api.nvim_set_current_win(orig_win)
+        require("mini.pick").default_choose(item)
       end,
     },
   })
