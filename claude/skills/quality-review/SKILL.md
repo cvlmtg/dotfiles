@@ -32,7 +32,8 @@ If the task touched many files, ask the user if they want a focused or broad rev
 For each issue found, note the file, line (if applicable), severity tag (`[high]`, `[medium]`, `[low]`), and a brief explanation.
 
 **Severity guide:**
-- `[high]` — likely bug, violated invariant, or security issue; fix before merging
+- `[critical]` — security vulnerability, data loss risk, or production-breaking bug; merge-blocking, fix immediately
+- `[high]` — likely bug or violated invariant; fix before merging
 - `[medium]` — code quality or maintainability concern; fix soon
 - `[low]` — style, minor improvement, or nice-to-have
 
@@ -45,7 +46,7 @@ For each issue found, note the file, line (if applicable), severity tag (`[high]
 ### 2. Project Invariants
 - Read the project's `CLAUDE.md` for stated rules and architectural invariants
 - Verify the modified code respects all of them (e.g. forbidden patterns, required abstractions, data model constraints, naming conventions)
-- Flag any violation as `[high]` — these are the rules the project author set deliberately
+- Flag any violation as `[high]` (or `[critical]` if the invariant guards security or data integrity) — these are the rules the project author set deliberately
 
 ### 3. Logical Correctness
 - Off-by-one errors, wrong boundary conditions, inverted logic
@@ -103,7 +104,7 @@ index. [severity] file:line — description
 
 End with a short **Summary** section:
 - Total in-scope issues found, broken down by severity
-- Which `[high]` issues (if any) must be fixed before merging
+- Which `[critical]` or `[high]` issues (if any) must be fixed before merging
 - One sentence on overall code health
 
 ### Out of Scope Issues
