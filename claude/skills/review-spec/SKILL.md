@@ -1,22 +1,22 @@
 ---
-name: review-plan
-description: Review a plan file for contradictions, ambiguities, missing instructions, and logic gaps. Asks clarifying questions, adds checkboxes to step-based sections if absent, then updates and saves the plan. Use when the user says things like "review the plan", "check the plan", "/review-plan", or names a specific plan file to review.
+name: review-spec
+description: Review a spec file (SPEC.md or ROADMAP.md) for contradictions, ambiguities, missing instructions, and logic gaps. Asks clarifying questions, adds checkboxes to step-based sections if absent, then updates and saves the spec. Use when the user says things like "review the spec", "check the spec", "/review-spec", or names a specific spec file to review.
 ---
 
-# Plan Review
+# Spec Review
 
-A structured review of a plan file to catch issues before implementation begins. The goal is a clear, complete, unambiguous plan that a developer could follow without needing to ask questions.
+A structured review of a spec file (SPEC.md or ROADMAP.md) to catch issues before implementation begins. The goal is a clear, complete, unambiguous spec that a developer could follow without needing to ask questions.
 
 ## Setup
 
-1. Identify the plan file:
+1. Identify the spec file:
    - If the user named a file, use that path.
    - Otherwise, look for `ROADMAP.md` or `SPEC.md` in the current working directory or repository root.
-   - If not found, ask the user where the plan file is.
+   - If not found, ask the user where the spec file is.
 
-2. Read the full plan file before doing anything else.
+2. Read the full spec file before doing anything else.
 
-3. Read `CLAUDE.md` (project-level, if it exists) to understand project conventions and constraints — these inform whether the plan is aligned with the project's rules.
+3. Read `CLAUDE.md` (project-level, if it exists) to understand project conventions and constraints — these inform whether the spec is aligned with the project's rules.
 
 ---
 
@@ -38,7 +38,7 @@ Work through each dimension below. Collect all findings before asking questions 
 ### 3. Missing Instructions
 - Steps referenced but never defined
 - Prerequisites assumed but not listed (dependencies, setup, environment)
-- Teardown or rollback steps missing where the plan modifies shared state
+- Teardown or rollback steps missing where the spec modifies shared state
 - Open questions listed without a resolution path
 
 ### 4. Logic Gaps
@@ -51,7 +51,7 @@ Work through each dimension below. Collect all findings before asking questions 
 - Identify every section or list that enumerates discrete steps or tasks.
 - If those items use plain `-` or `*` bullets (not `- [ ]` checkboxes), convert them to `- [ ]` format.
 - Do **not** convert descriptive or explanatory bullet lists — only action items and steps.
-- Do **not** check off any boxes unless the plan already marks them complete.
+- Do **not** check off any boxes unless the spec already marks them complete.
 
 ---
 
@@ -67,7 +67,7 @@ If all issues are self-evident fixes (adding missing checkboxes, rewording for c
 
 Once you have everything you need:
 
-1. Apply all fixes to the plan file — resolve contradictions, fill gaps, clarify ambiguous steps, add checkboxes.
+1. Apply all fixes to the spec file — resolve contradictions, fill gaps, clarify ambiguous steps, add checkboxes.
 2. Do **not** add content the user didn't ask for. Don't expand scope, add new phases, or refactor sections that aren't part of the issues found.
 3. Use the Edit tool (not Write) to make surgical changes where possible. Use Write only for a full rewrite.
 4. After saving, briefly summarize what changed and why.
@@ -84,16 +84,16 @@ After the review (before asking questions or making changes), report findings gr
 ## Findings
 
 ### Contradictions
-- [location in plan] — description
+- [location in spec] — description
 
 ### Ambiguities
-- [location in plan] — description
+- [location in spec] — description
 
 ### Missing Instructions
-- [location in plan] — description
+- [location in spec] — description
 
 ### Logic Gaps
-- [location in plan] — description
+- [location in spec] — description
 
 ### Checkboxes to Add
 - Section "X" — N items need `- [ ]` format
@@ -101,4 +101,4 @@ After the review (before asking questions or making changes), report findings gr
 
 Then either ask clarifying questions (if needed) or proceed to update the file.
 
-End with a one-sentence summary of the plan's overall readiness.
+End with a one-sentence summary of the spec's overall readiness.
