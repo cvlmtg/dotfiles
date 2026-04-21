@@ -22,7 +22,7 @@ This is the highest-priority rule in this file. It overrides problem-solving ins
 - **KISS (Keep It Simple, Stupid)**: Choose the simplest solution that works. Avoid unnecessary abstractions or indirection.
 - **Single Source of Truth (SSOT)**: Data and configuration live in one place. Derive other states from that source.
 - **Fail Fast**: Design systems to error out loudly and clearly. Avoid silent failures (null/undefined).
-- **Surgical Changes**: Touch only what is necessary. Minimize the blast radius of your changes.
+- **Surgical Changes**: Within the scope agreed in the plan, touch only what is necessary. This rule constrains incidental additions (drive-by cleanup, adjacent refactors), NOT the scope of the agreed plan itself. Shrinking an approved refactor to "reduce blast radius" is a deviation — see HARD STOP.
 
 ## Behavioral Constraints (The "Cautionary Tale")
 - **Read Before Write**: Before proposing or implementing changes, you MUST explore relevant type definitions, dependencies, and file structures. Never assume an API or function exists without verifying it first.
