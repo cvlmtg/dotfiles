@@ -477,39 +477,12 @@ function LinterStatus()
   return table.concat(msgs, " ")
 end
 
-function CodeCompanionChatStatus()
-  local ft = vim.bo.filetype
-
-  if ft ~= "codecompanion" then
-    return ""
-  end
-
-  local bufnr = vim.api.nvim_get_current_buf()
-
-  ---@diagnostic disable-next-line: undefined-field
-  local meta = _G.codecompanion_chat_metadata and _G.codecompanion_chat_metadata[bufnr] or nil
-  local adapter = meta and meta.adapter and meta.adapter.name or ""
-  local model = meta and meta.adapter and meta.adapter.model or ""
-
-  if adapter == "" and model == "" then
-    return ""
-  end
-
-  if model ~= "" then
-    return ("%s/%s "):format(adapter, model)
-  end
-
-  return ("%s "):format(adapter)
-end
-
 vim.o.statusline = table.concat({
   "%#LineNr#",
   "%{v:lua.StatuslineColumn()}",
   "%*",
   " %{v:lua.StatuslinePath()}",
   "%( %{v:lua.LinterStatus()} %)",
-  "%=",
-  "%{v:lua.CodeCompanionChatStatus()}",
   "%*"
 })
 
@@ -867,54 +840,6 @@ require("lazy").setup({
         json = true,
       },
     },
-  },
-  {
-    "olimorris/codecompanion.nvim",
-    version = "^19.0.0",
-    dependencies = {
-      "nvim-lua/plenary.nvim",
-      "nvim-treesitter/nvim-treesitter",
-      "franco-ruggeri/codecompanion-spinner.nvim",
-    },
-    keys = {
-      { "<leader>c", "<cmd>CodeCompanionChat Toggle<CR>" },
-      { "<leader>x", "<cmd>CodeCompanionActions<CR>" },
-    },
-    opts = function()
-      -- If ANTHROPIC_API_KEY is set, use Anthropic/Claude; otherwise use GitHub Copilot.
-      -- Override the Copilot model with the CODECOMPANION_MODEL env var.
-      local adapter
-
-      if vim.env.ANTHROPIC_API_KEY then
-        adapter = {
-          name = "anthropic",
-          model = "claude-sonnet-4.6",
-        }
-      else
-        adapter = {
-          name = "copilot",
-          model = vim.env.CODECOMPANION_MODEL or "gpt-5-mini",
-        }
-      end
-
-      return {
-        extensions = {
-          spinner = {},
-        },
-        interactions = {
-          chat = {
-            adapter = adapter,
-          },
-        },
-        prompt_library = {
-          markdown = {
-            dirs = {
-              "~/.prompts"
-            },
-          },
-        },
-      }
-    end,
   },
 
 ------------------------------------------------------------------------
