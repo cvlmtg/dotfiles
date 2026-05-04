@@ -1,6 +1,6 @@
 ---
 name: review-spec
-description: Review a spec file (SPEC.md or ROADMAP.md) for contradictions, ambiguities, missing instructions, and logic gaps. Asks clarifying questions, adds checkboxes to step-based sections if absent, then updates and saves the spec. Use when the user says things like "review the spec", "check the spec", "/review-spec", or names a specific spec file to review.
+description: Review SPEC.md / ROADMAP.md for contradictions, ambiguities, missing instructions, logic gaps. Ask clarifying questions, adds checkboxes to step-based sections if absent, (draft `## Implementation Plan` if none), update and save the spec. Never add checkboxes in descriptive sections. Use when the user says "review the spec", "check the spec", "/review-spec", or names a specific spec file.
 ---
 
 # Spec Review
@@ -10,12 +10,10 @@ A structured review of a spec file (SPEC.md or ROADMAP.md) to catch issues befor
 ## Setup
 
 1. Identify the spec file:
-   - If the user named a file, use that path.
-   - Otherwise, look for `ROADMAP.md` or `SPEC.md` in the current working directory or repository root.
-   - If not found, ask the user where the spec file is.
-
+ - If the user named a file, use that path.
+ - Otherwise, look for `ROADMAP.md` or `SPEC.md` in the current working directory or repository root.
+ - If not found, ask the user where the spec file is.
 2. Read the full spec file before doing anything else.
-
 3. Read `CLAUDE.md` (project-level, if it exists) to understand project conventions and constraints — these inform whether the spec is aligned with the project's rules.
 
 ---
@@ -48,10 +46,33 @@ Work through each dimension below. Collect all findings before asking questions 
 - A goal stated without a clear path to reach it
 
 ### 5. Checkbox Audit
-- Identify every section or list that enumerates discrete steps or tasks.
-- If those items use plain `-` or `*` bullets (not `- [ ]` checkboxes), convert them to `- [ ]` format.
-- Do **not** convert descriptive or explanatory bullet lists — only action items and steps.
-- Do **not** check off any boxes unless the spec already marks them complete.
+
+Checkboxes belong **only inside designated tracker section**. Tracker section = top-level (`##`) heading matching, case-insensitive:
+
+- `Implementation Plan`
+- `Tasks`
+- `TODO` / `To Do`
+- `Checklist`
+- `Delivery` / `Delivery Plan`
+- `Milestones`
+- `Roadmap` (only as sub-section inside larger spec, not as document title)
+
+Everything else — `Pages`, `Boards`, `Cards`, `UI`, `Database`, `Auth`, `Tech stack`, etc. — is **descriptive**. Keeps plain bullets even when wording sounds actionable (`- Cards can be deleted`, `- Boards will have:`, `- The owner can invite other users`). Wording is not the signal; section is.
+
+**Inside tracker section:**
+- Convert plain `-` / `*` bullets → `- [ ]`.
+- Leave `- [x]` as-is. Never check boxes yourself.
+
+**Outside any tracker section:**
+- Never add `- [ ]` / `- [x]`, even if bullet sounds actionable.
+- Never strip existing checkbox markers — user put them there on purpose. Flag inconsistency as finding instead.
+
+**No tracker section exists:**
+- Draft `## Implementation Plan` to append at end.
+- Derive phases from existing feature-area structure (one phase per major `##` section, ordered so each delivers working slice). Each phase: `### Phase N — <name>` heading + `- [ ]` items echoing spec deliverables.
+- Surface under "Implementation Plan to Add" in findings **before** writing — user can redirect if phasing wrong.
+
+**Sanity check before any checkbox edit:** ask "would marking this `[x]` make sense as completed work?" Bullet like `- Boards will have:` followed by data-field sub-bullets fails — checking meaningless. Skip.
 
 ---
 
@@ -65,11 +86,11 @@ If all issues are self-evident fixes (adding missing checkboxes, rewording for c
 
 ## Update Step
 
-Once you have everything you need:
+When ready:
 
-1. Apply all fixes to the spec file — resolve contradictions, fill gaps, clarify ambiguous steps, add checkboxes.
-2. Do **not** add content the user didn't ask for. Don't expand scope, add new phases, or refactor sections that aren't part of the issues found.
-3. Use the Edit tool (not Write) to make surgical changes where possible. Use Write only for a full rewrite.
+1. Apply all fixes — resolve contradictions, fill gaps, clarify ambiguous steps, manage checkboxes in tracker, append drafted `## Implementation Plan` if missing.
+2. Don't add content the user didn't ask for. No scope expansion, no invented features, no refactoring descriptive sections outside the issues found. Drafting missing tracker is the one exception — phases must echo deliverables already implied by spec, never introduce new ones.
+3. Use Edit tool (not Write) for surgical changes where possible. Use Write only for a full rewrite.
 4. After saving, briefly summarize what changed and why.
 
 **Never commit the changes.** If the user asks you to commit, remind them this skill does not commit.
@@ -96,9 +117,12 @@ After the review (before asking questions or making changes), report findings gr
 - [location in spec] — description
 
 ### Checkboxes to Add
-- Section "X" — N items need `- [ ]` format
+- Tracker section "X" — N plain bullets need `- [ ]` format
+
+### Implementation Plan to Add
+- No tracker section found — proposing N phases derived from sections A, B, C (list phase names)
 ```
 
 Then either ask clarifying questions (if needed) or proceed to update the file.
 
-End with a one-sentence summary of the spec's overall readiness.
+End with a one-sentence summary of spec's overall readiness.
