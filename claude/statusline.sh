@@ -139,6 +139,7 @@ format_reset_time() {
   read -r cache_read
   read -r cwd
   read -r session_start
+  read -r effort
 } < <(printf '%s' "$input" | jq -r '
   (.model.display_name // "Claude"),
   (.context_window.context_window_size // 200000 | tostring),
@@ -146,8 +147,9 @@ format_reset_time() {
   (.context_window.current_usage.cache_creation_input_tokens // 0 | tostring),
   (.context_window.current_usage.cache_read_input_tokens // 0 | tostring),
   (.cwd // ""),
-  (.session.start_time // "")
-')
+  (.session.start_time // ""),
+  (.effort.level // "default")
+' | tr -d '\r')
 
 [ "$size" -eq 0 ] 2>/dev/null && size=200000
 ([ -z "$cwd" ] || [ "$cwd" = "null" ]) && cwd=$(pwd)
@@ -161,12 +163,6 @@ if [ "$size" -gt 0 ]; then
   pct_used=$(( current * 100 / size ))
 else
   pct_used=0
-fi
-
-effort="default"
-settings_path="$HOME/.claude/settings.json"
-if [ -f "$settings_path" ]; then
-  effort=$(jq -r '.effortLevel // "default"' "$settings_path" 2>/dev/null)
 fi
 
 # ── LINE 1: Model │ Context % │ Directory (branch) │ Session │ Thinking ──
@@ -331,7 +327,7 @@ if [ -n "$usage_data" ]; then
     (.extra_usage.utilization // 0 | round | tostring),
     (.extra_usage.used_credits // 0 | tostring),
     (.extra_usage.monthly_limit // 0 | tostring)
-  ' 2>/dev/null)
+  ' 2>/dev/null | tr -d '\r')
 
   if [ -n "$five_hour_pct" ]; then
     five_hour_reset=$(format_reset_time "$five_hour_reset_iso" "time")
