@@ -71,4 +71,15 @@ This is the highest-priority rule in this file. It overrides problem-solving ins
 5. **Track & Document**:
     - Mark items complete in `ROADMAP.md` or `SPEC.md` as you progress.
     - Provide a high-level summary of changes at each step.
-6. **Final Validation**: Never mark a task as done without proof of correctness (logs, tests, or diff behavior).
+6. **Final Validation**: Never mark a task done without proof of correctness (logs, tests, diff behavior) AND a pre-done self-review pass over diff. Run a self-review while the implementation context is hot — catches obvious wins so `/simplify` has less to do.
+   **Pre-done self-review checklist** (run mentally against `git diff`; fix issues directly, no subagents):
+   - **Internal duplication**: near-duplicate block in diff? Two similar functions, branches, or copy-pasted logic with small variation — collapse.
+   - **Dead branches & unreachable code**: conditions always true/false given new code, fallback paths for cases that can no longer occur, error handling for impossible failures.
+   - **Premature abstractions**: helpers, wrappers, or params added for hypothetical second caller that doesn't exist yet. One caller → inline.
+   - **Narrating comments**: comments that describe WHAT code does, reference current task ("added for X"), or restate diff. Delete. Keep only non-obvious WHY.
+   - **Leftover scaffolding**: debug prints, commented-out code, temp asserts, TODO markers added during impl but already addressed.
+   - **Parameter sprawl**: new params bolted onto existing functions instead of restructuring. Added 3+ params or new optional flag → reconsider shape.
+   - **Stringly-typed values**: raw strings/numbers where constant or existing enum already exists nearby.
+   - **Over-broad error handling**: try/except (or equiv) wrapping more than line that can actually fail, swallowing errors silently, or catching exceptions that can't be raised.
+
+   The checklist does NOT cover: cross-file reuse search, codebase-wide naming consistency, sibling-file pattern alignment. Those need fresh eyes on whole tree — `/simplify`'s job, don't duplicate.
