@@ -3,8 +3,10 @@
 alias vim="nvim"
 
 # Delete only "bar/" from "foo/bar/" with ctrl-w
-stty werase undef
-bind '"\C-w": backward-kill-word'
+if [[ $- == *i* ]]; then
+  stty werase undef
+  bind '"\C-w": backward-kill-word'
+fi
 
 # COMMAND ALIASES -----------------------------------------------------
 
