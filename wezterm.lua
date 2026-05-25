@@ -224,6 +224,12 @@ else
     key = "s", mods = "LEADER|SHIFT", action = action.SplitVertical { args = pwsh, domain = { DomainName = "local" } }
   })
 
+  -- Ctrl+1..9 to switch tabs (matches macOS Cmd+1..9)
+  for i = 1, 9 do
+    table.insert(config.keys, { key = tostring(i), mods = "CTRL", action = action.ActivateTab(i - 1) })
+  end
+  table.insert(config.keys, { key = "0", mods = "CTRL", action = action.ActivateTab(9) })
+
   -- Paste with Ctrl+V
   table.insert(config.keys, {
     key = "v", mods = "CTRL", action = action.PasteFrom("Clipboard"),
