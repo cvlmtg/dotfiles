@@ -1,6 +1,6 @@
 ---
 name: iterate-plan
-description: Iteratively draft and harden an implementation plan from a prompt or spec file, running up to 5 review rounds with decision-locking until all readiness checks pass or the round cap is reached. Use when the user says things like "iterate on a plan", "harden this plan", "/iterate-plan", or gives a prompt/spec and wants a rigorously refined implementation plan.
+description: Iteratively draft and harden an implementation plan from a prompt or spec file, running up to 5 review rounds with decision-locking until all readiness checks pass or the round cap is reached. The spec file is read as source material to draft a separate plan file — this skill never edits the input spec in place. Use when the user says things like "iterate on a plan", "harden this plan", "/iterate-plan", or gives a prompt/spec and wants a rigorously refined implementation plan. If the user wants to QA or edit an existing SPEC.md/ROADMAP.md in place (checkboxes, tracker hygiene), use /review-spec instead.
 ---
 
 # Iterate Plan
@@ -15,7 +15,7 @@ Draft an implementation plan and harden it through bounded review rounds. The go
 
 1. Confirm plan mode is active. If not, halt per the note above.
 2. Identify the input:
-   - If the user gave a path to a `.md` file, read it in full.
+   - If the user gave a path to a `.md` file, read it in full as source material. This skill reads it but never edits it — if the user wants to QA or fix the spec doc in place, that is `/review-spec`, not this skill.
    - Otherwise, treat the user's message as the prompt verbatim.
 3. Identify the plan file path:
    - If the plan-mode system specified one, use it.
