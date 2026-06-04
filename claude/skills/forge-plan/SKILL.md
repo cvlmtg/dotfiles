@@ -1,13 +1,13 @@
 ---
-name: iterate-plan
-description: Iteratively draft and harden an implementation plan from a prompt or spec file, running up to 5 review rounds with decision-locking until all readiness checks pass or the round cap is reached. The spec file is read as source material to draft a separate plan file — this skill never edits the input spec in place. Use when the user says things like "iterate on a plan", "harden this plan", "/iterate-plan", or gives a prompt/spec and wants a rigorously refined implementation plan. If the user wants to QA or edit an existing SPEC.md/ROADMAP.md in place (checkboxes, tracker hygiene), use /review-spec instead.
+name: forge-plan
+description: Draft and harden an implementation plan from a prompt or spec file, running up to 5 review rounds with decision-locking until all readiness checks pass or the round cap is reached. The spec file is read as source material to draft a separate plan file — this skill never edits the input spec in place. Use when the user says things like "forge a plan", "harden this plan", "/forge-plan", or gives a prompt/spec and wants a rigorously refined implementation plan. If the user wants to QA or edit an existing SPEC.md/ROADMAP.md in place (checkboxes, tracker hygiene), use /review-spec instead.
 ---
 
-# Iterate Plan
+# Forge Plan
 
 Draft an implementation plan and harden it through bounded review rounds. The goal is a plan a developer could execute without follow-up questions, reached without bikeshedding or infinite revision.
 
-**Must run inside plan mode.** If plan mode is not active, stop immediately and tell the user: *"This skill must run in plan mode. Type `plan` to enter plan mode, then re-invoke /iterate-plan."* Do not proceed.
+**Must run inside plan mode.** If plan mode is not active, stop immediately and tell the user: *"This skill must run in plan mode. Type `plan` to enter plan mode, then re-invoke /forge-plan."* Do not proceed.
 
 ---
 

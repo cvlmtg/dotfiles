@@ -13,7 +13,7 @@ A structured review of a spec file (SPEC.md or ROADMAP.md) to catch issues befor
  - If the user named a file, use that path.
  - Otherwise, look for `ROADMAP.md` or `SPEC.md` in the current working directory or repository root.
  - If not found, ask the user where the spec file is.
- - If the user wants a *fresh executable plan* hardened through review rounds (not in-place edits to the spec doc), use `/iterate-plan` instead.
+ - If the user wants a *fresh executable plan* hardened through review rounds (not in-place edits to the spec doc), use `/forge-plan` instead.
 2. Read the full spec file before doing anything else.
 3. Read `CLAUDE.md` (project-level, if it exists) to understand project conventions and constraints — these inform whether the spec is aligned with the project's rules.
 
