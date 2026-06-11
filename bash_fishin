@@ -2,6 +2,9 @@
 
 alias vim="nvim"
 
+# don't duplicate commands in history
+export HISTCONTROL=ignoreboth:erasedups
+
 # Delete only "bar/" from "foo/bar/" with ctrl-w
 if [[ $- == *i* ]]; then
   stty werase undef
