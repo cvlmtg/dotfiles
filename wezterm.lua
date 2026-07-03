@@ -180,6 +180,8 @@ config.keys = {
   { key = "n", mods = "LEADER", action = action.ActivateTabRelative(1) },
   { key = "r", mods = "LEADER", action = action.RotatePanes("Clockwise") },
   { key="Enter", mods="SHIFT", action=wezterm.action.SendString("\n") },
+  { key = 'x', mods = 'CTRL|SHIFT', action = wezterm.action.DisableDefaultAssignment },
+  { key = 'w', mods = 'CTRL|SHIFT', action = wezterm.action.DisableDefaultAssignment },
 }
 
 for i = 1, 9 do
