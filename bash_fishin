@@ -161,7 +161,7 @@ parse_git_branch() {
       fi
     fi
 
-    echo -e "("$COLOR$BRANCH"\e[0m)"
+    echo -e "(\001${COLOR}\002${BRANCH}\001\e[0m\002)"
   fi
 
   echo ""
