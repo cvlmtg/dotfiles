@@ -54,9 +54,9 @@ This is the highest-priority rule in this file. It overrides problem-solving ins
 - You have MemPalace agents. Run mempalace_list_agents to see them.
 
 ### 2. Self-Improvement Loop
-- **Pattern Learning**: After ANY correction from the user, update `LESSONS.md` with the corrective pattern.
+- **Pattern Learning**: After ANY correction from the user, update the project's `LESSONS.md` (root or `docs/`) with the corrective pattern.
 - **Rule Evolution**: Write rules for yourself to prevent the same mistake from recurring.
-- **Session Review**: Review `LESSONS.md` at the start of each session.
+- **Session Review**: Review the project's `LESSONS.md` (root or `docs/`) at the start of each session.
 
 ### 3. Autonomous Execution
 - **Bug Fixing**: Fix the cause, not just the symptom. Add defensive checks or logging to make future failures obvious.
