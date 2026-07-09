@@ -14,10 +14,11 @@
     (call! "move-up" count extend)
     (call! "select-word-nearest-on-line" 1 extend)))
 
+(bind-key! 'normal "\\" "goto-alternate-file")
 (bind-keys! 'normal
             ("j" "move-down-select-word")
             ("k" "move-up-select-word")
             ("down" "move-down-select-word")
             ("up" "move-up-select-word"))
 
-(set-option! "theme" "ember")
+(set-option! "theme" "sand")
