@@ -21,4 +21,8 @@
             ("down" "move-down-select-word")
             ("up" "move-up-select-word"))
 
+(set-option! "whitespace-space" "trailing")
+(set-option! "whitespace-tab" "all")
+(set-option! "tab-style" "soft")
+(set-option! "tab-width" "2")
 (set-option! "theme" "sand")
