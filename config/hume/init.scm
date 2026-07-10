@@ -25,4 +25,3 @@
 (set-option! "whitespace-tab" "all")
 (set-option! "tab-style" "soft")
 (set-option! "tab-width" "2")
-(set-option! "theme" "sand")
