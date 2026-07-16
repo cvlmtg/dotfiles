@@ -1,6 +1,7 @@
-(load-plugin "core:plum")
 (load-plugin "core:stdlib")
 (load-plugin "core:vim-keybind")
+(declare-plugin "core:plum")
+(declare-plugin "core:lsp")
 
 (define-command! "move-down-select-word"
   "Move down one visual line, then select the nearest word on that line."
