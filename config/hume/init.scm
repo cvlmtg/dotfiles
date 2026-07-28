@@ -18,6 +18,7 @@
     (call! "select-word-nearest-on-line" 1 extend)))
 
 (bind-key! 'normal "space space" "lsp-goto-definition")
+(bind-key! 'normal "space m" "picker-git-modified")
 (bind-key! 'normal "space b" "picker-buffers")
 (bind-key! 'normal "space f" "picker-files")
 (bind-key! 'normal "space d" "lsp-hover")
