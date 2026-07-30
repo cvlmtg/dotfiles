@@ -71,7 +71,7 @@ This is the highest-priority rule in this file. It overrides problem-solving ins
 5. **Track & Document**:
     - Mark items complete in `ROADMAP.md` or `SPEC.md` as you progress.
     - Provide a high-level summary of changes at each step.
-6. **Final Validation**: Never mark a task done without proof of correctness (logs, tests, diff behavior) AND a pre-done self-review pass over diff. Run a self-review while the implementation context is hot — catches obvious wins so `/simplify` has less to do.
+6. **Final Validation**: Never mark a task done without proof of correctness (logs, tests, diff behavior) AND a pre-done self-review pass over diff. Run a self-review while the implementation context is hot — catches obvious wins so `/simplify` has less to do. One full verification run per change, formatter first: run the project's full suite/CI script exactly once, after formatting — not before, not again after. Narrow targeted runs while iterating are fine; repeating the whole suite to "confirm" a formatter or other no-op step is not.
    **Pre-done self-review checklist** (run mentally against `git diff`; fix issues directly, no subagents):
    - **Internal duplication**: near-duplicate block in diff? Two similar functions, branches, or copy-pasted logic with small variation — collapse.
    - **Dead branches & unreachable code**: conditions always true/false given new code, fallback paths for cases that can no longer occur, error handling for impossible failures.
