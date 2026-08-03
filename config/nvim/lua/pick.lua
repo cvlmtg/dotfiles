@@ -170,9 +170,9 @@ function M.setup()
   vim.keymap.set("n", "<leader>f", find_project_files, { desc = "Search [F]iles" })
   vim.keymap.set("n", "<leader>a", grep_word, { desc = "Search [A]ll occurrences of the current word" })
   vim.keymap.set("n", "<leader>e", diagnostics, { desc = "Search [E]rrors / Warnings" })
-  vim.keymap.set("n", "<leader>g", function()
+  vim.keymap.set("n", "<leader>m", function()
     require("mini.extra").pickers.git_files({ scope = "modified" })
-  end, { desc = "[G]it modified files (staged/unstaged)" })
+  end, { desc = "Git [m]odified files (staged/unstaged)" })
 end
 
 M.todo_pick = todo_pick
