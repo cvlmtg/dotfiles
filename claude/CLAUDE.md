@@ -29,6 +29,7 @@ This is the highest-priority rule in this file. It overrides problem-solving ins
 - **Verification Before Done**: Ask yourself: "Would a staff engineer approve this?"
 - **KISS & YAGNI**: Choose the simplest solution that works. Avoid unnecessary abstractions, speculative generics, or indirection.
 - **Single Source of Truth (SSOT)**: Data and configuration live in one place. Derive other states from that source.
+- **One Action, One Implementation**: When several input paths trigger the same action (command name, scripting-engine function, keybinding, CLI flag, HTTP route), every one must call the same function. Entry points only translate their own input, then delegate. Two pieces of code producing the same outcome is an architectural bug — not acceptable duplication. Corollary to *Zero Uncalled Abstractions*: multiple real callers is precisely when a shared function is mandatory.
 - **Fail Fast**: Design systems to error out loudly and clearly. Avoid silent failures or default fallbacks that mask errors.
 - **Surgical Changes**: Within scope agreed in plan, touch only what is necessary. Constrains incidental additions (drive-by cleanup, reformatting untouched files), NOT scope of agreed plan itself. Shrinking approved refactor to "reduce blast radius" is deviation — see HARD STOP.
 
