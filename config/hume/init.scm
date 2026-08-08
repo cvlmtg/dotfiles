@@ -1,8 +1,9 @@
 (load-plugin "core:stdlib")
 (load-plugin "core:pickers")
 (load-plugin "core:vim-keybind")
-(declare-plugin "core:lsp")
 (declare-plugin "core:plum")
+(declare-plugin "core:lsp")
+(declare-plugin "core:git-diff")
 (declare-plugin "core:steel-server")
 
 (define-command! "move-down-select-word"
@@ -33,3 +34,4 @@
 (set-option! "whitespace-tab" "all")
 (set-option! "tab-style" "soft")
 (set-option! "tab-width" "2")
+(set-option! "lsp.inlay-hints" "true")
