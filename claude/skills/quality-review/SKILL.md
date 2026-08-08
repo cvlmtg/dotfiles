@@ -16,7 +16,7 @@ Unless the user specifies otherwise, focus the review on:
 
 If the task touched many files, ask the user if they want a focused or broad review before starting.
 
-The duplication hunt (§4) is deliberately **not** bounded by this scope — a duplicate's twin can live anywhere in the tree, and a finding is never downgraded for sitting outside the reviewed files.
+The duplication hunt (§4) and the dead-code hunt (§5) are deliberately **not** bounded by this scope — a duplicate's twin, or code orphaned elsewhere in the tree by this diff, can live anywhere in the tree, and a finding is never downgraded for sitting outside the reviewed files.
 
 ---
 
@@ -25,8 +25,9 @@ The duplication hunt (§4) is deliberately **not** bounded by this scope — a d
 1. Read `git diff HEAD` (or use task context) to identify exactly which files and lines changed
 2. Read stated rules and architectural invariants — these are the highest-priority things to check. Read the project's `CLAUDE.md` if one exists, and also the global `~/.claude/CLAUDE.md` if one exists — global principles (SSOT, One Action One Implementation, Zero Uncalled Abstractions, Fail Fast, etc.) apply even when the project has no CLAUDE.md of its own
 3. Enumerate the **actions** the diff introduces or touches — each distinct outcome the code produces (validate X, format Y, resolve a path, dispatch a command). For each, search the whole codebase for another implementation of that same outcome: by name, by call site, by the data it reads/writes — not by text similarity alone. Renamed, reordered, and differently-styled duplicates are the ones grep misses and the ones that matter most
-4. For large scopes (5+ files), use parallel subagents to review independent files or categories simultaneously
-5. Work through the checklist below; skip categories clearly irrelevant to the task
+4. When the diff removes, replaces, or stops calling something, check whether anything upstream lost its last caller — search the whole codebase the same way step 3 does for duplication, before assuming it's a normal edit
+5. For large scopes (5+ files), use parallel subagents to review independent files or categories simultaneously
+6. Work through the checklist below; skip categories clearly irrelevant to the task
 
 ---
 
@@ -72,7 +73,20 @@ Severity: `[high]` — architectural bug, not style. `[critical]` when the two p
 
 **Guardrail against over-firing**: incidental similarity is not duplication. Two functions with the same shape but different outcomes stay separate — the test is whether a future change to the behavior would have to be made in both places.
 
-### 5. Simplification
+### 5. Dead Code
+Code that no longer runs, or never runs, in production — whether the diff left it behind, introduced it, or orphaned something elsewhere in the tree. The standard here isn't "could be better," it's "does anything reach this."
+
+- Unreachable branches: conditions or fallbacks that cannot occur — prove it, don't guess (see guardrail below)
+- Unused locals: variables, imports, or parameters introduced during the task and never referenced
+- Orphaned by the diff: a function or branch the task added but never wired up; old code left in place after being replaced instead of deleted
+- Orphaned elsewhere in the tree: if the diff removes the last caller of something, that something is now dead — search for it the same way §4 searches for duplication twins; not bounded by the reviewed-files scope
+- Test-only production code: no caller outside the test suite — unless it's a dedicated test helper/fixture written to support tests, not production logic that lost its last real caller
+
+Severity: `[medium]` normally (safe to delete, no behavior change). `[low]` for a stray unused import or variable. `[high]` when the dead code reveals the task's new logic never actually got wired in.
+
+**Guardrail against false positives**: a missing in-repo caller doesn't always mean dead. Exported public API, CLI entry points, framework-invoked hooks (routes, serializers, migrations, event handlers), and reflection/string-based dispatch can all have callers a grep won't find. When unreachability isn't provable, report it as a question, not a finding.
+
+### 6. Simplification
 Goal is less logic to reason about, not fewer lines — a dense one-liner replacing a clear five-line block is not a finding.
 
 - Conditionals that can collapse: redundant branches, negations that cancel, conditions subsumed by an earlier guard, `if`/`else` chains that are really a lookup table
@@ -80,7 +94,6 @@ Goal is less logic to reason about, not fewer lines — a dense one-liner replac
 - Algorithms doing more work than the problem needs: repeated scans, sorting to find a min, rebuilding a structure per iteration, manual bookkeeping the language already provides
 - Redundant state: variables derivable from another, flags tracking something already implied by control flow, caches with one reader
 - Indirection with no second caller: pass-through wrappers, single-implementation interfaces, parameters only ever passed one value
-- Dead branches: fallbacks for conditions that cannot occur
 
 **Hard guardrail — do not trade correctness for brevity:**
 - Behavior must be identical for every input, including edge cases and error paths
@@ -90,27 +103,26 @@ Goal is less logic to reason about, not fewer lines — a dense one-liner replac
 
 Severity: `[medium]` normally; `[low]` for cosmetic wins; `[high]` when the complexity is actively hiding a correctness question.
 
-### 6. Code Quality Issues
+### 7. Code Quality Issues
 - Magic numbers or strings that should be constants
 - Functions doing too many things (suggest splitting if so)
-- Unused variables, imports, or parameters introduced during the task
 - Leftover debug output (adapt to the project's language: debug print statements, log spam, temporary assertions, etc.)
 - Separation of concerns violations: logic that belongs to a different layer or abstraction (e.g. business logic in a view, data access in a controller, presentation logic in a model) — flag where responsibility should live and why
 
-### 7. Test Coverage Gaps
+### 8. Test Coverage Gaps
 - Missing edge cases
 - Boundary conditions: off-by-one, max/min values, limits
 - Error paths: does the code propagate errors? Are those tested?
 - New code paths introduced by the task that have no corresponding test
 - Tests that were passing before but may now be brittle due to changes
 
-### 8. Error Handling Gaps
+### 9. Error Handling Gaps
 - Errors that are silently swallowed or ignored
 - Missing input validation on public-facing functions or API handlers
 - Unhandled error propagation in the project's language idiom (e.g. unchecked `Result`/`Option` in Rust, unhandled exceptions in Python, unhandled promise rejections in JS)
 - Missing error context that would make debugging hard (e.g. re-throwing without wrapping)
 
-### 9. Performance Concerns (flag only obvious ones)
+### 10. Performance Concerns (flag only obvious ones)
 - Unnecessary memory allocations in hot paths
 - Wrong or inefficient algorithms
 - N+1 query patterns introduced
@@ -128,18 +140,19 @@ For each finding:
 index. [severity] file:line — description
 ```
 
-Duplication (§4) findings must name both locations, which implementation survives, and which callers redirect to it. Simplification (§5) findings must show what the simplified logic looks like. Neither gets a bare problem description — the skill does not apply fixes itself, so the report must be actionable as-is.
+Duplication (§4) findings must name both locations, which implementation survives, and which callers redirect to it. Dead Code (§5) findings must name the dead location and show why nothing reaches it — the caller the diff removed, or confirmation no caller ever existed. Simplification (§6) findings must show what the simplified logic looks like. None gets a bare problem description — the skill does not apply fixes itself, so the report must be actionable as-is.
 
 End with a short **Summary** section:
 - Total in-scope issues found, broken down by severity
 - Which `[critical]` or `[high]` issues (if any) must be fixed before merging
 - One line confirming the duplication twin-hunt ran and what it covered (e.g. "twin-hunt: checked N actions against the full tree, 0 duplicates found")
+- One line confirming the dead-code hunt ran and what it covered (e.g. "dead-code hunt: checked N orphaned symbols against the full tree, 0 found")
 - One sentence on overall code health
 
 ### Out of Scope Issues
 
 If during the review you notice issues in files **outside the current task's scope** (e.g., pre-existing bugs, stale code in unrelated files), do **not** mix them into the main findings. Instead, append a separate **"Out of Scope"** section at the very end of the report. List each issue with file + brief description and let the user decide whether to address them.
 
-**Exception**: duplication findings from §4 always belong in the main findings, never in Out of Scope — even when the twin implementation lives outside the reviewed files. The diff created or perpetuated the duplication, so it's in scope by definition.
+**Exception**: duplication findings from §4, and dead-code findings from §5 caused by this diff, always belong in the main findings, never in Out of Scope — even when the twin implementation, or the now-orphaned code, lives outside the reviewed files. The diff created or perpetuated the issue, so it's in scope by definition. Pre-existing dead code unrelated to the diff still goes to Out of Scope.
 
 Be direct and specific. Don't pad the report.
