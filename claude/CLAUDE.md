@@ -60,9 +60,15 @@ AI slop (bloat, unverified APIs, unnecessary indirection, narrative noise) is st
 - **Security Gates**: Never suggest hardcoded credentials or secrets. Explicitly flag changes impacting authentication, authorization, or data exposure.
 
 ## Technical Standards: Writing Tests
-- **Verification Validity**: After writing a test, simulate a failure (e.g., flip a condition) to ensure the test actually catches bugs.
-- **Independent Oracle**: Derive expected values from inputs using logic independent of the implementation. Avoid circular tests using implementation helpers.
-- **Zero-Effect Check**: Ensure test assertions would fail if implementation logic were removed or defaulted.
+Test comes first. **Red run first, green run last — never a third run to re-confirm.** Green is already the final state; re-running to "make sure" is waste.
+
+1. **Red Before Green**: Write the test, run it, confirm it fails. Then write the fix/feature. Run again, confirm it passes. Two runs, not three. Never implement first and then validate the test by breaking and restoring working code.
+2. **Red for the Right Reason**: Read the failure output. It must be the assertion failing, or the missing symbol the feature will add — not a typo, bad import, missing fixture, or collection error. Wrong reason → fix the test and re-run before touching implementation. An unread red run proves nothing.
+3. **Narrow Runs**: The red/green cycle runs only the target test, not the full suite. Full-suite run happens once at the end — see Task Management Protocol #5.
+4. **Independent Oracle**: Derive expected values from inputs using logic independent of the implementation. Avoid circular tests using implementation helpers.
+5. **Zero-Effect Check**: Assert on values, not on "no exception thrown". Reason this through statically — it costs no run.
+6. **Fix Already Written**: If the bug was found by writing the fix, stash or revert it, run the test to get red, then restore and run green. Still two runs, green last.
+7. **When Red-First Does Not Apply**: behavior-preserving refactors and characterization tests for existing untested code pass before and after by design. Say so explicitly and skip the red run — never damage working code to manufacture one.
 
 ## Workflow & Orchestration
 
