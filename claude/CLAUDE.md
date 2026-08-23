@@ -46,6 +46,11 @@ AI slop (bloat, unverified APIs, unnecessary indirection, narrative noise) is st
    - Do not relax strict types to `any` / dynamic / untyped alternatives as a shortcut.
 4. **No Residual Scaffolding**: Never commit `// TODO`, placeholder returns, empty catch blocks, or leftover debug/tracing statements.
 5. **Clean Diffs**: Do not reformat untouched code, change whitespace, or rearrange imports outside the active diff scope.
+6. **Comments: Brief and Self-Contained**:
+   - Explain non-obvious *why*, never *what* the code does.
+   - Never reference `SPEC.md`, `ROADMAP.md`, `LESSONS.md`, plan files, task/step numbers, or "as discussed". Those are temporary scratchpads — the comment must still make sense once they are rewritten or deleted.
+   - Self-contained by default. Point elsewhere only when strictly necessary, and only at stable targets: README, user manual, published API docs or a standard, or another comment in the codebase.
+   - No padding: cut restated code, narrated history, and filler. Length is earned by content, not capped — if the *why* genuinely needs a paragraph, write the paragraph. Never worsen the code or push the explanation somewhere harder to reach just to shorten a comment.
 
 ## Behavioral Constraints
 - **Read Before Write**: Explore relevant type definitions, dependencies, and file structures before generating code.
@@ -86,10 +91,9 @@ AI slop (bloat, unverified APIs, unnecessary indirection, narrative noise) is st
 4. **Track & Document**: Mark items complete in `ROADMAP.md` or `SPEC.md`. Summarize changes per step.
 5. **Final Validation & Pre-Done Checklist**: Never mark task done without proof of correctness (logs, tests, diff behavior) AND a pre-done self-review pass over diff. Run self-review while implementation context is hot — catches obvious wins so `/simplify` has less to do. One full verification run per change, formatter first: run project's full suite/CI script exactly once, after formatting — not before, not again after. Narrow targeted runs while iterating are fine; repeating whole suite to "confirm" a formatter or other no-op step is not.
    **Pre-done self-review checklist** (run mentally against `git diff`; fix issues directly, no subagents):
-   - Re-check diff against **Anti-Slop Protocol** above (no phantom APIs, no uncalled abstractions, no residual scaffolding, clean diffs).
+   - Re-check diff against **Anti-Slop Protocol** above (no phantom APIs, no uncalled abstractions, no residual scaffolding, clean diffs, brief self-contained comments).
    - *Internal duplication*: Collapse similar functions or copy-pasted branches.
    - *Dead branches*: Remove impossible fallbacks and unreachable code.
-   - *Narrating comments*: Delete comments explaining *what* code does or referencing current task. Keep only non-obvious *why*.
    - *Parameter sprawl*: Reconsider functions with 3+ added parameters or new boolean flags.
    - *Stringly-typed values*: raw strings/numbers where a constant or existing enum already exists nearby.
    - *Over-broad error handling*: Restrict exception blocks strictly to failing statements.
