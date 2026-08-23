@@ -9,12 +9,20 @@ A systematic sweep of recently touched code to catch issues before they become p
 
 ## Scope
 
+The review target is a **set of code**, not a set of commits. The user names it: "everything after commit X", "the current diff", "what we just did". Resolve that to a diff and review every line in it.
+
 Unless the user specifies otherwise, focus the review on:
 1. Files modified during the current task
 2. Files directly imported or called by those files
 3. Any test files related to the above
 
-If the task touched many files, ask the user if they want a focused or broad review before starting.
+**Commit history inside the range is not scope information.** Whatever produced the code — one commit or twenty, a prior "quality review" commit among them — the code in the range is reviewed in full, at full depth:
+- Code an earlier review already covered is reviewed again. A previous pass is not evidence of quality: its findings may have been reported but never fixed, fixed wrongly, or invalidated by later edits.
+- The fixes an earlier review produced are themselves code in the range, and get the same scrutiny as everything else.
+- Never narrow the range, skip files, or shorten the checklist because of what a commit message claims was done.
+- A finding is never downgraded, omitted, or marked "already known" because a previous review surfaced it. Report it as if seen for the first time.
+
+If the user gave no explicit range and the task touched many files, ask whether they want a focused or broad review before starting. If they did give a range, review it as given — don't ask to shrink it.
 
 The duplication hunt (§4) and the dead-code hunt (§5) are deliberately **not** bounded by this scope — a duplicate's twin, or code orphaned elsewhere in the tree by this diff, can live anywhere in the tree, and a finding is never downgraded for sitting outside the reviewed files.
 
@@ -22,7 +30,7 @@ The duplication hunt (§4) and the dead-code hunt (§5) are deliberately **not**
 
 ## Execution Strategy
 
-1. Read `git diff HEAD` (or use task context) to identify exactly which files and lines changed
+1. Resolve the review range to a single diff and read it: `git diff <base> HEAD` for "everything after commit X", `git diff HEAD` for uncommitted work, or use task context. Read it as one unified change — do not walk commit-by-commit, and do not read commit messages to decide what deserves review
 2. Read stated rules and architectural invariants — these are the highest-priority things to check. Read the project's `CLAUDE.md` if one exists, and also the global `~/.claude/CLAUDE.md` if one exists — global principles (SSOT, One Action One Implementation, Zero Uncalled Abstractions, Fail Fast, etc.) apply even when the project has no CLAUDE.md of its own
 3. Enumerate the **actions** the diff introduces or touches — each distinct outcome the code produces (validate X, format Y, resolve a path, dispatch a command). For each, search the whole codebase for another implementation of that same outcome: by name, by call site, by the data it reads/writes — not by text similarity alone. Renamed, reordered, and differently-styled duplicates are the ones grep misses and the ones that matter most
 4. When the diff removes, replaces, or stops calling something, check whether anything upstream lost its last caller — search the whole codebase the same way step 3 does for duplication, before assuming it's a normal edit
