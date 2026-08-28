@@ -7,6 +7,8 @@
 (declare-plugin "core:git-diff")
 (declare-plugin "core:steel-server")
 
+; ---------------------------------------------------------------------
+
 (bind-key! 'normal "space space" "lsp-goto-definition")
 (bind-key! 'normal "space a" "picker-grep-selection")
 (bind-key! 'normal "space m" "picker-git-modified")
@@ -15,6 +17,16 @@
 (bind-key! 'normal "space d" "lsp-hover")
 (bind-key! 'normal "\\" "goto-alternate-file")
 
+(define-command! "copy-buffer-path"
+  "Copy the current buffer's absolute path to the clipboard register (c)."
+  (lambda ()
+    (let ([path (buffer-path (current-buffer))])
+      (when path ; check for unsaved buffers
+        (write-register! "c" (list path))))))
+
+(bind-key! 'normal "space p" "copy-buffer-path")
+
+; ---------------------------------------------------------------------
 (set-option! "whitespace-space" "trailing")
 (set-option! "whitespace-tab" "all")
 (set-option! "tab-style" "soft")
