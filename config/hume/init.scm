@@ -10,12 +10,12 @@
 ; ---------------------------------------------------------------------
 
 (bind-key! 'normal "space space" "lsp-goto-definition")
-(bind-key! 'normal "space a" "picker-grep-selection")
 (bind-key! 'normal "space m" "picker-git-modified")
 (bind-key! 'normal "space b" "picker-buffers")
 (bind-key! 'normal "space f" "picker-files")
-(bind-key! 'normal "space d" "lsp-hover")
-(bind-key! 'normal "\\" "goto-alternate-file")
+(bind-key! 'normal "space a" "picker-grep")
+(bind-key! 'normal "space k" "lsp-hover")
+(bind-key! 'normal "\\" "goto-alternate-buffer")
 
 (define-command! "copy-buffer-path"
   "Copy the current buffer's absolute path to the clipboard register (c)."
