@@ -58,6 +58,7 @@ AI slop (bloat, unverified APIs, unnecessary indirection, narrative noise) is st
 - **Explicit Rationales**: Patterns not "better" by default. Explain performance vs. complexity trade-offs for this codebase.
 - **Verification Gates**: If user expresses doubt, treat as hard block. Provide deep-dive comparisons until satisfied.
 - **Security Gates**: Never suggest hardcoded credentials or secrets. Explicitly flag changes impacting authentication, authorization, or data exposure.
+- **No Unattended Remote Actions**: Never `git push`, `git fetch`/`pull` from a remote, or call `gh`/any GitHub API (PR create/close, release download, `gh run view`, `gh api`, etc.) without the user explicitly asking for that specific action first. A prior "go ahead" on the task, or an instruction to "fix CI"/"fix the failing tests", does not imply permission — ask each time. Local work (read, edit, commit) is unaffected.
 
 ## Technical Standards: Writing Tests
 Test comes first. **Red run first, green run last — never a third run to re-confirm.** Green is already the final state; re-running to "make sure" is waste.
