@@ -33,6 +33,27 @@ This is the highest-priority rule in this file. It overrides problem-solving ins
 - **Fail Fast**: Design systems to error out loudly and clearly. Avoid silent failures or default fallbacks that mask errors.
 - **Surgical Changes**: Within scope agreed in plan, touch only what is necessary. Constrains incidental additions (drive-by cleanup, reformatting untouched files), NOT scope of agreed plan itself. Shrinking approved refactor to "reduce blast radius" is deviation — see HARD STOP.
 
+## Constraint Relaxation Check
+Restrictions are load-bearing. Before any change that *subtracts* one instead of adding behavior, stop and name the cost.
+
+**Triggers** — any one fires the check:
+- Widening visibility or lifetime: `private`→`pub`/`pub(crate)`, adding `export`, module-local→global, `const`→`mut`, immutable→mutable field.
+- Loosening a type: narrow→`any`/`unknown`/`interface{}`, removing a newtype, adding a nullable/`Option` to dodge a construction site, widening a union or enum.
+- Deleting or softening an assertion, guard clause, invariant check, or error case.
+- Making a failure non-fatal: `unwrap`→default, error→warning log, adding a fallback path, swallowing an exception.
+- Adding a flag, env var, or boolean parameter whose purpose is to let a caller bypass existing behavior.
+
+**Required response when a trigger fires** — one line each, before writing the change:
+1. What invariant the restriction was enforcing.
+2. Who can now do the wrong thing that they could not do before, and how that failure shows up (compile error / loud runtime error / silent corruption / crash).
+3. The alternative that keeps the restriction, and why it was or was not chosen.
+
+If (2) is "any future caller" **and** the failure is silent or a runtime crash, the change is a **DEVIATION** → HARD STOP, ask, wait for approval.
+
+**Smell — the lint tell:** if the fix's own follow-up work is "add a lint / comment / doc so nobody misuses this", the fix was wrong. A compile-time restriction replaced by a warning is a downgrade. Say that out loud instead of writing the lint.
+
+**Tests do not earn an exemption.** A test needing access it does not have is the test's problem, not the API's. Try, in order: exercise it through the public API; put the test *inside* the module (`#[cfg(test)] mod tests` sees private items in Rust; same idea in other languages); a helper gated to test builds only. If none work, report the options and their costs — do not widen the API and move on.
+
 ## Anti-Slop Protocol & Code Quality Standards
 AI slop (bloat, unverified APIs, unnecessary indirection, narrative noise) is strictly unacceptable. All generated code must pass these constraints:
 
@@ -41,9 +62,7 @@ AI slop (bloat, unverified APIs, unnecessary indirection, narrative noise) is st
    - No pass-through wrapper functions around standard library/built-in calls.
    - No generic types, traits/interfaces, or parameters added for a hypothetical second caller.
    - One caller → inline logic.
-3. **Preserve Structural Integrity**:
-   - Never delete or disable existing tests, assertions, or type checks to make code compile or pass CI.
-   - Do not relax strict types to `any` / dynamic / untyped alternatives as a shortcut.
+3. **Preserve Structural Integrity**: Never delete or disable existing tests, assertions, or type checks to make code compile or pass CI — these are Constraint Relaxation triggers; run that check.
 4. **No Residual Scaffolding**: Never commit `// TODO`, placeholder returns, empty catch blocks, or leftover debug/tracing statements.
 5. **Clean Diffs**: Do not reformat untouched code, change whitespace, or rearrange imports outside the active diff scope.
 6. **Comments: Brief and Self-Contained**:
