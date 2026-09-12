@@ -15,6 +15,8 @@
 (bind-key! 'normal "space f" "picker-files")
 (bind-key! 'normal "space a" "picker-grep")
 (bind-key! 'normal "space k" "lsp-hover")
+(bind-key! 'normal "{" "goto-prev-tab")
+(bind-key! 'normal "}" "goto-next-tab")
 (bind-key! 'normal "\\" "goto-alternate-buffer")
 
 (define-command! "copy-buffer-path"
