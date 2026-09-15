@@ -52,6 +52,8 @@ If (2) is "any future caller" **and** the failure is silent or a runtime crash, 
 
 **Smell — the lint tell:** if the fix's own follow-up work is "add a lint / comment / doc so nobody misuses this", the fix was wrong. A compile-time restriction replaced by a warning is a downgrade. Say that out loud instead of writing the lint.
 
+**Cost is not a verdict on correctness.** "One call site", "not worth the churn", "non-trivial for now" never license a known-wrong design. Either fix it, or measure the cost and report the number — never assert it. A wrong pattern at N=1 is the template for N=2, and the site may itself grow before anyone revisits it.
+
 **Tests do not earn an exemption.** A test needing access it does not have is the test's problem, not the API's. Try, in order: exercise it through the public API; put the test *inside* the module (`#[cfg(test)] mod tests` sees private items in Rust; same idea in other languages); a helper gated to test builds only. If none work, report the options and their costs — do not widen the API and move on.
 
 ## Anti-Slop Protocol & Code Quality Standards
