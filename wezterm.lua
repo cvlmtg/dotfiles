@@ -93,6 +93,12 @@ config.term = "xterm-256color"
 config.initial_cols = 100
 config.initial_rows = 40
 
+config.audible_bell = "Disabled"
+config.visual_bell = {
+  fade_in_duration_ms = 0,
+  fade_out_duration_ms = 0,
+}
+
 if is_mac == true then
   config.quit_when_all_windows_are_closed = false
   config.window_decorations = "INTEGRATED_BUTTONS|RESIZE"
@@ -172,9 +178,9 @@ config.keys = {
   { key = "k", mods = "LEADER", action = action.ActivatePaneDirection("Up") },
   { key = "RightArrow", mods = "LEADER", action = action.ActivatePaneDirection("Right") },
   { key = "l", mods = "LEADER", action = action.ActivatePaneDirection("Right") },
-  { key = "c", mods = "LEADER", action = action.SpawnTab("CurrentPaneDomain") },
-  { key = "v", mods = "LEADER", action = action.SplitHorizontal { domain = "DefaultDomain" } },
-  { key = "s", mods = "LEADER", action = action.SplitVertical { domain = "DefaultDomain" } },
+  { key = "c", mods = "LEADER", action = action.SpawnTab("DefaultDomain") },
+  { key = "v", mods = "LEADER", action = action.SplitHorizontal { domain = "CurrentPaneDomain" } },
+  { key = "s", mods = "LEADER", action = action.SplitVertical { domain = "CurrentPaneDomain" } },
   { key = "p", mods = "LEADER", action = action.ActivateTabRelative(-1) },
   { key = "n", mods = "LEADER", action = action.ActivateTabRelative(1) },
   { key = "n", mods = "LEADER", action = action.ActivateTabRelative(1) },
@@ -191,10 +197,28 @@ end
 if is_windows == false then
   config.default_prog = { "/opt/homebrew/bin/fish", "--login" }
 else
+  local pwsh = { "%USERPROFILE%\\AppData\\Local\\Microsoft\\WindowsApps\\pwsh.exe" }
   local bash = { "C:\\Program Files\\Git\\bin\\bash.exe", "--login", "-i" }
-  local pwsh = { "C:\\Program Files\\PowerShell\\7\\pwsh.exe" }
-  local wsl = { "C:\\Windows\\system32\\wsl.exe", "-d", "Ubuntu-24.04" }
-  local wsl_domain = "WSL:Ubuntu-24.04"
+  local wsl_domain = "WSL:Ubuntu-26.04"
+
+  local domain_schemes = {
+    ['local'] = 'MaterialDarker',
+    [wsl_domain] = 'Ubuntu',
+  }
+
+  -- Create an event handler to update the scheme based on the active pane's domain
+  wezterm.on('update-status', function(window, pane)
+    local domain_name = pane:get_domain_name() or 'local'
+    local target_scheme = domain_schemes[domain_name] or config.color_scheme
+
+    local overrides = window:get_config_overrides() or {}
+    local current_scheme = overrides.color_scheme or config.color_scheme
+
+    if current_scheme ~= target_scheme then
+      overrides.color_scheme = target_scheme
+      window:set_config_overrides(overrides)
+    end
+  end)
 
   config.default_domain = "local"
   config.default_prog = bash
@@ -202,7 +226,6 @@ else
     {
       domain = { DomainName = wsl_domain },
       label = wsl_domain,
-      args = wsl,
     },
     {
       domain = { DomainName = "local" },
@@ -216,15 +239,14 @@ else
     },
   }
 
-  -- Add key binding to launch PowerShell with leader+shift+c on Windows
   table.insert(config.keys, {
-    key = "c", mods = "LEADER|SHIFT", action = action.SpawnCommandInNewTab { args = pwsh, domain = { DomainName = "local" } }
+    key = "c", mods = "LEADER|SHIFT", action = action.SpawnCommandInNewTab { domain = { DomainName = wsl_domain } }
   })
   table.insert(config.keys, {
-    key = "v", mods = "LEADER|SHIFT", action = action.SplitHorizontal { args = pwsh, domain = { DomainName = "local" } }
+    key = "v", mods = "LEADER|SHIFT", action = action.SplitHorizontal { domain = { DomainName = wsl_domain } }
   })
   table.insert(config.keys, {
-    key = "s", mods = "LEADER|SHIFT", action = action.SplitVertical { args = pwsh, domain = { DomainName = "local" } }
+    key = "s", mods = "LEADER|SHIFT", action = action.SplitVertical { domain = { DomainName = wsl_domain } }
   })
 
   -- Ctrl+1..9 to switch tabs (matches macOS Cmd+1..9)
