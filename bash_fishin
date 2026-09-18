@@ -1,7 +1,5 @@
 #!/bin/bash
 
-alias vim="nvim"
-
 # don't duplicate commands in history
 export HISTCONTROL=ignoreboth:erasedups
 
@@ -12,6 +10,14 @@ if [[ $- == *i* ]]; then
 fi
 
 # COMMAND ALIASES -----------------------------------------------------
+
+vim() {
+  if command -v nvim &> /dev/null; then
+    nvim "$@"
+  else
+    command vim "$@"
+  fi
+}
 
 function rg() {
   if command -v bat > /dev/null 2>&1; then
