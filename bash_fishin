@@ -9,6 +9,11 @@ if [[ $- == *i* ]]; then
   bind '"\C-w": backward-kill-word'
 fi
 
+# Add ~/.local/bin to PATH if it isn't already there
+if [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
+    export PATH="$HOME/.local/bin:$PATH"
+fi
+
 # COMMAND ALIASES -----------------------------------------------------
 
 vim() {
