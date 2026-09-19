@@ -1,6 +1,7 @@
 # Be 8 bit clean.
 set input-meta on
 set output-meta on
+set bell-style none
 
 # Delete only "bar/" from "foo/bar/" with ctrl-w
 "\C-w": backward-kill-word
