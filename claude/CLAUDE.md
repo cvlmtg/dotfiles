@@ -24,14 +24,14 @@ This is the highest-priority rule in this file. It overrides problem-solving ins
   - Pattern: [thing] [action] [reason]. [next step].
 
 ## Core Principles
-- **Find Root Causes**: No temporary fixes. Address the underlying issue.
-- **Demand Elegance**: For non-trivial changes, ask "is there a more elegant solution?". If a fix feels hacky, re-implement cleanly. Flag major refactors as a separate Plan Node.
+- **Find Root Causes**: No temporary fixes. Address the underlying issue — at the altitude the design needs, not the smallest one that makes the symptom go away. See **Fix Altitude**.
+- **Demand Elegance**: For non-trivial changes, ask "is there a more elegant solution?". If a fix feels hacky, re-implement cleanly. A major refactor is a plan node, not a deferral — propose it in *this* plan and let the user decide. Never patch locally and file the real fix as future work. See **Fix Altitude**.
 - **Verification Before Done**: Ask yourself: "Would a staff engineer approve this?"
 - **KISS & YAGNI**: Choose the simplest solution that works. Avoid unnecessary abstractions, speculative generics, or indirection.
 - **Single Source of Truth (SSOT)**: Data and configuration live in one place. Derive other states from that source.
 - **One Action, One Implementation**: When several input paths trigger the same action (command name, scripting-engine function, keybinding, CLI flag, HTTP route), every one must call the same function. Entry points only translate their own input, then delegate. Two pieces of code producing the same outcome is an architectural bug — not acceptable duplication. Corollary to *Zero Uncalled Abstractions*: multiple real callers is precisely when a shared function is mandatory.
 - **Fail Fast**: Design systems to error out loudly and clearly. Avoid silent failures or default fallbacks that mask errors.
-- **Surgical Changes**: Within scope agreed in plan, touch only what is necessary. Constrains incidental additions (drive-by cleanup, reformatting untouched files), NOT scope of agreed plan itself. Shrinking approved refactor to "reduce blast radius" is deviation — see HARD STOP.
+- **Surgical Changes**: Within scope agreed in plan, touch only what is necessary. Constrains incidental additions (drive-by cleanup, reformatting untouched files), NOT scope of agreed plan itself. Shrinking approved refactor to "reduce blast radius" is deviation — see HARD STOP. Governs execution, not design: never an argument for *proposing* a smaller fix — see **Fix Altitude**.
 
 ## Constraint Relaxation Check
 Restrictions are load-bearing. Before any change that *subtracts* one instead of adding behavior, stop and name the cost.
@@ -56,6 +56,29 @@ If (2) is "any future caller" **and** the failure is silent or a runtime crash, 
 
 **Tests do not earn an exemption.** A test needing access it does not have is the test's problem, not the API's. Try, in order: exercise it through the public API; put the test *inside* the module (`#[cfg(test)] mod tests` sees private items in Rust; same idea in other languages); a helper gated to test builds only. If none work, report the options and their costs — do not widen the API and move on.
 
+## Fix Altitude
+Governs **design time** — what to propose. Once a plan is agreed, **Surgical Changes** governs execution; this rule never licenses widening scope mid-plan (see HARD STOP).
+
+Two altitudes for any fix:
+- **Local** — patch at the failure site. Surrounding design unchanged.
+- **End-to-end** — change what made the failure possible: the type, the ownership boundary, the funnel — and every site of the same bug class.
+
+**Default is end-to-end.** A local fix is the exception. A project `CLAUDE.md` may set `default altitude: local` to invert this for that repo; absent that line, end-to-end is the default.
+
+**Every plan states its altitude on one line.** A plan proposing **local** must also state, before the steps:
+1. **End-to-end alternative declined** — concretely which type, boundary, or funnel would change.
+2. **Why local anyway** — the argument for this specific case.
+
+A local-altitude plan missing (1) or (2) is a rule violation, not a style miss. Naming the alternative is the entire point: an oversized end-to-end plan is visible and costs one sentence to reject, while a local patch presented as the correct fix is indistinguishable from one.
+
+**Forced end-to-end** — any one of these means local is insufficient on its own, and the plan names which fired:
+- The local fix trips a **Constraint Relaxation** trigger (widening visibility, loosening a type, softening a guard, adding a bypass flag).
+- The same bug class exists at another site, or the fix carries "also remember to do X at the other N call sites".
+- The fix's own follow-up work is a lint, a comment, or a doc telling future callers not to misuse it.
+- No external caller depends on the shape being patched — the code is still young enough to change freely.
+
+**User override is cheap and final**: "local fix", "just patch it", "don't refactor" sets the altitude for that task. No argument, no re-litigation.
+
 ## Anti-Slop Protocol & Code Quality Standards
 AI slop (bloat, unverified APIs, unnecessary indirection, narrative noise) is strictly unacceptable. All generated code must pass these constraints:
 
@@ -64,6 +87,7 @@ AI slop (bloat, unverified APIs, unnecessary indirection, narrative noise) is st
    - No pass-through wrapper functions around standard library/built-in calls.
    - No generic types, traits/interfaces, or parameters added for a hypothetical second caller.
    - One caller → inline logic.
+   - **Not speculative**: a funnel or type that an end-to-end fix or **One Action, One Implementation** *requires* is structural, not speculative — built at N=1 because the design demands it, not for a hypothetical second caller.
 3. **Preserve Structural Integrity**: Never delete or disable existing tests, assertions, or type checks to make code compile or pass CI — these are Constraint Relaxation triggers; run that check.
 4. **No Residual Scaffolding**: Never commit `// TODO`, placeholder returns, empty catch blocks, or leftover debug/tracing statements.
 5. **Clean Diffs**: Do not reformat untouched code, change whitespace, or rearrange imports outside the active diff scope.
@@ -97,7 +121,7 @@ Test comes first. **Red run first, green run last — never a third run to re-co
 ### 1. Planning & Subagents
 - **Plan Mode**: Enter plan mode for any task involving 3+ steps or architectural decisions.
 - **Subagent Strategy**: Use subagents liberally for research, parallel analysis, or focused tasks.
-- **Subagent Context**: Pass clear technical debriefing to subagents. **Include the HARD STOP rule explicitly.**
+- **Subagent Context**: Pass clear technical debriefing to subagents. **Include the HARD STOP rule explicitly**, plus the **Fix Altitude** default (and any task-specific override the user has given).
 - **Halt & Re-plan**: If a task goes sideways, STOP immediately. Do not push through a failing approach. Report blocker and wait.
 - You have MemPalace agents. Run `mempalace_list_agents` to see them.
 
@@ -114,7 +138,7 @@ Test comes first. **Red run first, green run last — never a third run to re-co
 
 ## Task Management Protocol
 1. **Session Start**: Read `LESSONS.md` before work begins. Apply listed patterns proactively.
-2. **Verify Plan**: Wait for "go-ahead" before starting implementation.
+2. **Verify Plan**: Plan opens with its **Fix Altitude** line; a local altitude carries the declined end-to-end alternative and the reason. Wait for "go-ahead" before starting implementation.
 3. **Step-by-Step Confirmation**: After each step, briefly report outcome and confirm alignment before proceeding.
 4. **Track & Document**: Mark items complete in `ROADMAP.md` or `SPEC.md`. Summarize changes per step.
 5. **Final Validation & Pre-Done Checklist**: Never mark task done without proof of correctness (logs, tests, diff behavior) AND a pre-done self-review pass over diff. Run self-review while implementation context is hot — catches obvious wins so `/simplify` has less to do. One full verification run per change, formatter first: run project's full suite/CI script exactly once, after formatting — not before, not again after. Narrow targeted runs while iterating are fine; repeating whole suite to "confirm" a formatter or other no-op step is not.
