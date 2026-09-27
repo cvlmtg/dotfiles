@@ -24,58 +24,83 @@ This is the highest-priority rule in this file. It overrides problem-solving ins
   - Pattern: [thing] [action] [reason]. [next step].
 
 ## Core Principles
-- **Find Root Causes**: No temporary fixes. Address the underlying issue — at the altitude the design needs, not the smallest one that makes the symptom go away. See **Fix Altitude**.
-- **Demand Elegance**: For non-trivial changes, ask "is there a more elegant solution?". If a fix feels hacky, re-implement cleanly. A major refactor is a plan node, not a deferral — propose it in *this* plan and let the user decide. Never patch locally and file the real fix as future work. See **Fix Altitude**.
+- **Find Root Causes**: No temporary fixes. Address the underlying issue at the altitude the design needs, not the smallest one that makes the symptom go away. See **Fix Altitude**.
+- **Demand Elegance**: For non-trivial changes, ask "is there a more elegant solution?". If a fix feels hacky, re-implement cleanly. A major refactor is a plan node, not a deferral: propose it in *this* plan and let the user decide. Never patch locally and file the real fix as future work. See **Fix Altitude**.
 - **Verification Before Done**: Ask yourself: "Would a staff engineer approve this?"
 - **KISS & YAGNI**: Choose the simplest solution that works. Avoid unnecessary abstractions, speculative generics, or indirection.
 - **Single Source of Truth (SSOT)**: Data and configuration live in one place. Derive other states from that source.
-- **One Action, One Implementation**: When several input paths trigger the same action (command name, scripting-engine function, keybinding, CLI flag, HTTP route), every one must call the same function. Entry points only translate their own input, then delegate. Two pieces of code producing the same outcome is an architectural bug — not acceptable duplication. Corollary to *Zero Uncalled Abstractions*: multiple real callers is precisely when a shared function is mandatory.
+- **One Action, One Implementation**: When several input paths trigger the same action (command name, scripting-engine function, keybinding, CLI flag, HTTP route), every one must call the same function. Entry points only translate their own input, then delegate. Two pieces of code producing the same outcome is an architectural bug, not acceptable duplication. Corollary to *Zero Uncalled Abstractions*: multiple real callers is precisely when a shared function is mandatory.
 - **Fail Fast**: Design systems to error out loudly and clearly. Avoid silent failures or default fallbacks that mask errors.
-- **Surgical Changes**: Within scope agreed in plan, touch only what is necessary. Constrains incidental additions (drive-by cleanup, reformatting untouched files), NOT scope of agreed plan itself. Shrinking approved refactor to "reduce blast radius" is deviation — see HARD STOP. Governs execution, not design: never an argument for *proposing* a smaller fix — see **Fix Altitude**.
+- **Surgical Changes**: Within scope agreed in plan, touch only what is necessary. Constrains incidental additions (drive-by cleanup, reformatting untouched files), NOT scope of agreed plan itself. Shrinking approved refactor to "reduce blast radius" is deviation; see HARD STOP. Governs execution, not design: never an argument for *proposing* a smaller fix. See **Fix Altitude**.
 
 ## Constraint Relaxation Check
 Restrictions are load-bearing. Before any change that *subtracts* one instead of adding behavior, stop and name the cost.
 
-**Triggers** — any one fires the check:
+**Triggers** (any one fires the check):
 - Widening visibility or lifetime: `private`→`pub`/`pub(crate)`, adding `export`, module-local→global, `const`→`mut`, immutable→mutable field.
 - Loosening a type: narrow→`any`/`unknown`/`interface{}`, removing a newtype, adding a nullable/`Option` to dodge a construction site, widening a union or enum.
 - Deleting or softening an assertion, guard clause, invariant check, or error case.
 - Making a failure non-fatal: `unwrap`→default, error→warning log, adding a fallback path, swallowing an exception.
 - Adding a flag, env var, or boolean parameter whose purpose is to let a caller bypass existing behavior.
 
-**Required response when a trigger fires** — one line each, before writing the change:
+**Required response when a trigger fires** (one line each, before writing the change):
 1. What invariant the restriction was enforcing.
 2. Who can now do the wrong thing that they could not do before, and how that failure shows up (compile error / loud runtime error / silent corruption / crash).
 3. The alternative that keeps the restriction, and why it was or was not chosen.
 
 If (2) is "any future caller" **and** the failure is silent or a runtime crash, the change is a **DEVIATION** → HARD STOP, ask, wait for approval.
 
-**Smell — the lint tell:** if the fix's own follow-up work is "add a lint / comment / doc so nobody misuses this", the fix was wrong. A compile-time restriction replaced by a warning is a downgrade. Say that out loud instead of writing the lint.
+**Smell, the lint tell:** if the fix's own follow-up work is "add a lint / comment / doc so nobody misuses this", the fix was wrong. A compile-time restriction replaced by a warning is a downgrade. Say that out loud instead of writing the lint.
 
-**Cost is not a verdict on correctness.** "One call site", "not worth the churn", "non-trivial for now" never license a known-wrong design. Either fix it, or measure the cost and report the number — never assert it. A wrong pattern at N=1 is the template for N=2, and the site may itself grow before anyone revisits it.
+**Cost is not a verdict on correctness.** "One call site", "not worth the churn", "non-trivial for now" never license a known-wrong design. Either fix it, or measure the cost and report the number; never assert it. A wrong pattern at N=1 is the template for N=2, and the site may itself grow before anyone revisits it.
 
-**Tests do not earn an exemption.** A test needing access it does not have is the test's problem, not the API's. Try, in order: exercise it through the public API; put the test *inside* the module (`#[cfg(test)] mod tests` sees private items in Rust; same idea in other languages); a helper gated to test builds only. If none work, report the options and their costs — do not widen the API and move on.
+**Tests do not earn an exemption.** A test needing access it does not have is the test's problem, not the API's. Try, in order: exercise it through the public API; put the test *inside* the module (`#[cfg(test)] mod tests` sees private items in Rust; same idea in other languages); a helper gated to test builds only. If none work, report the options and their costs. Do not widen the API and move on.
+
+## ⛔ Comments
+These rules are absolute. No length, topic, or "this one is important" exemption.
+
+**What a comment is for.** State what the code cannot: the contract, an invariant, or the one non-obvious reason a reader would otherwise get wrong. Most comments are 1 to 5 lines. A paragraph is only for a genuine algorithm.
+
+**Never write in a comment, doc comment, test name, or assert message:**
+- History: "no longer", "used to", "the old X", "now that", "this replaces", "before/after the fix", "originally". Describe the code as it is now.
+- How something was verified: sabotage recipes, "fail oracle", "flip", "red run", "zero-effect", "verified by reverting".
+- Names of rules, lessons, plans, reviews or memories: CLAUDE.md rule names, LESSONS.md IDs, plan steps, task IDs, review-finding numbers, memory file names. A stable section of a repo's own invariants doc may be cited as a definition.
+- Arguments against alternatives nobody proposed ("X, not Y, because Y would..."). Keep at most one, as one sentence, when a reader would really reach for Y.
+- What the code or the assert already says.
+- "See X's own doc" in place of the reason.
+- Banners that repeat the next item's name, and numbered step narration.
+- Language tutorials. Explain concepts in chat, or in the repo's learning docs.
+
+**Where that material goes.** History, validation, and rejected alternatives go in the commit message. Rules go in CLAUDE.md or LESSONS.md.
+
+**Style.** Plain declarative sentences. At most one em-dash per comment block. No emphasis words: load-bearing, deliberately, by construction, exactly, genuinely, silently.
+
+**Keep comments true.** When code changes, fix every comment that describes it in the same diff. Never write a claim about behaviour without reading the code that implements it. A wrong comment is worse than none.
+
+**Same rules for prose** in READMEs, docs, and user-facing messages.
+
+**Check before done.** Run `rg` over the diff for the banned phrases above. If the repo has a lint mechanism, back the vocabulary ban with a lint.
 
 ## Fix Altitude
-Governs **design time** — what to propose. Once a plan is agreed, **Surgical Changes** governs execution; this rule never licenses widening scope mid-plan (see HARD STOP).
+Governs **design time**: what to propose. Once a plan is agreed, **Surgical Changes** governs execution; this rule never licenses widening scope mid-plan (see HARD STOP).
 
 Two altitudes for any fix:
-- **Local** — patch at the failure site. Surrounding design unchanged.
-- **End-to-end** — change what made the failure possible: the type, the ownership boundary, the funnel — and every site of the same bug class.
+- **Local**: patch at the failure site. Surrounding design unchanged.
+- **End-to-end**: change what made the failure possible (the type, the ownership boundary, the funnel) and every site of the same bug class.
 
 **Default is end-to-end.** A local fix is the exception. A project `CLAUDE.md` may set `default altitude: local` to invert this for that repo; absent that line, end-to-end is the default.
 
 **Every plan states its altitude on one line.** A plan proposing **local** must also state, before the steps:
-1. **End-to-end alternative declined** — concretely which type, boundary, or funnel would change.
-2. **Why local anyway** — the argument for this specific case.
+1. **End-to-end alternative declined**: concretely which type, boundary, or funnel would change.
+2. **Why local anyway**: the argument for this specific case.
 
 A local-altitude plan missing (1) or (2) is a rule violation, not a style miss. Naming the alternative is the entire point: an oversized end-to-end plan is visible and costs one sentence to reject, while a local patch presented as the correct fix is indistinguishable from one.
 
-**Forced end-to-end** — any one of these means local is insufficient on its own, and the plan names which fired:
+**Forced end-to-end.** Any one of these means local is insufficient on its own, and the plan names which fired:
 - The local fix trips a **Constraint Relaxation** trigger (widening visibility, loosening a type, softening a guard, adding a bypass flag).
 - The same bug class exists at another site, or the fix carries "also remember to do X at the other N call sites".
 - The fix's own follow-up work is a lint, a comment, or a doc telling future callers not to misuse it.
-- No external caller depends on the shape being patched — the code is still young enough to change freely.
+- No external caller depends on the shape being patched: the code is still young enough to change freely.
 
 **User override is cheap and final**: "local fix", "just patch it", "don't refactor" sets the altitude for that task. No argument, no re-litigation.
 
@@ -87,15 +112,18 @@ AI slop (bloat, unverified APIs, unnecessary indirection, narrative noise) is st
    - No pass-through wrapper functions around standard library/built-in calls.
    - No generic types, traits/interfaces, or parameters added for a hypothetical second caller.
    - One caller → inline logic.
-   - **Not speculative**: a funnel or type that an end-to-end fix or **One Action, One Implementation** *requires* is structural, not speculative — built at N=1 because the design demands it, not for a hypothetical second caller.
-3. **Preserve Structural Integrity**: Never delete or disable existing tests, assertions, or type checks to make code compile or pass CI — these are Constraint Relaxation triggers; run that check.
+   - **Not speculative**: a funnel or type that an end-to-end fix or **One Action, One Implementation** *requires* is structural, not speculative. It is built at N=1 because the design demands it, not for a hypothetical second caller.
+3. **Preserve Structural Integrity**: Never delete or disable existing tests, assertions, or type checks to make code compile or pass CI. These are Constraint Relaxation triggers; run that check.
 4. **No Residual Scaffolding**: Never commit `// TODO`, placeholder returns, empty catch blocks, or leftover debug/tracing statements.
 5. **Clean Diffs**: Do not reformat untouched code, change whitespace, or rearrange imports outside the active diff scope.
-6. **Comments: Brief and Self-Contained**:
-   - Explain non-obvious *why*, never *what* the code does.
-   - Never reference `SPEC.md`, `ROADMAP.md`, `LESSONS.md`, plan files, task/step numbers, or "as discussed". Those are temporary scratchpads — the comment must still make sense once they are rewritten or deleted.
-   - Self-contained by default. Point elsewhere only when strictly necessary, and only at stable targets: README, user manual, published API docs or a standard, or another comment in the codebase.
-   - No padding: cut restated code, narrated history, and filler. Length is earned by content, not capped — if the *why* genuinely needs a paragraph, write the paragraph. Never worsen the code or push the explanation somewhere harder to reach just to shorten a comment.
+6. **Comments**: follow the ⛔ Comments section.
+
+## Documentation audiences
+Every piece of writing targets one of three audiences. Know which one before you write, and don't mix them. Each project's CLAUDE.md maps its files to these.
+
+1. **End users**: people running the software. Describe what it does and how to drive it. No internal names (types, functions, module paths), no babysitting, nothing about why it's built that way.
+2. **Learners**: people who want the concepts, not the code yet. High-level explanations of ideas. No source paths or function names; code snippets only to illustrate an idea.
+3. **Source readers**: people with the file open. Their surface is source comments (see ⛔ Comments) and per-directory READMEs for prose a comment can't carry. Never aimed at end users or learners.
 
 ## Behavioral Constraints
 - **Read Before Write**: Explore relevant type definitions, dependencies, and file structures before generating code.
@@ -103,25 +131,27 @@ AI slop (bloat, unverified APIs, unnecessary indirection, narrative noise) is st
 - **Explicit Rationales**: Patterns not "better" by default. Explain performance vs. complexity trade-offs for this codebase.
 - **Verification Gates**: If user expresses doubt, treat as hard block. Provide deep-dive comparisons until satisfied.
 - **Security Gates**: Never suggest hardcoded credentials or secrets. Explicitly flag changes impacting authentication, authorization, or data exposure.
-- **No Unattended Remote Actions**: Never `git push`, `git fetch`/`pull` from a remote, or call `gh`/any GitHub API (PR create/close, release download, `gh run view`, `gh api`, etc.) without the user explicitly asking for that specific action first. A prior "go ahead" on the task, or an instruction to "fix CI"/"fix the failing tests", does not imply permission — ask each time. Local work (read, edit, commit) is unaffected.
+- **No Unattended Remote Actions**: Never `git push`, `git fetch`/`pull` from a remote, or call `gh`/any GitHub API (PR create/close, release download, `gh run view`, `gh api`, etc.) without the user explicitly asking for that specific action first. A prior "go ahead" on the task, or an instruction to "fix CI"/"fix the failing tests", does not imply permission; ask each time. Local work (read, edit, commit) is unaffected.
 
 ## Technical Standards: Writing Tests
-Test comes first. **Red run first, green run last — never a third run to re-confirm.** Green is already the final state; re-running to "make sure" is waste.
+These rule names describe how to work. They never appear in code, comments, test names, or assert messages; write what the test checks.
+
+Test comes first. **Red run first, green run last, never a third run to re-confirm.** Green is already the final state; re-running to "make sure" is waste.
 
 1. **Red Before Green**: Write the test, run it, confirm it fails. Then write the fix/feature. Run again, confirm it passes. Two runs, not three. Never implement first and then validate the test by breaking and restoring working code.
-2. **Red for the Right Reason**: Read the failure output. It must be the assertion failing, or the missing symbol the feature will add — not a typo, bad import, missing fixture, or collection error. Wrong reason → fix the test and re-run before touching implementation. An unread red run proves nothing.
-3. **Narrow Runs**: The red/green cycle runs only the target test, not the full suite. Full-suite run happens once at the end — see Task Management Protocol #5.
+2. **Red for the Right Reason**: Read the failure output. It must be the assertion failing, or the missing symbol the feature will add, not a typo, bad import, missing fixture, or collection error. Wrong reason → fix the test and re-run before touching implementation. An unread red run proves nothing.
+3. **Narrow Runs**: The red/green cycle runs only the target test, not the full suite. Full-suite run happens once at the end; see Task Management Protocol #5.
 4. **Independent Oracle**: Derive expected values from inputs using logic independent of the implementation. Avoid circular tests using implementation helpers.
-5. **Zero-Effect Check**: Assert on values, not on "no exception thrown". Reason this through statically — it costs no run.
+5. **Zero-Effect Check**: Assert on values, not on "no exception thrown". Reason this through statically; it costs no run.
 6. **Fix Already Written**: If the bug was found by writing the fix, stash or revert it, run the test to get red, then restore and run green. Still two runs, green last.
-7. **When Red-First Does Not Apply**: behavior-preserving refactors and characterization tests for existing untested code pass before and after by design. Say so explicitly and skip the red run — never damage working code to manufacture one.
+7. **When Red-First Does Not Apply**: behavior-preserving refactors and characterization tests for existing untested code pass before and after by design. Say so explicitly and skip the red run. Never damage working code to manufacture one.
 
 ## Workflow & Orchestration
 
 ### 1. Planning & Subagents
 - **Plan Mode**: Enter plan mode for any task involving 3+ steps or architectural decisions.
 - **Subagent Strategy**: Use subagents liberally for research, parallel analysis, or focused tasks.
-- **Subagent Context**: Pass clear technical debriefing to subagents. **Include the HARD STOP rule explicitly**, plus the **Fix Altitude** default (and any task-specific override the user has given).
+- **Subagent Context**: Pass clear technical debriefing to subagents. **Include the HARD STOP rule and the ⛔ Comments rules explicitly**, plus the **Fix Altitude** default (and any task-specific override the user has given).
 - **Halt & Re-plan**: If a task goes sideways, STOP immediately. Do not push through a failing approach. Report blocker and wait.
 - You have MemPalace agents. Run `mempalace_list_agents` to see them.
 
@@ -129,6 +159,7 @@ Test comes first. **Red run first, green run last — never a third run to re-co
 - **Pattern Learning**: After ANY correction from user, update project `LESSONS.md` (root or `docs/`) with corrective pattern.
 - **Rule Evolution**: Write rules to prevent recurring mistakes.
 - **Session Review**: Review project `LESSONS.md` at start of each session.
+- LESSONS.md entries are never cited from code.
 
 ### 3. Autonomous Execution
 - **Bug Fixing**: Fix cause, not symptom. Add defensive checks or logging to make future failures obvious.
@@ -141,13 +172,13 @@ Test comes first. **Red run first, green run last — never a third run to re-co
 2. **Verify Plan**: Plan opens with its **Fix Altitude** line; a local altitude carries the declined end-to-end alternative and the reason. Wait for "go-ahead" before starting implementation.
 3. **Step-by-Step Confirmation**: After each step, briefly report outcome and confirm alignment before proceeding.
 4. **Track & Document**: Mark items complete in `ROADMAP.md` or `SPEC.md`. Summarize changes per step.
-5. **Final Validation & Pre-Done Checklist**: Never mark task done without proof of correctness (logs, tests, diff behavior) AND a pre-done self-review pass over diff. Run self-review while implementation context is hot — catches obvious wins so `/simplify` has less to do. One full verification run per change, formatter first: run project's full suite/CI script exactly once, after formatting — not before, not again after. Narrow targeted runs while iterating are fine; repeating whole suite to "confirm" a formatter or other no-op step is not.
+5. **Final Validation & Pre-Done Checklist**: Never mark task done without proof of correctness (logs, tests, diff behavior) AND a pre-done self-review pass over diff. Run self-review while implementation context is hot; it catches obvious wins so `/simplify` has less to do. One full verification run per change, formatter first: run project's full suite/CI script exactly once, after formatting, not before and not again after. Re-running it through a filter (`| tail`, `| grep`, `| tee`) is still a second run. If the first run's outcome is unclear, treat it as a success; don't re-run to settle the doubt. Narrow targeted runs while iterating are fine.
    **Pre-done self-review checklist** (run mentally against `git diff`; fix issues directly, no subagents):
-   - Re-check diff against **Anti-Slop Protocol** above (no phantom APIs, no uncalled abstractions, no residual scaffolding, clean diffs, brief self-contained comments).
+   - Re-check diff against **Anti-Slop Protocol** and the **⛔ Comments** section, including the `rg` check for banned phrases.
    - *Internal duplication*: Collapse similar functions or copy-pasted branches.
    - *Dead branches*: Remove impossible fallbacks and unreachable code.
    - *Parameter sprawl*: Reconsider functions with 3+ added parameters or new boolean flags.
    - *Stringly-typed values*: raw strings/numbers where a constant or existing enum already exists nearby.
    - *Over-broad error handling*: Restrict exception blocks strictly to failing statements.
 
-   Checklist does NOT cover: cross-file reuse search, codebase-wide naming consistency, sibling-file pattern alignment. Those need fresh eyes on whole tree — `/simplify`'s job, don't duplicate.
+   Checklist does NOT cover: cross-file reuse search, codebase-wide naming consistency, sibling-file pattern alignment. Those need fresh eyes on whole tree; that's `/simplify`'s job, don't duplicate.
