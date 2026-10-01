@@ -52,7 +52,8 @@
 (define (primary-head pane)
   (let loop ([sels (or (buffer-selections pane) '())])
     (cond [(null? sels) #f]
-          [(caddr (car sels)) (cadr (car sels))]
+          [(call! "stdlib/selection-primary?" (car sels))
+           (call! "stdlib/selection-head" (car sels))]
           [else (loop (cdr sels))])))
 
 (define (cased-letter? c)
@@ -61,7 +62,7 @@
 (define (letter-before-cursor? pane)
   (let ([head (primary-head pane)])
     (and head
-         (let* ([line (- (offset->line pane head) 1)]
+         (let* ([line (offset->line pane head)]
                 [col  (- head (line->offset pane line))])
            (and (> col 0)
                 (cased-letter?
@@ -84,8 +85,8 @@
   (let ([a (call! "stdlib/selection-anchor" sel)]
         [h (call! "stdlib/selection-head" sel)])
     (buffer-lines bid
-                  #:start (- (offset->line bid (min a h)) 1)
-                  #:end (offset->line bid (max a h)))))
+                  #:start (offset->line bid (min a h))
+                  #:end (+ (offset->line bid (max a h)) 1))))
 
 ; `indent`/`unindent` act on whole lines but skip blank ones (empty or
 ; whitespace-only), so a linewise selection covering nothing but blank lines
