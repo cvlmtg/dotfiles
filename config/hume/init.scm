@@ -3,10 +3,12 @@
 (load-plugin! "core:buffer-words")
 (load-plugin! "core:vim-keybind")
 (load-plugin! "cvlmtg/grep.hume")
-(declare-plugin! "core:plum")
-(declare-plugin! "core:lsp")
-(declare-plugin! "core:git-diff")
-(declare-plugin! "core:steel-server")
+(load-plugin! "core:plum")
+(load-plugin! "core:lsp")
+(load-plugin! "core:lsp-install")
+(load-plugin! "core:undotree")
+(load-plugin! "core:git-diff")
+(load-plugin! "core:steel-server")
 
 ; ---------------------------------------------------------------------
 
