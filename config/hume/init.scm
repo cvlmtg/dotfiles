@@ -45,6 +45,14 @@
 
 (bind-key! 'normal "space p" "copy-buffer-path")
 
+; LSP -----------------------------------------------------------------
+
+(for-each
+  (lambda (lang)
+    (set-language-servers! lang
+      '("typescript-language-server" "vscode-eslint-language-server")))
+  '("javascript" "jsx" "typescript" "tsx"))
+
 ; TAB -----------------------------------------------------------------
 
 ; Complete after a letter; insert a tab everywhere else (start of line,
