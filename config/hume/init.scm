@@ -4,7 +4,7 @@
 (load-plugin! "core:vim-keybind")
 (load-plugin! "cvlmtg/grep.hume")
 (load-plugin! "core:plum")
-(load-plugin! "core:lsp")
+(load-plugin! "core:lsp" #:config (hash "inlay-hints" #t))
 (load-plugin! "core:lsp-install")
 (load-plugin! "core:undotree")
 (load-plugin! "core:git-diff")
@@ -21,7 +21,6 @@
 (set-option! "whitespace-tab" "all")
 (set-option! "tab-style" "soft")
 (set-option! "tab-width" "2")
-(set-option! "lsp.inlay-hints" "true")
 (set-option! "signcolumn" "always:2")
 
 ; ---------------------------------------------------------------------
@@ -44,6 +43,15 @@
         (write-register! "c" (list path))))))
 
 (bind-key! 'normal "space p" "copy-buffer-path")
+
+(define-typed-command! "trim-trailing"
+  "Remove trailing spaces and tabs."
+  (lambda (pane)
+    (when (selections-charwise? pane)
+      (select-all pane))
+    (when (sift-within pane "(?m)[ \t]+$")
+      (delete-selection pane)
+      (keep-primary-selection pane))))
 
 ; LSP -----------------------------------------------------------------
 
@@ -83,7 +91,7 @@
   "Complete after a letter, otherwise insert a tab."
   (lambda (pane)
     (if (letter-before-cursor? pane)
-        (call! "completion-trigger" pane)
+        (completion-trigger pane)
         (insert-key! pane "tab"))))
 
 (bind-key! 'insert "tab" "tab-or-complete")
@@ -116,15 +124,15 @@
   "Indent when every selection is linewise with text, otherwise focus the next pane."
   (lambda (bid)
     (if (indent-would-edit? bid)
-        (call! "indent" bid)
-        (call! "pane-focus-next" bid))))
+        (indent bid)
+        (pane-focus-next bid))))
 
 (define-command! "unindent-or-focus-pane"
   "Unindent when every selection is linewise with text, otherwise focus the next pane."
   (lambda (bid)
     (if (indent-would-edit? bid)
-        (call! "unindent" bid)
-        (call! "pane-focus-next" bid))))
+        (unindent bid)
+        (pane-focus-next bid))))
 
 ; Without the kitty protocol, Tab and Ctrl-i are the same byte (0x09), so
 ; rebinding "tab" here also removes jump-forward from the keyboard entirely.
