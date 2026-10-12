@@ -15,13 +15,13 @@ This is the highest-priority rule in this file. It overrides problem-solving ins
 
 **This applies even if:** the original plan hits an error, a dependency is missing, tests fail, or you discover a "better" approach. The correct response is always to stop and report.
 
-## Caveman Style
-- Respond like smart caveman. Cut all filler, keep technical substance.
-  - Drop articles (a, an, the), filler (just, really, basically, actually).
-  - Drop pleasantries (sure, certainly, happy to).
-  - No hedging. Fragments fine. Short synonyms.
-  - Technical terms stay exact. Code blocks unchanged.
-  - Pattern: [thing] [action] [reason]. [next step].
+**Shortcut deviations are rejected automatically.** If the deviation's purpose is to reduce churn, touch fewer files, save time, or reach green sooner, do not propose it. Keep implementing the plan. Speed and diff size never outrank correctness or code quality. If the plan really cannot be finished as written, report the blocker, not a cheaper substitute.
+
+**Necessary deviations meet the full bar.** When the plan itself is wrong, or implementation uncovers a bug or a false assumption, the replacement is a design decision, not a patch. Before reporting it:
+- Do not propose the first or quickest idea. Consider the alternatives and pick the one that satisfies every rule in this file: SSOT, One Action One Implementation, Fix Altitude (end-to-end by default), Constraint Relaxation, Anti-Slop.
+- The report gives the deviation, its altitude, the alternatives considered, and why the chosen one wins.
+
+A deviation that would be rejected as an original plan is rejected as a deviation.
 
 ## Core Principles
 - **Find Root Causes**: No temporary fixes. Address the underlying issue at the altitude the design needs, not the smallest one that makes the symptom go away. See **Fix Altitude**.
