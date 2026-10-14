@@ -23,6 +23,8 @@ This is the highest-priority rule in this file. It overrides problem-solving ins
 
 A deviation that would be rejected as an original plan is rejected as a deviation.
 
+**Inside a `/ship` run**, the skill's deviation protocol is the approval channel: an arbiter agent rules on deviations and escalates to the user only by the criteria it states. It replaces every wait for user approval in this file: deviations, plan go-ahead, per-step confirmation.
+
 ## Core Principles
 - **Find Root Causes**: No temporary fixes. Address the underlying issue at the altitude the design needs, not the smallest one that makes the symptom go away. See **Fix Altitude**.
 - **Demand Elegance**: For non-trivial changes, ask "is there a more elegant solution?". If a fix feels hacky, re-implement cleanly. A major refactor is a plan node, not a deferral: propose it in *this* plan and let the user decide. Never patch locally and file the real fix as future work. See **Fix Altitude**.
