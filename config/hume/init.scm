@@ -138,3 +138,27 @@
 ; rebinding "tab" here also removes jump-forward from the keyboard entirely.
 (bind-key! 'normal "tab" "indent-or-focus-pane")
 (bind-key! 'normal "shift-tab" "unindent-or-focus-pane")
+
+; GIT DIFF ------------------------------------------------------------
+
+; Off when inline diff is on, pointing the gutter signs back at HEAD first (the
+; ref is shared with the signs; show-inline-diff sets it, the toggle then turns
+; inline off). Otherwise on against HEAD when the tree is dirty
+; (`git diff --quiet` exits 1), HEAD^ when it is clean (exits 0).
+(define-command! "toggle-inline-diff-auto"
+  "Toggle inline git diff: against HEAD when the tree is dirty, HEAD^ when clean."
+  (lambda (pane)
+    (if (call! "git-diff/inline-diff?" pane)
+        (begin
+          (call! "git-diff/show-inline-diff" pane "HEAD")
+          (call! "git-diff/toggle-inline-diff" pane))
+        (let ([path (buffer-path pane)])
+          (when path
+            (spawn-async! "git" '("diff" "--quiet" "HEAD")
+              (lambda (stdout stderr code)
+                (cond [(= code 0) (call! "git-diff/show-inline-diff" pane "HEAD^")]
+                      [(= code 1) (call! "git-diff/show-inline-diff" pane "HEAD")]
+                      [else (log! 'warn (string-append "git diff failed: " (trim stderr)))]))
+              #:cwd (parent-name path)))))))
+
+(bind-key! 'normal "space d" "toggle-inline-diff-auto")
