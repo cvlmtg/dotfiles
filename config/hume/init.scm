@@ -80,11 +80,12 @@
 (define (letter-before-cursor? pane)
   (let ([head (primary-head pane)])
     (and head
-         (let* ([line (offset->line pane head)]
-                [col  (- head (line->offset pane line))])
+         (let* ([line (char-offset->line pane head)]
+                [col  (- head (line->char-offset pane line))])
            (and (> col 0)
                 (cased-letter?
-                  (string-ref (car (buffer-lines pane #:start line #:end (+ line 1)))
+                  (string-ref (car (buffer-lines pane
+                                                 #:range (hash 'start-line line 'end-line (+ line 1))))
                               (- col 1))))))))
 
 (define-command! "tab-or-complete"
@@ -103,8 +104,8 @@
   (let ([a (call! "stdlib/selection-anchor" sel)]
         [h (call! "stdlib/selection-head" sel)])
     (buffer-lines bid
-                  #:start (offset->line bid (min a h))
-                  #:end (+ (offset->line bid (max a h)) 1))))
+                  #:range (hash 'start-line (char-offset->line bid (min a h))
+                                'end-line (+ (char-offset->line bid (max a h)) 1)))))
 
 ; `indent`/`unindent` act on whole lines but skip blank ones (empty or
 ; whitespace-only), so a linewise selection covering nothing but blank lines
