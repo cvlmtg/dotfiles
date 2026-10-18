@@ -133,7 +133,7 @@
   (lambda (bid)
     (if (indent-would-edit? bid)
         (unindent bid)
-        (pane-focus-next bid))))
+        (pane-focus-prev bid))))
 
 ; Without the kitty protocol, Tab and Ctrl-i are the same byte (0x09), so
 ; rebinding "tab" here also removes jump-forward from the keyboard entirely.
