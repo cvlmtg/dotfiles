@@ -19,9 +19,9 @@
 
 (set-option! "whitespace-space" "trailing")
 (set-option! "whitespace-tab" "all")
-(set-option! "tab-style" "soft")
-(set-option! "tab-width" "2")
-(set-option! "signcolumn" "always:2")
+(set-option! "indent-style" "soft")
+(set-option! "indent-width" "2")
+(set-option! "gutter-signs" "always:2")
 
 ; ---------------------------------------------------------------------
 
