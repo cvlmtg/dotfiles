@@ -31,10 +31,14 @@ function rg() {
     PAGER="less -R"
   fi
 
+  # MSYS path conversion collapses "//" to "/"; elsewhere rg needs a single byte.
+  local sep=/
+  case "$OSTYPE" in msys*|cygwin*) sep=// ;; esac
+
   if [ -t 1 ]; then
-    command rg --smart-case --heading --path-separator / --pretty -g "!*.min.js" -g "!*.map" "$@" | tr -d "\017" | eval "$PAGER"
+    command rg --smart-case --heading --path-separator "$sep" --pretty -g "!*.min.js" -g "!*.map" "$@" | tr -d "\017" | eval "$PAGER"
   else
-    command rg --smart-case --path-separator / "$@"
+    command rg --smart-case --path-separator "$sep" "$@"
   fi
 }
 
