@@ -163,3 +163,47 @@
               #:cwd (parent-name path)))))))
 
 (bind-key! 'normal "space d" "toggle-inline-diff-auto")
+
+; MARKDOWN ------------------------------------------------------------
+
+(define (heading-prefix-length line)
+  (let* ((n (string-length line))
+         (skip (lambda (i c)
+                 (let loop ((i i))
+                   (if (and (< i n) (char=? (string-ref line i) c))
+                       (loop (+ i 1))
+                       i)))))
+    (skip (skip 0 #\#) #\space)))
+
+(define (anchor-lines pane)
+  (let loop ((sels (buffer-selections pane)) (lines '()))
+    (if (null? sels)
+        (reverse lines)
+        (let ((line (char-offset->line pane (call! "stdlib/selection-anchor" (car sels)))))
+          (loop (cdr sels)
+                (if (and (pair? lines) (= line (car lines)))
+                    lines
+                    (cons line lines)))))))
+
+(define-command! "markdown-heading"
+  "Turn the line of each selection's anchor into a Markdown heading. The count sets the level."
+  (lambda (pane count)
+    (let ((prefix (string-append (make-string (min 6 (max 1 count)) #\#) " ")))
+      (edit-text! pane
+        (filter (lambda (edit) edit)
+          (map (lambda (line)
+                 (let ((text (car (buffer-lines pane #:range (hash 'start-line line 'end-line (+ line 1))))))
+                   (and (> (string-length text) 0)
+                        (let ((start (line->char-offset pane line)))
+                          (hash 'start-char start
+                                'end-char (+ start (heading-prefix-length text))
+                                'text prefix)))))
+               (anchor-lines pane)))))))
+
+(bind-key! 'normal "G H" "markdown-heading" #:keymap 'markdown-keys)
+
+(register-hook! 'on-language-set
+  (lambda (pane lang)
+    (if (equal? lang "markdown")
+        (attach-keymap! pane 'markdown-keys)
+        (detach-keymap! pane 'markdown-keys))))
