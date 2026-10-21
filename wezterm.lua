@@ -189,6 +189,7 @@ config.keys = {
   { key="Enter", mods="SHIFT", action=wezterm.action.SendString("\n") },
   { key = 'x', mods = 'CTRL|SHIFT', action = wezterm.action.DisableDefaultAssignment },
   { key = 'w', mods = 'CTRL|SHIFT', action = wezterm.action.DisableDefaultAssignment },
+  { key = '|', mods = 'CTRL|SHIFT', action = action.SendString '\x1b[92:124;6u' },
 }
 
 for i = 1, 9 do
