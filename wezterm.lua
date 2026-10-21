@@ -92,6 +92,7 @@ config.font = wezterm.font("Fira Code")
 config.term = "xterm-256color"
 config.initial_cols = 100
 config.initial_rows = 40
+config.mouse_wheel_scrolls_tabs = false
 
 config.audible_bell = "Disabled"
 config.visual_bell = {
@@ -254,6 +255,11 @@ else
     table.insert(config.keys, { key = tostring(i), mods = "CTRL", action = action.ActivateTab(i - 1) })
   end
   table.insert(config.keys, { key = "0", mods = "CTRL", action = action.ActivateTab(9) })
+
+  -- New tab in the current pane's domain (matches macOS Cmd+T)
+  table.insert(config.keys, {
+    key = "t", mods = "LEADER", action = action.SpawnTab("CurrentPaneDomain"),
+  })
 
   -- Paste with Ctrl+V
   table.insert(config.keys, {
