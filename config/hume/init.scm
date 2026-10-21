@@ -15,7 +15,7 @@
 (configure-statusline!
   '("Position" "steel:git-branch" "FilePath" "Language" "ReadOnly" "DirtyIndicator")
   '()
-  '("MacroRecording" "SearchMatches" "Diagnostics" "KittyProtocol" "Separator" "Mode"))
+  '("MacroRecording" "Pipe" "SearchMatches" "Diagnostics" "KittyProtocol" "Separator" "Mode"))
 
 (set-option! "whitespace-space" "trailing")
 (set-option! "whitespace-tab" "all")
