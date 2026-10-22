@@ -42,6 +42,17 @@ function rg() {
   fi
 }
 
+git() {
+  case "$PWD" in
+    /mnt/[a-z]/*)
+      "/mnt/c/Program Files/Git/cmd/git.exe" "$@"
+      ;;
+    *)
+      command /usr/bin/git "$@"
+      ;;
+  esac
+}
+
 # GIT UTILITIES -------------------------------------------------------
 
 # git status
