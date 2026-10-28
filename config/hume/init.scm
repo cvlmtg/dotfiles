@@ -4,7 +4,7 @@
 (load-plugin! "core:vim-keybind")
 (load-plugin! "cvlmtg/grep.hume")
 (load-plugin! "core:plum")
-(load-plugin! "core:lsp" #:config (hash "inlay-hints" #t))
+(load-plugin! "core:lsp" #:config (hash 'inlay-hints #t))
 (load-plugin! "core:lsp-install")
 (load-plugin! "core:undotree")
 (load-plugin! "core:git-diff")
@@ -20,7 +20,7 @@
 (set-option! "whitespace-space" "trailing")
 (set-option! "whitespace-tab" "all")
 (set-option! "indent-style" "soft")
-(set-option! "indent-width" "2")
+(set-option! "indent-width" 2)
 (set-option! "gutter-signs" "always:2")
 
 ; ---------------------------------------------------------------------
@@ -67,18 +67,11 @@
 ; after whitespace/punctuation). Steel has no char-alphabetic?, so "letter"
 ; is tested as "has case" — covers Latin/Greek/Cyrillic, excludes digits,
 ; punctuation, and caseless scripts.
-(define (primary-head pane)
-  (let loop ([sels (or (buffer-selections pane) '())])
-    (cond [(null? sels) #f]
-          [(call! "stdlib/selection-primary?" (car sels))
-           (call! "stdlib/selection-head" (car sels))]
-          [else (loop (cdr sels))])))
-
 (define (cased-letter? c)
   (not (char=? (char-upcase c) (char-downcase c))))
 
 (define (letter-before-cursor? pane)
-  (let ([head (primary-head pane)])
+  (let ([head (call! "stdlib/cursor-char-offset" (buffer-selections pane))])
     (and head
          (let* ([line (char-offset->line pane head)]
                 [col  (- head (line->char-offset pane line))])
@@ -101,8 +94,8 @@
   (not (equal? (trim line) "")))
 
 (define (selection-lines bid sel)
-  (let ([a (call! "stdlib/selection-anchor" sel)]
-        [h (call! "stdlib/selection-head" sel)])
+  (let ([a (selection-anchor sel)]
+        [h (selection-head sel)])
     (buffer-lines bid
                   #:range (hash 'start-line (char-offset->line bid (min a h))
                                 'end-line (+ (char-offset->line bid (max a h)) 1)))))
@@ -156,10 +149,12 @@
         (let ([path (buffer-path pane)])
           (when path
             (spawn-async! "git" '("diff" "--quiet" "HEAD")
-              (lambda (stdout stderr code)
-                (cond [(= code 0) (call! "git-diff/show-inline-diff" pane "HEAD^")]
-                      [(= code 1) (call! "git-diff/show-inline-diff" pane "HEAD")]
-                      [else (log! 'warn (string-append "git diff failed: " (trim stderr)))]))
+              (lambda (result)
+                (let ([code (hash-ref result 'exit)])
+                  (cond [(equal? code 0) (call! "git-diff/show-inline-diff" pane "HEAD^")]
+                        [(equal? code 1) (call! "git-diff/show-inline-diff" pane "HEAD")]
+                        [else (log! 'warning (string-append "git diff failed: "
+                                                            (trim (hash-ref result 'stderr))))])))
               #:cwd (parent-name path)))))))
 
 (bind-key! 'normal "space d" "toggle-inline-diff-auto")
@@ -179,7 +174,7 @@
   (let loop ((sels (buffer-selections pane)) (lines '()))
     (if (null? sels)
         (reverse lines)
-        (let ((line (char-offset->line pane (call! "stdlib/selection-anchor" (car sels)))))
+        (let ((line (char-offset->line pane (selection-anchor (car sels)))))
           (loop (cdr sels)
                 (if (and (pair? lines) (= line (car lines)))
                     lines
@@ -200,10 +195,10 @@
                                 'text prefix)))))
                (anchor-lines pane)))))))
 
-(bind-key! 'normal "G H" "markdown-heading" #:keymap 'markdown-keys)
+(bind-key! 'normal "G H" "markdown-heading" #:keymap "markdown-keys")
 
 (register-hook! 'on-language-set
   (lambda (pane lang)
     (if (equal? lang "markdown")
-        (attach-keymap! pane 'markdown-keys)
-        (detach-keymap! pane 'markdown-keys))))
+        (attach-keymap! pane "markdown-keys")
+        (detach-keymap! pane "markdown-keys"))))
