@@ -58,6 +58,14 @@ If (2) is "any future caller" **and** the failure is silent or a runtime crash, 
 
 **Tests do not earn an exemption.** A test needing access it does not have is the test's problem, not the API's. Try, in order: exercise it through the public API; put the test *inside* the module (`#[cfg(test)] mod tests` sees private items in Rust; same idea in other languages); a helper gated to test builds only. If none work, report the options and their costs. Do not widen the API and move on.
 
+## Unlikely Scenarios
+A hypothetical bug that needs a rare combination of events (the clock moved backward between two operations, a file swapped between two syscalls) gets no fix, no review finding, and no memory entry. Two exceptions:
+1. The fix is small, or it makes the code more correct by construction (a type, a removed branch, a simpler design). State kept only to cover the rare case does not qualify.
+2. The outcome is a security breach or serious data loss. Judge these by whether someone could trigger them on purpose (a crafted file, archive, path, or server response), not by how often they happen by accident.
+
+This rule weighs how likely a bug is to be reached. It narrows "Cost is not a verdict on correctness" for unlikely bugs only: a design that is wrong on paths people actually take stays wrong whatever the fix costs.
+When it is unclear whether a scenario is rare, give the reason it looks rare in one line and let the user decide.
+
 ## ⛔ Comments
 These rules are absolute. No length, topic, or "this one is important" exemption.
 
