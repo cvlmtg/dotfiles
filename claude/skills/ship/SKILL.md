@@ -96,14 +96,13 @@ Never rule on a deviation yourself.
 
 1. Stop if not inside a git repository, or if `git status --porcelain` is not empty. Report it; never stash, commit or discard the user's changes.
 2. Choose a kebab-case slug of 2 to 5 words. If `RUN` exists, append `-2`, `-3`, and so on.
-3. If the current branch is the default branch (`main`, `master`, or the target of the local ref `refs/remotes/origin/HEAD`), run `git switch -c ship/<slug>`. Otherwise stay on the current branch.
-4. Write `input.md` and `state.md`:
+3. Write `input.md` and `state.md`. The run commits on the current branch:
 
 ```
 # Ship run: <slug>
 Repo: <REPO>
 Input: <spec path, or "prompt">
-Branch: <branch>
+Branch: <git branch --show-current>
 Base: <git rev-parse HEAD>
 Complexity: pending
 Phase: 1
@@ -171,12 +170,12 @@ Print to the user:
 - Issues outside the plan: `Out of scope` from reviews and `Observed` from implementer reports.
 - The `RUN` path.
 
-Never push. The user decides what happens to the branch.
+Never push, and never create, switch or check out a branch or worktree. The user chooses where the run commits and what happens to the branch.
 
 ## Resume
 
 1. Find runs under `$HOME/.claude/ship-runs/<basename of REPO>/`. With no slug and more than one run, ask which one.
-2. Read `state.md`, check out its branch, and continue from its `Phase:`. In Phase 6, continue at the first `pending` step.
+2. Read `state.md`. If the current branch is not its `Branch:`, stop and ask the user to switch to it. Otherwise continue from its `Phase:`. In Phase 6, continue at the first `pending` step.
 3. If the working tree is dirty, the interrupted step left changes. Ask the user whether to keep them, in which case the step reviewer reviews them as round 1, or to discard them, which the user does. Never discard them yourself.
 
 Agent IDs do not survive a session. Resumed phases use fresh agents.
