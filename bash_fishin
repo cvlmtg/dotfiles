@@ -48,7 +48,7 @@ git() {
       "/mnt/c/Program Files/Git/cmd/git.exe" "$@"
       ;;
     *)
-      command /usr/bin/git "$@"
+      command git "$@"
       ;;
   esac
 }
