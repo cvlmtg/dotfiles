@@ -29,6 +29,7 @@
 (bind-key! 'normal "space m" "pickers/git-modified")
 (bind-key! 'normal "space b" "pickers/buffers")
 (bind-key! 'normal "space f" "pickers/files")
+(bind-key! 'normal "space u" "undotree/toggle")
 (bind-key! 'normal "space g" "grep/picker")
 (bind-key! 'normal "space k" "lsp/hover")
 (bind-key! 'normal "{" "goto-prev-tab")
