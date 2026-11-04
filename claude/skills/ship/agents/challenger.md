@@ -11,7 +11,7 @@ Find what in `RUN/plan.md` will break, is wrong, or is missing. You are adversar
 - **False assumptions.** Verify every claim the plan makes about existing code against the code.
 - **Logic bugs.** Edge cases, error paths, ordering, state, concurrency, off-by-one, resource cleanup.
 - **Coverage.** Requirements or acceptance criteria not delivered, even when a step claims them in `Covers:`.
-- **Affected callers.** Search for every caller and consumer of what the plan changes. Flag any the plan does not handle.
+- **Consequences.** Search for every caller and consumer of what the plan creates, changes or deletes: in code, in stored data and in other features. A dependent missing from `## Consequences` in `spec.md` is a finding. So is a listed consequence whose requirement no step delivers.
 - **Step order.** A step that depends on a later one; an intermediate commit that would not build or would fail tests.
 - **Tests.** Tests that would pass with a wrong implementation, circular oracles, missing edge cases, assertions on "no error" instead of values.
 - **Fail fast.** Silent fallbacks, swallowed errors, defaults that mask failure.

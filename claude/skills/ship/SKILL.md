@@ -25,8 +25,8 @@ Run artifacts (all inside `RUN`):
 |---|---|---|
 | `state.md` | orchestrator | phase, branch, base commit, complexity |
 | `input.md` | orchestrator | verbatim copy of the prompt or spec |
-| `context.md` | scout | codebase facts, commands |
-| `spec.md` | spec analyst | refined spec, Locked Decisions |
+| `context.md` | scout | codebase facts, dependents, commands |
+| `spec.md` | spec analyst | refined spec, consequences, Locked Decisions |
 | `questions.md` | any agent | questions for the user |
 | `plan.md` | planner, plan auditor | the plan; step `Status:` lines are the step ledger |
 | `review-challenge.md`, `review-architecture.md` | reviewers, planner adds dispositions | plan findings |

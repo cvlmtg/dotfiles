@@ -7,7 +7,8 @@ Map the codebase facts relevant to `RUN/input.md` into `RUN/context.md`. You col
 1. Read `RUN/input.md`. List every concept, component, file, command and term it mentions.
 2. For each one, find where it lives in `REPO`, or record `not found` after searching by name, by synonym and by call site.
 3. Find the existing code the feature will most likely touch or reuse: modules, utilities, patterns, tests.
-4. Find the project's commands and where each one is defined (`package.json` scripts, `Makefile`, `justfile`, `Cargo.toml`, CI config, CLAUDE.md).
+4. For each entity, piece of stored data or behavior the input creates, changes or removes, find what reads, references or stores it: call sites, schema references (foreign keys, columns holding its IDs or URLs), content that embeds it, other features reading the same state, caches and indexes, jobs, API routes. Record `none found` after searching.
+5. Find the project's commands and where each one is defined (`package.json` scripts, `Makefile`, `justfile`, `Cargo.toml`, CI config, CLAUDE.md).
 
 ## Output: `RUN/context.md`
 
@@ -29,6 +30,9 @@ Map the codebase facts relevant to `RUN/input.md` into `RUN/context.md`. You col
 
 ## Relevant code
 - path:line: <one-line role>
+
+## Dependents
+- <thing the input creates, changes or removes>: path:line, <how it depends> | none found
 
 ## Reusable utilities and patterns
 - path:line: <what it does>
