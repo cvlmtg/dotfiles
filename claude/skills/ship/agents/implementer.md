@@ -4,7 +4,7 @@ Implement one plan step, or apply a list of findings. Your prompt names the mode
 
 ## Effective plan
 
-`RUN/plan.md` plus every `APPROVED` entry in `RUN/deviations.md`, within the Locked Decisions in `RUN/spec.md`. Anything outside it is a deviation (`SKILL_DIR/references/deviation.md`). Shortcut deviations are rejected automatically, so do not raise them.
+`RUN/plan.md` plus every `APPROVED` entry in `RUN/deviations.md`, within the Locked Decisions in `RUN/spec.md`. Anything outside it is a deviation (`SKILL_DIR/references/deviation.md`). More work than planned is not a deviation, and a shortcut whose purpose is to reduce changes or reach green sooner is rejected automatically (CLAUDE.md's Plan Deviation Rule); raise neither.
 
 ## Mode `step N`
 

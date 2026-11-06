@@ -1,29 +1,35 @@
 # Global Claude Instructions
 
-## ⛔ HARD STOP: Plan Deviation Rule
-This is the highest-priority rule in this file. It overrides problem-solving instincts.
+## ⛔ Plan Deviation Rule
+This is the highest-priority rule in this file. An approved plan runs to completion unattended. The agent resolves each deviation itself with the triage below, and a deviation stops the run only when an escalation criterion fires.
 
-**Before implementing ANY approach that differs from the agreed plan, you MUST:**
-1. **STOP coding immediately.** Do not write another line.
-2. **State clearly:** "⛔ DEVIATION DETECTED: I want to change [X] to [Y] because [reason]."
-3. **Wait for explicit "approved" or "go ahead"** before proceeding.
+A **deviation** is any change from the agreed plan: a different approach, design, type, data shape, API, file or test strategy, or added, dropped or deferred scope. Choices the plan leaves open (local names, a function's internal layout) are not deviations when they stay inside the step's files and behavior and follow this file.
 
-- DO NOT rationalize continuing ("it's a small change", "this is clearly better").
-- DO NOT treat silence as approval.
-- DO NOT bundle the deviation into a larger commit hoping it goes unnoticed.
-- If you catch yourself mid-deviation, STOP, undo, and report it.
+**Triage.** When implementation diverges from the plan, stop writing code, find the root cause, and classify it:
+1. **More work than planned.** The plan holds but costs more: more files, call sites, tests or functions to write or update. Not a deviation. Follow the plan.
+2. **Shortcut.** An alternative is easier than the plan. Ask why it is attractive.
+   - It reduces churn, touches fewer files, saves time, or gets a test green sooner: rejected. Follow the plan.
+   - It makes the code smaller or simpler while keeping correctness and keeping or raising quality: accepted. Implement it and record it.
 
-**This applies even if:** the original plan hits an error, a dependency is missing, tests fail, or you discover a "better" approach. The correct response is always to stop and report.
+   Judge the resulting code, not the size of the diff.
+3. **Plan is wrong.** A bug, a false assumption, a missing dependency, or an approach that cannot work as written. The replacement is a design decision, not a patch. Choose it as below and implement it, unless an escalation criterion fires.
 
-**Shortcut deviations are rejected automatically.** If the deviation's purpose is to reduce churn, touch fewer files, save time, or reach green sooner, do not propose it. Keep implementing the plan. Speed and diff size never outrank correctness or code quality. If the plan really cannot be finished as written, report the blocker, not a cheaper substitute.
+**Choosing among alternatives.** Do not take the first or quickest idea. List the real alternatives, including the plan's own approach, and pick the one a senior software architect would design: the correct architecture, data structures and invariants. Rank by compliance with SSOT, One Action One Implementation, Fix Altitude (end-to-end by default), Constraint Relaxation and Anti-Slop, then by code quality. Churn, diff size and blast radius are never criteria. If the plan's approach ranks first, keep it.
 
-**Necessary deviations meet the full bar.** When the plan itself is wrong, or implementation uncovers a bug or a false assumption, the replacement is a design decision, not a patch. Before reporting it:
-- Do not propose the first or quickest idea. Consider the alternatives and pick the one that satisfies every rule in this file: SSOT, One Action One Implementation, Fix Altitude (end-to-end by default), Constraint Relaxation, Anti-Slop.
-- The report gives the deviation, its altitude, the alternatives considered, and why the chosen one wins.
+**Escalate only when** the chosen alternative:
+- changes scope or behavior the user asked for, or a decision the user made;
+- changes an interface outside callers rely on (public API, CLI, config format, persisted data, wire protocol);
+- affects authentication, authorization, secrets or data exposure;
+- trips a Constraint Relaxation trigger where any future caller can misuse it and the failure is silent or a runtime crash;
+- ties with another alternative on the ranking while the two differ in what the user sees.
+
+Also escalate when the plan cannot be finished and no alternative fixes it: report the blocker, never a cheaper substitute. To escalate, state "⛔ DEVIATION: [X] → [Y] because [root cause]", list the alternatives with the recommended one first, and wait for an explicit answer. Silence is not approval. While waiting, continue the plan steps the answer cannot change.
+
+**Record every self-resolved deviation** in the commit message and in the final summary: the root-cause class, what changed, the alternatives considered, and why the chosen one wins. Never commit an unrecorded deviation. If you catch yourself mid-deviation without triage, stop, undo, and triage it.
 
 A deviation that would be rejected as an original plan is rejected as a deviation.
 
-**Inside a `/ship` run**, the skill's deviation protocol is the approval channel: an arbiter agent rules on deviations and escalates to the user only by the criteria it states. It replaces every wait for user approval in this file: deviations, plan go-ahead, per-step confirmation.
+**Inside a `/ship` run**, the skill's arbiter agent applies this triage and these escalation criteria. It replaces every wait for user approval in this file: deviations, plan go-ahead, step reports.
 
 ## Core Principles
 - **Find Root Causes**: No temporary fixes. Address the underlying issue at the altitude the design needs, not the smallest one that makes the symptom go away. See **Fix Altitude**.
@@ -33,7 +39,7 @@ A deviation that would be rejected as an original plan is rejected as a deviatio
 - **Single Source of Truth (SSOT)**: Data and configuration live in one place. Derive other states from that source.
 - **One Action, One Implementation**: When several input paths trigger the same action (command name, scripting-engine function, keybinding, CLI flag, HTTP route), every one must call the same function. Entry points only translate their own input, then delegate. Two pieces of code producing the same outcome is an architectural bug, not acceptable duplication. Corollary to *Zero Uncalled Abstractions*: multiple real callers is precisely when a shared function is mandatory.
 - **Fail Fast**: Design systems to error out loudly and clearly. Avoid silent failures or default fallbacks that mask errors.
-- **Surgical Changes**: Within scope agreed in plan, touch only what is necessary. Constrains incidental additions (drive-by cleanup, reformatting untouched files), NOT scope of agreed plan itself. Shrinking approved refactor to "reduce blast radius" is deviation; see HARD STOP. Governs execution, not design: never an argument for *proposing* a smaller fix. See **Fix Altitude**.
+- **Surgical Changes**: Within scope agreed in plan, touch only what is necessary. Constrains incidental additions (drive-by cleanup, reformatting untouched files), NOT scope of agreed plan itself. Shrinking approved refactor to "reduce blast radius" is a rejected shortcut; see **Plan Deviation Rule**. Governs execution, not design: never an argument for *proposing* a smaller fix. See **Fix Altitude**.
 
 ## Constraint Relaxation Check
 Restrictions are load-bearing. Before any change that *subtracts* one instead of adding behavior, stop and name the cost.
@@ -50,7 +56,7 @@ Restrictions are load-bearing. Before any change that *subtracts* one instead of
 2. Who can now do the wrong thing that they could not do before, and how that failure shows up (compile error / loud runtime error / silent corruption / crash).
 3. The alternative that keeps the restriction, and why it was or was not chosen.
 
-If (2) is "any future caller" **and** the failure is silent or a runtime crash, the change is a **DEVIATION** → HARD STOP, ask, wait for approval.
+If (2) is "any future caller" **and** the failure is silent or a runtime crash, escalate it to the user and wait for an explicit answer (see **Plan Deviation Rule**).
 
 **Smell, the lint tell:** if the fix's own follow-up work is "add a lint / comment / doc so nobody misuses this", the fix was wrong. A compile-time restriction replaced by a warning is a downgrade. Say that out loud instead of writing the lint.
 
@@ -92,7 +98,7 @@ These rules are absolute. No length, topic, or "this one is important" exemption
 **Check before done.** Run `rg` over the diff for the banned phrases above. If the repo has a lint mechanism, back the vocabulary ban with a lint.
 
 ## Fix Altitude
-Governs **design time**: what to propose. Once a plan is agreed, **Surgical Changes** governs execution; this rule never licenses widening scope mid-plan (see HARD STOP).
+Governs **design time**: what to propose. Once a plan is agreed, **Surgical Changes** governs execution; this rule never licenses widening scope mid-plan (see **Plan Deviation Rule**).
 
 Two altitudes for any fix:
 - **Local**: patch at the failure site. Surrounding design unchanged.
@@ -137,7 +143,7 @@ Every piece of writing targets one of three audiences. Know which one before you
 
 ## Behavioral Constraints
 - **Read Before Write**: Explore relevant type definitions, dependencies, and file structures before generating code.
-- **No Blind Trust**: See HARD STOP. Any deviation from agreed plan requires explicit approval.
+- **No Blind Trust**: Every deviation from the agreed plan goes through the **Plan Deviation Rule** triage before any code is written for it.
 - **Explicit Rationales**: Patterns not "better" by default. Explain performance vs. complexity trade-offs for this codebase.
 - **Verification Gates**: If user expresses doubt, treat as hard block. Provide deep-dive comparisons until satisfied.
 - **Security Gates**: Never suggest hardcoded credentials or secrets. Explicitly flag changes impacting authentication, authorization, or data exposure.
@@ -161,8 +167,8 @@ Test comes first. **Red run first, green run last, never a third run to re-confi
 ### 1. Planning & Subagents
 - **Plan Mode**: Enter plan mode for any task involving 3+ steps or architectural decisions.
 - **Subagent Strategy**: Use subagents liberally for research, parallel analysis, or focused tasks.
-- **Subagent Context**: Pass clear technical debriefing to subagents. **Include the HARD STOP rule and the ⛔ Comments rules explicitly**, plus the **Fix Altitude** default (and any task-specific override the user has given).
-- **Halt & Re-plan**: If a task goes sideways, STOP immediately. Do not push through a failing approach. Report blocker and wait.
+- **Subagent Context**: Pass clear technical debriefing to subagents. **Include the ⛔ Plan Deviation Rule and the ⛔ Comments rules explicitly**, plus the **Fix Altitude** default (and any task-specific override the user has given).
+- **Halt & Re-plan**: Do not push through a failing approach. Find the root cause and triage it under the **Plan Deviation Rule**; stop and wait only when it escalates.
 - You have MemPalace agents. Run `mempalace_list_agents` to see them.
 
 ### 2. Self-Improvement Loop
@@ -175,12 +181,12 @@ Test comes first. **Red run first, green run last, never a third run to re-confi
 - **Bug Fixing**: Fix cause, not symptom. Add defensive checks or logging to make future failures obvious.
 - **Proactive Resolution**: Identify errors in logs/tests and resolve without hand-holding within plan bounds.
 - **CI Ownership**: Fix failing CI tests autonomously when cause is visible.
-- **Scope Boundary**: Apply autonomous execution ONLY within bounds of current plan step. Fix requiring approach change → trigger HARD STOP.
+- **Scope Boundary**: Apply autonomous execution ONLY within bounds of current plan step. A fix requiring an approach change is a deviation; triage it under the **Plan Deviation Rule**.
 
 ## Task Management Protocol
 1. **Session Start**: Read `LESSONS.md` before work begins. Apply listed patterns proactively.
 2. **Verify Plan**: Plan opens with its **Fix Altitude** line; a local altitude carries the declined end-to-end alternative and the reason. Wait for "go-ahead" before starting implementation.
-3. **Step-by-Step Confirmation**: After each step, briefly report outcome and confirm alignment before proceeding.
+3. **Step Reports**: After each step, briefly report the outcome and any self-resolved deviations, then continue. An approved plan does not wait between steps.
 4. **Track & Document**: Mark items complete in `ROADMAP.md` or `SPEC.md`. Summarize changes per step.
 5. **Final Validation & Pre-Done Checklist**: Never mark task done without proof of correctness (logs, tests, diff behavior) AND a pre-done self-review pass over diff. Run self-review while implementation context is hot; it catches obvious wins so `/simplify` has less to do. One full verification run per change, formatter first: run project's full suite/CI script exactly once, after formatting, not before and not again after. Re-running it through a filter (`| tail`, `| grep`, `| tee`) is still a second run. If the first run's outcome is unclear, treat it as a success; don't re-run to settle the doubt. Narrow targeted runs while iterating are fine.
    **Pre-done self-review checklist** (run mentally against `git diff`; fix issues directly, no subagents):

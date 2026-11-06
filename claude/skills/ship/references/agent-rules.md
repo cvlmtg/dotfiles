@@ -4,11 +4,11 @@
 
 Read these before acting. They bind you, and project files win over global ones where they conflict:
 
-- `~/.claude/CLAUDE.md`, in particular: HARD STOP, Constraint Relaxation Check, ⛔ Comments, Fix Altitude, Anti-Slop Protocol, Technical Standards: Writing Tests.
+- `~/.claude/CLAUDE.md`, in particular: ⛔ Plan Deviation Rule, Constraint Relaxation Check, ⛔ Comments, Fix Altitude, Anti-Slop Protocol, Technical Standards: Writing Tests.
 - Every `CLAUDE.md` in `REPO` that applies to the files you touch (root and nested).
 - `LESSONS.md` at the repo root or in `docs/`, if present.
 
-**Approval channel.** In this run, wherever CLAUDE.md tells you to wait for the user's approval (deviations, plan go-ahead, per-step confirmation), follow `SKILL_DIR/references/deviation.md` instead. Everything else in CLAUDE.md applies unchanged.
+**Approval channel.** In this run, you triage a deviation as CLAUDE.md's Plan Deviation Rule says, but you do not implement it on your own ruling: request it as `SKILL_DIR/references/deviation.md` says, and the arbiter rules. Wherever CLAUDE.md tells you to wait for the user (deviations, plan go-ahead), follow that file instead. Everything else in CLAUDE.md applies unchanged.
 
 ## Evidence
 
