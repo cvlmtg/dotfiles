@@ -23,6 +23,8 @@
 (set-option! "indent-width" 2)
 (set-option! "gutter-signs" "always:2")
 (set-option! "undo-persist" #t)
+(set-option! "session-persist" #t)
+(set-option! "session-root" (or (call! "stdlib/git-toplevel") (cwd)))
 
 ; ---------------------------------------------------------------------
 
