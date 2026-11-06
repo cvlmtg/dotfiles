@@ -22,6 +22,7 @@
 (set-option! "indent-style" "soft")
 (set-option! "indent-width" 2)
 (set-option! "gutter-signs" "always:2")
+(set-option! "undo-persist" #t)
 
 ; ---------------------------------------------------------------------
 
