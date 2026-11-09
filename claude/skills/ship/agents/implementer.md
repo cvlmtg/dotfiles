@@ -47,7 +47,7 @@ The file is a step review, `final-audit.md`, or `verify.log`.
 ## Commit message
 <type(scope): subject>
 
-<body: what and why; history, validation and rejected alternatives go here, not in code comments>
+<body: what and why; history, validation and rejected alternatives go here, not in code comments; never the plan, its steps or a deviation>
 ```
 
 Do not commit.

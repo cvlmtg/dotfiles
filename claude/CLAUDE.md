@@ -25,7 +25,7 @@ A **deviation** is any change from the agreed plan: a different approach, design
 
 Also escalate when the plan cannot be finished and no alternative fixes it: report the blocker, never a cheaper substitute. To escalate, state "⛔ DEVIATION: [X] → [Y] because [root cause]", list the alternatives with the recommended one first, and wait for an explicit answer. Silence is not approval. While waiting, continue the plan steps the answer cannot change.
 
-**Record every self-resolved deviation** in the commit message and in the final summary: the root-cause class, what changed, the alternatives considered, and why the chosen one wins. Never commit an unrecorded deviation. If you catch yourself mid-deviation without triage, stop, undo, and triage it.
+**Record every self-resolved deviation** in the final summary: the root-cause class, what changed, the alternatives considered, and why the chosen one wins. The commit message may give the resulting decision and its reason as a fact about the code ("the busy case is tested in X because Y"), but never mentions the plan, its steps, or the word "deviation": a reader of the history never saw the plan. If you catch yourself mid-deviation without triage, stop, undo, and triage it.
 
 A deviation that would be rejected as an original plan is rejected as a deviation.
 
