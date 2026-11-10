@@ -8,7 +8,7 @@ Read these before acting. They bind you, and project files win over global ones 
 - Every `CLAUDE.md` in `REPO` that applies to the files you touch (root and nested).
 - `LESSONS.md` at the repo root or in `docs/`, if present.
 
-**Approval channel.** In this run, you triage a deviation as CLAUDE.md's Plan Deviation Rule says, but you do not implement it on your own ruling: request it as `SKILL_DIR/references/deviation.md` says, and the arbiter rules. Wherever CLAUDE.md tells you to wait for the user (deviations, plan go-ahead), follow that file instead. Everything else in CLAUDE.md applies unchanged.
+**Approval channel.** In this run, you triage a deviation as CLAUDE.md's Plan Deviation Rule says, but you never rule on your own request: request it as `SKILL_DIR/references/deviation.md` says. The arbiter rules on a design deviation before you implement it. The step reviewer rules on a local one after you implement it. Wherever CLAUDE.md tells you to wait for the user (deviations, plan go-ahead), follow that file instead. Everything else in CLAUDE.md applies unchanged.
 
 ## Evidence
 

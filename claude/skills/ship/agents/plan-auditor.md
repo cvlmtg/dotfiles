@@ -4,14 +4,14 @@ Give the final verdict on `RUN/plan.md` before implementation. Fix local defects
 
 ## Inputs
 
-`RUN/spec.md`, `RUN/plan.md`, `RUN/review-challenge.md`, `RUN/review-architecture.md` (with dispositions), `plan-audit.md` from a previous audit if one exists, `SKILL_DIR/references/plan-format.md`, the instruction files.
+`RUN/spec.md`, `RUN/plan.md`, `RUN/review-challenge.md`, `RUN/review-architecture.md` (both rounds, with dispositions; a round-2 finding still open and valid is structural), `plan-audit.md` from a previous audit if one exists, `SKILL_DIR/references/plan-format.md`, the instruction files.
 
 ## Checks
 
 1. **Coverage.** Every `R` and `AC` maps to steps that deliver it, not only list it.
 2. **Dispositions.** Each `applied` finding is reflected in the plan. Each `rejected` finding has a valid reason as `planner.md` defines it.
 3. **CLAUDE.md compliance.** The altitude line and, for local, the declined alternative and reason. SSOT, One Action One Implementation, KISS and YAGNI, Fail Fast, Constraint Relaxation, Anti-Slop, the testing rules, documentation audiences. Then every rule in the project's CLAUDE.md, one by one.
-4. **Executability.** Every step has all the fields in `plan-format.md`. Tags match the judgment each step needs: a `mechanical` step contains no decisions. Commands in `## Verification` exist.
+4. **Executability.** Every step has all the fields in `plan-format.md`. Tags match the judgment each step needs: a `mechanical` step contains no decisions. Commands in `## Verification` exist. A step expected to change more than about 400 lines is split into steps that each build and pass; the split is a local edit. Every hot path in `spec.md` has its measuring step and `Measurements:` line.
 5. **Consistency.** No contradictions between Approach, Design and Steps.
 
 ## Acting on defects

@@ -14,8 +14,8 @@ Judge whether the branch implements the plan faithfully and completely, and eval
    - `improvement`: an approved deviation that beats the plan under CLAUDE.md's rules. Confirm it does.
    - `unjustified`: no entry, a rejected entry implemented anyway, or a shortcut (scope reduced, tests skipped, local where the plan said end-to-end).
    Re-judge approved deviations too: one that turned out worse than the plan is a finding.
-3. **Cross-step quality.** What per-step reviews cannot see: duplication between steps, code a later step left dead, naming that drifts between steps, comments or docs a later step made stale.
-4. **Rules.** Instruction-file rules over the whole diff, including the `rg` check for banned comment phrases.
+3. **Stale text.** Comments or docs a later step made stale, and naming that drifts between steps. Duplication, dead code and other quality checks over the whole diff belong to the quality pass that follows; do not repeat them.
+4. **Hot paths.** Each entry under `## Hot paths` in `spec.md` has its measurement in the diff, and the measurement observes the cost on the slowest configuration, not a proxy. Work the diff adds to a recurring path that `## Hot paths` does not list is a finding.
 
 ## Output: `RUN/final-audit.md`
 

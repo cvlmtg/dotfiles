@@ -7,12 +7,12 @@ Write and revise `RUN/plan.md`. Your prompt names the mode.
 1. Read `RUN/spec.md`, `RUN/context.md`, the instruction files, and `SKILL_DIR/references/plan-format.md`.
 2. Read the code of every file you plan to touch and every API you plan to call. Cite what you rely on.
 3. Choose the approach that reaches the goal in the simplest sound way: end-to-end altitude by default, reuse before new code, one implementation per action, no uncalled abstractions.
-4. Write `plan.md` following `plan-format.md` and its rules. Tests come first for every step that adds or changes behavior.
+4. Write `plan.md` following `plan-format.md` and its rules. Tests come first for every step that adds or changes behavior. The Design fixes contracts, funnels and invariants, not code: what you leave to the implementer is reviewed once it exists, while code you write into the plan is frozen before anyone has seen it.
 5. If the spec leaves a decision open that changes the design and evidence cannot settle it, ask through `questions.md`.
 
 ## Mode `revise`
 
-Your prompt names the files with findings: the two review files, or `plan-audit.md`.
+Your prompt names the files with findings: the two review files, `plan-audit.md`, or a design review `review-D<n>.md`. For a design review, the plan is frozen except for its `## Design` and the steps whose `Status:` is `pending`. Edit only those.
 
 1. Handle every finding. Under each one in its file, add one line:
    - `Disposition: applied: <what changed in plan.md>`
@@ -22,6 +22,7 @@ Your prompt names the files with findings: the two review files, or `plan-audit.
 4. Change the approach if the findings require it. The plan is not frozen until the audit approves it.
 5. If applying a finding needs a user decision, ask through `questions.md`.
 6. After editing, re-check that every `R` and `AC` is still covered and the steps still build in order.
+7. When the findings came from the two review files, end your `SUMMARY` with `RECHECK: yes` if you rejected a finding, or if the revision added or changed a type, signature, funnel, ownership boundary or data flow. Otherwise end it with `RECHECK: no`.
 
 ## Changing the spec
 

@@ -14,7 +14,7 @@ Fix altitude: end-to-end | local
 <the strategy, 2 to 4 sentences>
 
 ## Design
-<types, ownership, data flow, error handling: only what the steps need, with path:line anchors into existing code>
+<types, ownership, funnels, invariants, data flow, error handling: only what the steps need, with path:line anchors into existing code. For each question several sites ask, name the one function that answers it and its inputs. State an algorithm by its contract, invariant and termination, not its body. No loop bodies or scratch variables: those are the implementer's.>
 
 ## Steps
 
@@ -35,6 +35,7 @@ Fix altitude: end-to-end | local
 ## Verification
 - Formatter: `<command>` (source: path:line)
 - Full suite: `<command>` (source: path:line)
+- Measurements: `<command>` → AC<n>, budget <number> | none (`## Hot paths` in spec.md is `None`)
 - Manual checks: <if any>
 
 ## Out of scope
@@ -45,6 +46,8 @@ Fix altitude: end-to-end | local
 
 - Every requirement `R<n>` and acceptance criterion `AC<n>` in `spec.md` appears in at least one step's `Covers:`.
 - Each step leaves the tree building and its tests passing, and is one coherent commit.
+- A step is one reviewable unit: split a step expected to change more than about 400 lines into steps that each build and pass.
+- Every entry under `## Hot paths` in `spec.md` has a step that measures it against its budget AC on the slowest configuration the spec names, with a bench or a call count through a counting test double. Its command appears under `## Verification` as a `Measurements:` line.
 - Every type, function or module the plan introduces has a caller within the plan.
 - Defer only what is strictly additive: a new command, flag or isolated module that can be added later without changing existing data structures, signatures or boundaries. Anything else is implemented now.
 - No compatibility shims, deprecated aliases or re-exports unless the spec requires them.
