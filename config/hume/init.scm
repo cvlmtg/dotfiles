@@ -35,6 +35,7 @@
 (bind-key! 'normal "space u" "undotree/toggle")
 (bind-key! 'normal "space g" "grep/picker")
 (bind-key! 'normal "space k" "lsp/hover")
+(bind-key! 'normal "enter" "toggle-fold")
 (bind-key! 'normal "{" "goto-prev-tab")
 (bind-key! 'normal "}" "goto-next-tab")
 (bind-key! 'normal "\\" "goto-alternate-buffer")
