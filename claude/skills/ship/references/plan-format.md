@@ -55,8 +55,10 @@ Fix altitude: end-to-end | local
 
 ## Tags
 
-The tag picks the implementer's model, so tag by how much judgment the step needs, not by size.
+The tag picks the implementer's model, so tag by how much judgment the step needs and how much risk it carries, not by size.
 
 - `mechanical`: no decisions left. Every edit is specified: renames, wiring, config, documentation from given content.
 - `standard`: implements the specified design using patterns that already exist in the codebase. Only local decisions.
 - `complex`: new algorithms, concurrency, subtle invariants, cross-module refactors, or decisions the plan cannot fully pin down.
+
+A step that changes authentication, authorization, secret handling, persisted data, or an interface outside callers rely on is at least `standard`, even when every edit is specified.

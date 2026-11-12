@@ -1,6 +1,7 @@
 ---
 name: ship
 description: Plan and implement a feature end to end with a team of subagents. Refines the prompt or spec, drafts a plan, has it challenged and audited, then implements, reviews and commits each step, and finishes with a fidelity audit, a plan-blind quality pass, and one full verification run with measurements. Runs autonomously; stops only for spec questions that evidence cannot settle and for deviations that need the user. Use when the user says "/ship", "ship this", "plan and build X", or hands over a prompt or spec file and wants it implemented hands-off.
+model: opus
 ---
 
 # Ship
@@ -42,10 +43,13 @@ Run artifacts (all inside `RUN`):
 
 ## Models
 
-This table is the only place models are assigned. Pass `model` on every Agent call.
+This table is the only place models are assigned; the orchestrator's row is set by `model:` in this file's frontmatter. Pass `model` on every Agent call.
+
+The frontmatter model holds until the user's next typed prompt, after which the session model applies. `/ship resume` sets it again.
 
 | Role | Prompt file | Model |
 |---|---|---|
+| orchestrator | `SKILL.md` | opus |
 | scout | `agents/scout.md` | sonnet |
 | spec analyst | `agents/spec-analyst.md` | opus |
 | planner | `agents/planner.md` | opus; fable when complexity is XL |
@@ -144,7 +148,7 @@ Either way the output is `review-challenge.md` and `review-architecture.md`, and
 
 Spawn the plan auditor. It fixes local defects in `plan.md` itself and writes `plan-audit.md` with a verdict.
 
-- `approved`: the plan is frozen. Go to Phase 6.
+- `approved`: the plan is frozen. Print one line per step to the user: number, title, tag, and the implementer model the tag selects. Do not wait for an answer. Go to Phase 6.
 - `structural`: resume the planner in `revise` mode with `plan-audit.md`, then spawn a fresh plan auditor. Allow this once. A second `structural` verdict stops the run: report the open issues to the user.
 
 ## Phase 6: Build
