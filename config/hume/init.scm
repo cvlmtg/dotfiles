@@ -142,10 +142,16 @@
 
 ; Off when inline diff is on, pointing the gutter signs back at HEAD first (the
 ; ref is shared with the signs; show-inline-diff sets it, the toggle then turns
-; inline off). Otherwise on against HEAD when the tree is dirty
+; inline off). Otherwise on against the index (":0", stage 0) when the file has
+; staged changes (`git diff --cached --quiet -- <file>` exits 1), so it shows
+; what a plain `git diff` shows, and works for a file HEAD does not have yet.
+; Without staged changes, on against HEAD when the tree is dirty
 ; (`git diff --quiet` exits 1), HEAD^ when it is clean (exits 0).
+(define (log-git-diff-failure result)
+  (log! 'warning (string-append "git diff failed: " (trim (hash-ref result 'stderr)))))
+
 (define-command! "toggle-inline-diff-auto"
-  "Toggle inline git diff: against HEAD when the tree is dirty, HEAD^ when clean."
+  "Toggle inline git diff: against the index when the file has staged changes, else against HEAD when the tree is dirty, HEAD^ when clean."
   (lambda (pane)
     (if (call! "git-diff/inline-diff?" pane)
         (begin
@@ -153,14 +159,21 @@
           (call! "git-diff/toggle-inline-diff" pane))
         (let ([path (buffer-path pane)])
           (when path
-            (spawn-async! "git" '("diff" "--quiet" "HEAD")
-              (lambda (result)
-                (let ([code (hash-ref result 'exit)])
-                  (cond [(equal? code 0) (call! "git-diff/show-inline-diff" pane "HEAD^")]
-                        [(equal? code 1) (call! "git-diff/show-inline-diff" pane "HEAD")]
-                        [else (log! 'warning (string-append "git diff failed: "
-                                                            (trim (hash-ref result 'stderr))))])))
-              #:cwd (parent-name path)))))))
+            (let ([cwd (parent-name path)])
+              (spawn-async! "git" (list "diff" "--cached" "--quiet" "--" (file-name path))
+                (lambda (staged)
+                  (let ([code (hash-ref staged 'exit)])
+                    (cond [(equal? code 1) (call! "git-diff/show-inline-diff" pane ":0")]
+                          [(equal? code 0)
+                           (spawn-async! "git" '("diff" "--quiet" "HEAD")
+                             (lambda (result)
+                               (let ([code (hash-ref result 'exit)])
+                                 (cond [(equal? code 0) (call! "git-diff/show-inline-diff" pane "HEAD^")]
+                                       [(equal? code 1) (call! "git-diff/show-inline-diff" pane "HEAD")]
+                                       [else (log-git-diff-failure result)])))
+                             #:cwd cwd)]
+                          [else (log-git-diff-failure staged)])))
+                #:cwd cwd)))))))
 
 (bind-key! 'normal "space d" "toggle-inline-diff-auto")
 
