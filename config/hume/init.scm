@@ -9,6 +9,7 @@
 (load-plugin! "core:undotree")
 (load-plugin! "core:git-diff")
 (load-plugin! "core:steel-server")
+(load-plugin! "core:markdown-preview")
 
 ; ---------------------------------------------------------------------
 
