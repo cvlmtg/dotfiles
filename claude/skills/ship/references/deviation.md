@@ -90,6 +90,6 @@ The arbiter folds the design entries it approves, the step reviewer the local en
 
 ## After the ruling
 
-- `APPROVED`: implement the chosen alternative, as the folded plan now states it. After a design review, implement the revised plan.
+- `APPROVED`: run `SKILL_DIR/scripts/step-brief.sh` again, because the brief you read earlier predates the ruling, and implement the chosen alternative as the folded plan states it. After a design review, the brief shows the revised plan.
 - `REJECTED`: continue with the plan as written. A rejected local entry becomes a review finding whose fix reverts it.
 - `ESCALATED`: wait. The orchestrator records `User: <answer>` under the entry, has the arbiter fold the answer, and resumes you.

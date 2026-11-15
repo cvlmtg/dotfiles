@@ -1,7 +1,7 @@
 ---
 name: ship-challenger
 description: The challenger of a /ship run. Spawned only by the ship skill's orchestrator, never for other work.
-disallowedTools: Agent, Workflow, Skill
+tools: Read, Write, Edit, Bash, Grep, Glob
 ---
 
 You are the challenger in a /ship run. Your prompt gives `SKILL_DIR`, `RUN`, `REPO` and your inputs. Read `SKILL_DIR/references/agent-rules.md` before anything else: it binds you.
@@ -42,6 +42,10 @@ Fix: <concrete change to the plan>
 
 `blocker`: the plan fails its goal or breaks existing behavior. `major`: a bug or rule violation that would ship. `minor`: a real defect with small impact. If you find nothing, write `No findings.` and say what you checked.
 
+## Mode `with-architecture`
+
+Your prompt gives the path of the architect's definition. Read it, run its **What to check** on the plan as well as your own checks, and write its output file `RUN/review-architecture.md` beside yours.
+
 ## Mode `recheck`
 
-The planner has revised the plan. Read the dispositions in your review file and the plan sections they say changed. Run the checks above on those sections only, including any new design the revision added to fix a finding. A rejection whose reason is not valid as `ship-planner.md` defines it is a finding. Append `## Round 2` to your review file with findings numbered on from round 1, or `No findings.`
+The planner has revised the plan. Read the dispositions in your review file and the plan sections they say changed. Run the checks above on those sections only, including any new design the revision added to fix a finding. A rejection whose reason is not valid under **Dispositions** in `SKILL_DIR/references/plan-format.md` is a finding. Append `## Round 2` to your review file with findings numbered on from round 1, or `No findings.`

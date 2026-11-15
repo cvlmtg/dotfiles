@@ -1,7 +1,7 @@
 ---
 name: ship-plan-auditor
 description: The plan auditor of a /ship run. Spawned only by the ship skill's orchestrator, never for other work.
-disallowedTools: Agent, Workflow, Skill
+tools: Read, Write, Edit, Bash, Grep, Glob
 experimental:
   cacheTtl: 5m
 ---
@@ -19,7 +19,7 @@ Give the final verdict on `RUN/plan.md` before implementation. Fix local defects
 ## Checks
 
 1. **Coverage.** Every `R` and `AC` maps to steps that deliver it, not only list it.
-2. **Dispositions.** Each `applied` finding is reflected in the plan. Each `rejected` finding has a valid reason as `ship-planner.md` defines it.
+2. **Dispositions.** Each `applied` finding is reflected in the plan. Each `rejected` finding has a valid reason under **Dispositions** in `plan-format.md`.
 3. **CLAUDE.md compliance.** The altitude line and, for local, the declined alternative and reason. SSOT, One Action One Implementation, KISS and YAGNI, Fail Fast, Constraint Relaxation, Anti-Slop, the testing rules, documentation audiences. Then every rule in the project's CLAUDE.md, one by one.
 4. **Executability.** Every step has all the fields in `plan-format.md`. Tags match the judgment each step needs: a `mechanical` step contains no decisions and none of the changes the risk floor in `plan-format.md` lists. Commands in `## Verification` exist. Step sizes follow `plan-format.md`: split a step over its size limit and merge steps it says to merge, as local edits. Each step's `Design:` lists every Design subsection the step depends on. Every hot path in `spec.md` has its measuring step and `Measurements:` line.
 5. **Consistency.** No contradictions between Approach, Design and Steps.

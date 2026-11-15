@@ -56,7 +56,7 @@ The frontmatter model holds until the user's next typed prompt, after which the 
 | planner | `ship-planner` | opus; fable when complexity is XL |
 | challenger | `ship-challenger` | opus; fable when complexity is XL |
 | architect | `ship-architect` | opus; fable when complexity is XL |
-| plan reviewer (complexity S or M) | `ship-challenger`, also running the architect's checks | opus |
+| plan reviewer (complexity S or M) | `ship-challenger` in `with-architecture` mode | opus |
 | plan auditor | `ship-plan-auditor` | opus |
 | implementer | `ship-implementer` | step tag `mechanical` haiku, `standard` sonnet, `complex` opus; fix mode sonnet; quality-fix mode opus |
 | step reviewer | `ship-step-reviewer` | sonnet; opus when the step is `complex`, and for the `quality` review |
@@ -75,7 +75,7 @@ REPO: <REPO>
 <role inputs: mode, step number, files to act on, base commit>
 ```
 
-An agent's final message is only its status block (defined in `references/agent-rules.md`). Read the files it lists only when your next action needs them, and then only the section you need: your context is resent on every turn of the run.
+An agent's final message is only its status block (defined in `references/agent-rules.md`). Its `VERDICT:` line carries the verdict or ruling of the file the agent wrote: route on it without opening the file. Read a file an agent lists only when your next action needs its content, and then only the section you need: your context is resent on every turn of the run.
 
 - `done`: continue.
 - `questions`: see **Asking the user**, then resume the same agent with `SendMessage`, passing the answers.
@@ -92,14 +92,14 @@ Read `RUN/questions.md` and ask with `AskUserQuestion`, at most 4 questions per 
 
 A deviation is defined in `references/deviation.md`. The requesting agent appends an entry `D<n>` to `deviations.md`.
 
-A `Scope: local` entry gets no arbiter. The implementer applies it and continues, and the step reviewer rules on it in that step's review. When a review returns, check `deviations.md` for `Status: needs arbiter`. Handle each such entry as a design entry below, then resume the implementer with the ruling.
+A `Scope: local` entry gets no arbiter. The implementer applies it and continues, and the step reviewer rules on it in that step's review. A step reviewer that finds such an entry is not local names it in its `SUMMARY` as `NEEDS ARBITER: D<n>`. Handle each such entry as a design entry below, then resume the implementer with the ruling.
 
 A `Scope: design` entry comes with status `deviation`:
 
 1. Spawn the arbiter with the entry ID.
 2. Ruling `APPROVED` or `REJECTED`: resume the requesting agent with the ruling.
 3. Ruling `ESCALATED`: ask the user the question the arbiter wrote under the entry, record the answer as `User: <answer>` under it, resume the arbiter with the answer so it folds it into the plan, then resume the requesting agent. A folded answer that changes a type, signature, ownership boundary or data flow a `pending` step uses goes to design review as in 4.
-4. Ruling `APPROVED (<letter>, design review)`: before resuming, spawn the architect in `design-review D<n>` mode with the base commit. It writes `RUN/review-D<n>.md`. If that file has findings, spawn the planner in `revise` mode with it. The planner edits only the plan's `## Design` and steps whose `Status:` is `pending`, and adds a disposition under each finding. Then resume the requesting agent with the ruling and the revised plan.
+4. Ruling `APPROVED (<letter>, design review)`: before resuming, spawn the architect in `design-review D<n>` mode with the base commit. It writes `RUN/review-D<n>.md`. If its verdict is `findings`, spawn the planner in `revise` mode with it. The planner edits only the plan's `## Design` and steps whose `Status:` is `pending`, and adds a disposition under each finding. Then resume the requesting agent with the ruling and the revised plan.
 
 Never rule on a deviation yourself.
 
@@ -133,7 +133,7 @@ Spawn the planner in `draft` mode. It writes `plan.md`.
 ## Phase 3: Review
 
 - Complexity `L` or `XL`: spawn the challenger and the architect in one message so they run in parallel.
-- Complexity `S` or `M`: spawn one plan reviewer. Its prompt adds `Also run the checks of AGENTS/ship-architect.md and write its review file.` It runs both sets of checks.
+- Complexity `S` or `M`: spawn one plan reviewer, the challenger in `with-architecture` mode, and give it the absolute path of `AGENTS/ship-architect.md`. It runs both sets of checks.
 
 Either way the output is `review-challenge.md` and `review-architecture.md`, and nobody edits the plan.
 
@@ -158,7 +158,7 @@ For each step in `plan.md` whose `Status:` is `pending`, in order:
 2. Spawn the step reviewer for step `N`. It writes `steps/<N>/review-1.md` with verdict `pass` or `fix`.
 3. On `fix`: resume the implementer with the review file, then resume the reviewer for round 2 (`review-2.md`). At most 2 fix rounds.
 4. Still `fix` after round 2: spawn a new implementer one model tier higher (haiku to sonnet, sonnet to opus, opus to fable) with every report and review of the step, and a new reviewer. One attempt. Still `fix`: stop and report to the user.
-5. On `pass`: run `SKILL_DIR/scripts/commit-step.sh RUN N "<trailer>"`, passing the session's commit attribution trailer as the third argument if the harness provides one. It commits everything with the message at the end of `report.md`, sets the step's `Status:` to `done (<short hash>)` and prints the hash. If a hook rejects the commit, treat its output as a review finding and go to step 3.
+5. On `pass`: run `SKILL_DIR/scripts/commit-step.sh RUN N "<trailer>"`, passing the session's commit attribution trailer as the third argument if the harness provides one. It commits everything with the message at the end of `report.md`, sets the step's `Status:` to `done (<short hash>)` and prints the hash. For `final`, `quality` and `verify` it prints `none` when the round changed no file, which happens when every finding was disputed and withdrawn. If a hook rejects the commit, treat its output as a review finding and go to step 3.
 
 Update `Phase:` in `state.md` at each phase change.
 
@@ -174,7 +174,7 @@ The final audit asks whether the code matches the plan. This phase asks whether 
 1. Spawn the quality reviewers with the base commit and a lens. Pass no path to `plan.md`, `spec.md`, `deviations.md` or any review. Each writes `RUN/quality/<lens>.md`.
    - Complexity `L` or `XL`: four reviewers in one message, one per lens: `reuse`, `simplification`, `efficiency`, `altitude`.
    - Complexity `S` or `M`: one reviewer with lens `all`.
-2. If any file has findings: spawn the implementer in `quality-fix` mode, then the step reviewer on that diff (step `quality`, files under `steps/quality/`). Run fix rounds and commit as in Phase 6. One cycle; findings still open go to the final report.
+2. If any reviewer's verdict is `findings`: spawn the implementer in `quality-fix` mode, then the step reviewer on that diff (step `quality`, files under `steps/quality/`). Run fix rounds and commit as in Phase 6. One cycle; findings still open go to the final report.
 
 ## Phase 8: Verify
 

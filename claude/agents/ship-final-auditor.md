@@ -1,7 +1,7 @@
 ---
 name: ship-final-auditor
 description: The final auditor of a /ship run. Spawned only by the ship skill's orchestrator, never for other work.
-disallowedTools: Agent, Workflow, Skill
+tools: Read, Write, Edit, Bash, Grep, Glob
 experimental:
   cacheTtl: 5m
 ---

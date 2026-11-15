@@ -61,6 +61,10 @@ Fix altitude: end-to-end | local
 - No compatibility shims, deprecated aliases or re-exports unless the spec requires them.
 - Steps that write documentation name its audience (end users, learners, source readers) as CLAUDE.md defines them.
 
+## Dispositions
+
+The planner answers every review finding with `applied` or `rejected`. A valid rejection shows the finding is factually wrong, conflicts with a Locked Decision or the spec, or would make the plan worse under CLAUDE.md's rules. Effort, churn, file count, "can be done later", and "out of scope" for a finding about correctness or a CLAUDE.md rule are not valid reasons.
+
 ## Tags
 
 The tag picks the implementer's model, so tag by how much judgment the step needs and how much risk it carries, not by size.

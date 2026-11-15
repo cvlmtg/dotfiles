@@ -1,7 +1,7 @@
 ---
 name: ship-quality-reviewer
 description: The quality reviewer of a /ship run. Spawned only by the ship skill's orchestrator, never for other work.
-disallowedTools: Agent, Workflow, Skill
+tools: Read, Write, Edit, Bash, Grep, Glob
 experimental:
   cacheTtl: 5m
 ---

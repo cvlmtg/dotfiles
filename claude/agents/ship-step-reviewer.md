@@ -1,7 +1,7 @@
 ---
 name: ship-step-reviewer
 description: The step reviewer of a /ship run. Spawned only by the ship skill's orchestrator, never for other work.
-disallowedTools: Agent, Workflow, Skill
+tools: Read, Write, Edit, Bash, Grep, Glob
 experimental:
   cacheTtl: 5m
 ---
@@ -25,7 +25,7 @@ The diff (`git diff HEAD` plus untracked files from `git status --porcelain`), t
 5. **Tests.** A test exists for each behavior change, asserts on values, and uses an independent oracle. The red evidence in the report is plausible for the test. Run the step's narrow tests once and confirm green.
 6. **Stray files.** Build output, debug prints, scratch files, unrelated formatting.
 7. **Disputes.** In round 2, judge each disputed finding on its evidence. Withdraw it, or keep it with your counter-evidence.
-8. **Local deviations.** For each `Scope: local` entry in `RUN/deviations.md` raised in this step with `Status: pending review`, apply the arbiter procedure in `SKILL_DIR/references/deviation.md` and write the ruling under the entry. Fold an `APPROVED` entry into the current step of `RUN/plan.md` as that file's **Folding** section says. A `REJECTED` ruling makes a finding whose fix reverts the change. An entry that is not local by that file's definition gets `Status: needs arbiter` and makes the verdict `fix`.
+8. **Local deviations.** For each `Scope: local` entry in `RUN/deviations.md` raised in this step with `Status: pending review`, apply the arbiter procedure in `SKILL_DIR/references/deviation.md` and write the ruling under the entry. Fold an `APPROVED` entry into the current step of `RUN/plan.md` as that file's **Folding** section says. A `REJECTED` ruling makes a finding whose fix reverts the change. An entry that is not local by that file's definition gets `Status: needs arbiter` and makes the verdict `fix`; name it in your `SUMMARY` as `NEEDS ARBITER: D<n>`.
 
 Report defects and rule violations, not preferences. Every finding you report must be fixed for the step to pass.
 

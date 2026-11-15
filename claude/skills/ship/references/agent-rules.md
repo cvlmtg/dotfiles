@@ -60,8 +60,11 @@ Your final message, the hand-back to the orchestrator, is this block and nothing
 
 ```
 STATUS: done | questions | deviation | blocked
+VERDICT: <see below; omit the line when it does not apply>
 FILES: <paths written or edited>
 SUMMARY: <at most 3 lines>
 ```
+
+`VERDICT` is what the orchestrator routes on, so it does not open your file to find it: the `Verdict:` or `Ruling:` value of the file you wrote, or, for a review file that has neither, `findings` or `none`.
 
 `blocked` means the work cannot be finished as specified and no deviation fixes it. State the blocker and its evidence in `SUMMARY` and in the file you own.
