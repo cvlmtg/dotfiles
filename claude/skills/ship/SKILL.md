@@ -17,6 +17,7 @@ You are the orchestrator. You route work between subagents, track state, ask the
 ## Paths
 
 - `SKILL_DIR`: absolute path of this skill's directory (normally `$HOME/.claude/skills/ship`).
+- `AGENTS`: `$HOME/.claude/agents/`, which holds one agent definition per role, `ship-<role>.md`. The body of each is that agent's system prompt.
 - `REPO`: `git rev-parse --show-toplevel`.
 - `RUN`: `$HOME/.claude/ship-runs/<basename of REPO>/<slug>/`, absolute.
 
@@ -32,14 +33,14 @@ Run artifacts (all inside `RUN`):
 | `plan.md` | planner, plan auditor | the plan; step `Status:` lines are the step ledger |
 | `review-challenge.md`, `review-architecture.md` | reviewers, planner adds dispositions | plan findings, round 1 and round 2 |
 | `plan-audit.md` | plan auditor | audit verdict and edits |
-| `deviations.md` | requesting agent, arbiter, step reviewer | deviation requests and rulings |
+| `deviations.md` | requesting agent, arbiter, step reviewer | log of deviation requests and rulings; approved entries are folded into `plan.md` and `spec.md` |
 | `review-D<n>.md` | architect, planner adds dispositions | design review after a deviation changed the design |
 | `steps/<N>/report.md`, `steps/<N>/review-<r>.md` | implementer, step reviewer | per-step evidence |
 | `final-audit.md` | final auditor | fidelity verdict |
 | `quality/<lens>.md` | quality reviewers | plan-blind quality findings |
 | `verify.log` | orchestrator | formatter, full-suite and measurement output |
 
-`spec.md` is frozen after Phase 1 and `plan.md` after Phase 5. From then on they change only through `deviations.md` and the design reviews a deviation triggers. The exceptions: you append user answers to `## Locked Decisions` and update step `Status:` lines.
+`spec.md` is frozen after Phase 1 and `plan.md` after Phase 5. From then on they change only when a ruling folds an approved deviation into them (`references/deviation.md`, **Folding**) and through the design reviews a deviation triggers. The exceptions: you append user answers to `## Locked Decisions`, and `scripts/commit-step.sh` updates step `Status:` lines.
 
 ## Models
 
@@ -47,37 +48,34 @@ This table is the only place models are assigned; the orchestrator's row is set 
 
 The frontmatter model holds until the user's next typed prompt, after which the session model applies. `/ship resume` sets it again.
 
-| Role | Prompt file | Model |
+| Role | Agent type | Model |
 |---|---|---|
 | orchestrator | `SKILL.md` | opus |
-| scout | `agents/scout.md` | sonnet |
-| spec analyst | `agents/spec-analyst.md` | opus |
-| planner | `agents/planner.md` | opus; fable when complexity is XL |
-| challenger | `agents/challenger.md` | opus; fable when complexity is XL |
-| architect | `agents/architect.md` | opus; fable when complexity is XL |
-| plan reviewer (complexity S or M) | `agents/challenger.md` and `agents/architect.md` | opus |
-| plan auditor | `agents/plan-auditor.md` | opus |
-| implementer | `agents/implementer.md` | step tag `mechanical` haiku, `standard` sonnet, `complex` opus; fix mode sonnet; quality-fix mode opus |
-| step reviewer | `agents/step-reviewer.md` | sonnet; opus when the step is `complex`, and for the `quality` review |
-| arbiter | `agents/arbiter.md` | opus |
-| final auditor | `agents/final-auditor.md` | opus |
-| quality reviewer | `agents/quality-reviewer.md` | opus |
+| scout | `ship-scout` | sonnet |
+| spec analyst | `ship-spec-analyst` | opus |
+| planner | `ship-planner` | opus; fable when complexity is XL |
+| challenger | `ship-challenger` | opus; fable when complexity is XL |
+| architect | `ship-architect` | opus; fable when complexity is XL |
+| plan reviewer (complexity S or M) | `ship-challenger`, also running the architect's checks | opus |
+| plan auditor | `ship-plan-auditor` | opus |
+| implementer | `ship-implementer` | step tag `mechanical` haiku, `standard` sonnet, `complex` opus; fix mode sonnet; quality-fix mode opus |
+| step reviewer | `ship-step-reviewer` | sonnet; opus when the step is `complex`, and for the `quality` review |
+| arbiter | `ship-arbiter` | opus |
+| final auditor | `ship-final-auditor` | opus |
+| quality reviewer | `ship-quality-reviewer` | opus |
 
 ## Spawning agents
 
-Use the Agent tool with `subagent_type: "general-purpose"`, the model from the table, and this prompt:
+Use the Agent tool with the agent type and the model from the table, and this prompt:
 
 ```
-You are the <role> in a /ship run.
-Your instructions: <SKILL_DIR>/agents/<file>.md
-Rules for every agent: <SKILL_DIR>/references/agent-rules.md
 SKILL_DIR: <SKILL_DIR>
 RUN: <RUN>
 REPO: <REPO>
 <role inputs: mode, step number, files to act on, base commit>
 ```
 
-Every agent ends with a status block (defined in `references/agent-rules.md`):
+An agent's final message is only its status block (defined in `references/agent-rules.md`). Read the files it lists only when your next action needs them, and then only the section you need: your context is resent on every turn of the run.
 
 - `done`: continue.
 - `questions`: see **Asking the user**, then resume the same agent with `SendMessage`, passing the answers.
@@ -100,7 +98,7 @@ A `Scope: design` entry comes with status `deviation`:
 
 1. Spawn the arbiter with the entry ID.
 2. Ruling `APPROVED` or `REJECTED`: resume the requesting agent with the ruling.
-3. Ruling `ESCALATED`: ask the user the question the arbiter wrote under the entry, record the answer as `User: <answer>` under it, then resume the requesting agent.
+3. Ruling `ESCALATED`: ask the user the question the arbiter wrote under the entry, record the answer as `User: <answer>` under it, resume the arbiter with the answer so it folds it into the plan, then resume the requesting agent. A folded answer that changes a type, signature, ownership boundary or data flow a `pending` step uses goes to design review as in 4.
 4. Ruling `APPROVED (<letter>, design review)`: before resuming, spawn the architect in `design-review D<n>` mode with the base commit. It writes `RUN/review-D<n>.md`. If that file has findings, spawn the planner in `revise` mode with it. The planner edits only the plan's `## Design` and steps whose `Status:` is `pending`, and adds a disposition under each finding. Then resume the requesting agent with the ruling and the revised plan.
 
 Never rule on a deviation yourself.
@@ -108,8 +106,9 @@ Never rule on a deviation yourself.
 ## Phase 0: Setup
 
 1. Stop if not inside a git repository, or if `git status --porcelain` is not empty. Report it; never stash, commit or discard the user's changes.
-2. Choose a kebab-case slug of 2 to 5 words. If `RUN` exists, append `-2`, `-3`, and so on.
-3. Write `input.md` and `state.md`. The run commits on the current branch:
+2. Stop if `AGENTS/ship-implementer.md` does not exist, and tell the user to link the agents directory of their dotfiles to `~/.claude/agents`.
+3. Choose a kebab-case slug of 2 to 5 words. If `RUN` exists, append `-2`, `-3`, and so on.
+4. Write `input.md` and `state.md`. The run commits on the current branch:
 
 ```
 # Ship run: <slug>
@@ -134,7 +133,7 @@ Spawn the planner in `draft` mode. It writes `plan.md`.
 ## Phase 3: Review
 
 - Complexity `L` or `XL`: spawn the challenger and the architect in one message so they run in parallel.
-- Complexity `S` or `M`: spawn one plan reviewer. Its prompt names both instruction files; it runs both sets of checks.
+- Complexity `S` or `M`: spawn one plan reviewer. Its prompt adds `Also run the checks of AGENTS/ship-architect.md and write its review file.` It runs both sets of checks.
 
 Either way the output is `review-challenge.md` and `review-architecture.md`, and nobody edits the plan.
 
@@ -159,8 +158,7 @@ For each step in `plan.md` whose `Status:` is `pending`, in order:
 2. Spawn the step reviewer for step `N`. It writes `steps/<N>/review-1.md` with verdict `pass` or `fix`.
 3. On `fix`: resume the implementer with the review file, then resume the reviewer for round 2 (`review-2.md`). At most 2 fix rounds.
 4. Still `fix` after round 2: spawn a new implementer one model tier higher (haiku to sonnet, sonnet to opus, opus to fable) with every report and review of the step, and a new reviewer. One attempt. Still `fix`: stop and report to the user.
-5. On `pass`: `git add -A`, then commit with the message drafted at the end of `report.md`, adding the session's commit attribution trailer if the harness provides one. If a hook rejects the commit, treat its output as a review finding and go to step 3.
-6. Set the step's line to `- Status: done (<short hash>)` in `plan.md`.
+5. On `pass`: run `SKILL_DIR/scripts/commit-step.sh RUN N "<trailer>"`, passing the session's commit attribution trailer as the third argument if the harness provides one. It commits everything with the message at the end of `report.md`, sets the step's `Status:` to `done (<short hash>)` and prints the hash. If a hook rejects the commit, treat its output as a review finding and go to step 3.
 
 Update `Phase:` in `state.md` at each phase change.
 

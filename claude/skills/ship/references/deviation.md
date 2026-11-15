@@ -60,7 +60,7 @@ The arbiter applies it to design entries, and the step reviewer to local ones. A
 
 A step reviewer that finds a `Scope: local` entry is not local by the definition above does not rule on it. It sets `Status: needs arbiter`.
 
-Write the ruling under the entry and set `Status:` to the ruling:
+Write the ruling under the entry and set `Status:` to the ruling. An `APPROVED` ruling also folds the entry into the plan (see **Folding**).
 
 ```
 Ruling: <ruling>
@@ -76,8 +76,20 @@ Options:
 2. <alternative>: <consequence>
 ```
 
+## Folding
+
+`plan.md` and `spec.md` state the plan as it stands; `deviations.md` is the record of why it changed. Agents that implement or review a step read the plan, not this log.
+
+Whoever approves an entry edits the frozen artifacts to state the chosen alternative before the requesting agent resumes:
+
+- the `## Design` subsections it changes, and the steps it changes whose `Status:` is `pending`, plus the current step; never a `done` step;
+- `spec.md`, when the entry changes it;
+- the entry's ID added to the `Deviations:` line of each step it edited.
+
+The arbiter folds the design entries it approves, the step reviewer the local entries it approves. For an `ESCALATED` entry the orchestrator resumes the arbiter with the user's answer, and the arbiter folds the alternative the user chose, if it changes the plan.
+
 ## After the ruling
 
-- `APPROVED`: implement the chosen alternative. The approved entry is part of the effective plan from now on. After a design review, the revised plan is too.
+- `APPROVED`: implement the chosen alternative, as the folded plan now states it. After a design review, implement the revised plan.
 - `REJECTED`: continue with the plan as written. A rejected local entry becomes a review finding whose fix reverts it.
-- `ESCALATED`: wait. The orchestrator records `User: <answer>` under the entry and resumes you.
+- `ESCALATED`: wait. The orchestrator records `User: <answer>` under the entry, has the arbiter fold the answer, and resumes you.
