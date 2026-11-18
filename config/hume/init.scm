@@ -8,8 +8,9 @@
 (load-plugin! "core:lsp-install")
 (load-plugin! "core:undotree")
 (load-plugin! "core:git-diff")
+(load-plugin! "core:colorizer")
 (load-plugin! "core:steel-server")
-(load-plugin! "core:markdown-preview")
+(load-plugin! "core:markdown")
 
 ; ---------------------------------------------------------------------
 
@@ -18,14 +19,16 @@
   '()
   '("MacroRecording" "Pipe" "SearchMatches" "Diagnostics" "KittyProtocol" "Separator" "Mode"))
 
+(set-option! "session-root" (or (call! "stdlib/git-toplevel") (cwd)))
+(set-option! "session-persist" #t)
+(set-option! "undo-persist" #t)
+
+(set-option! "hook-viewport-debounce-ms" 20)
 (set-option! "whitespace-space" "trailing")
 (set-option! "whitespace-tab" "all")
 (set-option! "indent-style" "soft")
 (set-option! "indent-width" 2)
 (set-option! "gutter-signs" "always:2")
-(set-option! "undo-persist" #t)
-(set-option! "session-persist" #t)
-(set-option! "session-root" (or (call! "stdlib/git-toplevel") (cwd)))
 
 ; ---------------------------------------------------------------------
 
