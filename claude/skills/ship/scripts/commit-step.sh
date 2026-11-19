@@ -1,8 +1,9 @@
 #!/bin/sh
 # Commits the whole working tree with the message under `## Commit message` in
-# RUN/steps/STEP/report.md, followed by TRAILER when given. For a numbered plan
-# step it then sets the step's Status line in plan.md to done. Prints the short
-# hash. A hook that rejects the commit fails the script with the hook's output.
+# RUN/steps/STEP/implementation.md, followed by TRAILER when given. For a
+# numbered plan step it then sets the step's Status line in plan.md to done.
+# Prints the short hash. A hook that rejects the commit fails the script with
+# the hook's output.
 # A fix round (a STEP that is not a number) with nothing to commit prints `none`;
 # a numbered step with nothing to commit fails.
 set -eu
@@ -10,7 +11,7 @@ set -eu
 [ $# -ge 2 ] && [ $# -le 3 ] || { echo "usage: commit-step.sh RUN STEP [TRAILER]" >&2; exit 2; }
 run=$1
 step=$2
-report=$run/steps/$step/report.md
+report=$run/steps/$step/implementation.md
 msg=$run/steps/$step/commit-msg.txt
 
 awk '/^## Commit message/ { on = 1; next } on && /^## / { exit } on && !/^```/' "$report" > "$msg"

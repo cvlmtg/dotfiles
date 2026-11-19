@@ -35,7 +35,7 @@ Run artifacts (all inside `RUN`):
 | `plan-audit.md` | plan auditor | audit verdict and edits |
 | `deviations.md` | requesting agent, arbiter, step reviewer | log of deviation requests and rulings; approved entries are folded into `plan.md` and `spec.md` |
 | `review-D<n>.md` | architect, planner adds dispositions | design review after a deviation changed the design |
-| `steps/<N>/report.md`, `steps/<N>/review-<r>.md` | implementer, step reviewer | per-step evidence |
+| `steps/<N>/implementation.md`, `steps/<N>/review-<r>.md` | implementer, step reviewer | per-step evidence |
 | `final-audit.md` | final auditor | fidelity verdict |
 | `quality/<lens>.md` | quality reviewers | plan-blind quality findings |
 | `verify.log` | orchestrator | formatter, full-suite and measurement output |
@@ -154,11 +154,11 @@ Spawn the plan auditor. It fixes local defects in `plan.md` itself and writes `p
 
 For each step in `plan.md` whose `Status:` is `pending`, in order:
 
-1. Spawn the implementer for step `N` with the model the step's tag selects. It writes `steps/<N>/report.md` and does not commit.
+1. Spawn the implementer for step `N` with the model the step's tag selects. It writes `steps/<N>/implementation.md` and does not commit.
 2. Spawn the step reviewer for step `N`. It writes `steps/<N>/review-1.md` with verdict `pass` or `fix`.
 3. On `fix`: resume the implementer with the review file, then resume the reviewer for round 2 (`review-2.md`). At most 2 fix rounds.
 4. Still `fix` after round 2: spawn a new implementer one model tier higher (haiku to sonnet, sonnet to opus, opus to fable) with every report and review of the step, and a new reviewer. One attempt. Still `fix`: stop and report to the user.
-5. On `pass`: run `SKILL_DIR/scripts/commit-step.sh RUN N "<trailer>"`, passing the session's commit attribution trailer as the third argument if the harness provides one. It commits everything with the message at the end of `report.md`, sets the step's `Status:` to `done (<short hash>)` and prints the hash. For `final`, `quality` and `verify` it prints `none` when the round changed no file, which happens when every finding was disputed and withdrawn. If a hook rejects the commit, treat its output as a review finding and go to step 3.
+5. On `pass`: run `SKILL_DIR/scripts/commit-step.sh RUN N "<trailer>"`, passing the session's commit attribution trailer as the third argument if the harness provides one. It commits everything with the message at the end of `implementation.md`, sets the step's `Status:` to `done (<short hash>)` and prints the hash. For `final`, `quality` and `verify` it prints `none` when the round changed no file, which happens when every finding was disputed and withdrawn. If a hook rejects the commit, treat its output as a review finding and go to step 3.
 
 Update `Phase:` in `state.md` at each phase change.
 

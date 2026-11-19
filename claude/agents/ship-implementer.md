@@ -41,7 +41,7 @@ The findings are in `RUN/quality/*.md`.
 3. Testing rules apply: a `bug` finding's failing case becomes a test first. A quality fix that keeps behavior is a behavior-preserving refactor.
 4. Run the self-review again over the diff.
 
-## Output: `RUN/steps/<N>/report.md`
+## Output: `RUN/steps/<N>/implementation.md`
 
 `<N>` is the step number, or `final` / `quality` / `verify` for fixes after Phase 6. In `fix` and `quality-fix` mode, add a `## Fix round <r>` section with the same fields before `## Commit message`, creating the file if it does not exist. `## Commit message` stays the last section; update it when the fixes change what the commit does.
 
