@@ -2,8 +2,8 @@
 # Commits the whole working tree with the message under `## Commit message` in
 # RUN/steps/STEP/implementation.md, followed by TRAILER when given. For a
 # numbered plan step it then sets the step's Status line in plan.md to done.
-# Prints the short hash. A hook that rejects the commit fails the script with
-# the hook's output.
+# Prints the short hash. A message body over five non-blank lines, or a hook
+# that rejects the commit, fails the script with the reason.
 # A fix round (a STEP that is not a number) with nothing to commit prints `none`;
 # a numbered step with nothing to commit fails.
 set -eu
@@ -16,6 +16,8 @@ msg=$run/steps/$step/commit-msg.txt
 
 awk '/^## Commit message/ { on = 1; next } on && /^## / { exit } on && !/^```/' "$report" > "$msg"
 grep -q '[^[:space:]]' "$msg" || { echo "commit-step: no commit message in $report" >&2; exit 1; }
+body=$(sed 1d "$msg" | grep -c '[^[:space:]]' || true)
+[ "$body" -le 5 ] || { echo "commit-step: commit message body is $body lines in $report; the limit is 5" >&2; exit 1; }
 [ $# -eq 3 ] && printf '\n%s\n' "$3" >> "$msg"
 
 git add -A

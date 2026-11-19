@@ -65,7 +65,7 @@ The findings are in `RUN/quality/*.md`.
 ## Commit message
 <type(scope): subject>
 
-<body: what and why; history, validation and rejected alternatives go here, not in code comments; never the plan, its steps or a deviation>
+<body: two to five lines, what changed and why, at the level of behaviour or design; no walkthrough of helpers, renames, tests or docs, which the diff shows; never the plan, its steps or a deviation>
 ```
 
 Do not commit.
