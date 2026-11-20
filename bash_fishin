@@ -161,6 +161,11 @@ function gt() {
   git log --graph --oneline --exclude=refs/stash --all --date-order
 }
 
+# git tree of the current branch
+function gtt() {
+  git log --graph --oneline --date-order
+}
+
 # PROMPT --------------------------------------------------------------
 
 shorten_path() {
